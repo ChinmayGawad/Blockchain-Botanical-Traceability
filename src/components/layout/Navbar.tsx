@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import { QRScannerModal } from '../verification/QRScannerModal';
+import { WalletConnectButton } from '../common/WalletConnectButton';
 
 export const Navbar: React.FC = () => {
   const { currentUser, role, switchRole, logout } = useAuth();
@@ -68,7 +69,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5 font-mono text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Hyperledger Fabric Mainnet: Active
+              Solidity EVM Chain: Active
             </span>
             <span className="hidden sm:inline text-slate-500">|</span>
             <span className="hidden sm:inline font-mono text-slate-400">
@@ -76,7 +77,7 @@ export const Navbar: React.FC = () => {
             </span>
             <span className="hidden md:inline text-slate-500">|</span>
             <span className="hidden md:inline text-slate-400">
-              Channel: <span className="text-slate-200">{networkStats.channelName}</span>
+              Contract: <span className="text-emerald-300 font-mono">{networkStats.contractAddress ? `${networkStats.contractAddress.substring(0, 8)}...${networkStats.contractAddress.substring(networkStats.contractAddress.length - 6)}` : '0x5FbDB2...'}</span>
             </span>
           </div>
 
@@ -166,6 +167,11 @@ export const Navbar: React.FC = () => {
 
           {/* Right Action Tools & Interactive Role Switcher */}
           <div className="flex items-center gap-2.5">
+            {/* Web3 Wallet Connect */}
+            <div className="hidden sm:block">
+              <WalletConnectButton />
+            </div>
+
             {/* Quick QR Scanner Button */}
             <button
               onClick={() => setIsQRScannerOpen(true)}

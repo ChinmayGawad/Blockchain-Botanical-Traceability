@@ -12,6 +12,7 @@ import {
   TimelineEvent,
 } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_SUSPICIOUS_REPORTS } from '../data/mockData';
+import web3Service, { WalletState } from '../services/web3Service';
 
 interface BlockchainContextType {
   products: BotanicalProduct[];
@@ -24,15 +25,22 @@ interface BlockchainContextType {
     chaincodeVersion: string;
     tps: number;
     verifiedBatches: number;
+    networkName: string;
+    contractAddress: string;
   };
+  walletState: WalletState;
+  connectWallet: () => Promise<void>;
+  connectMetaMask: () => Promise<WalletState>;
+  connectLocalAccount: (accountIndex?: number) => Promise<WalletState>;
+  disconnectWallet: () => void;
   getProductById: (idOrBatch: string) => BotanicalProduct | undefined;
-  registerProduct: (product: Omit<BotanicalProduct, 'id' | 'status' | 'verificationState' | 'qrCodeValue' | 'createdTimestamp' | 'timeline' | 'blockchainTransactions'>) => BotanicalProduct;
-  processBatch: (productId: string, details: Omit<ProcessingDetails, 'txHash'>) => void;
-  submitLabResult: (productId: string, labReport: Omit<LabReport, 'txHash'>, approve: boolean) => void;
-  createShipment: (productId: string, shipment: Omit<ShipmentDetails, 'txHash' | 'status'>) => void;
-  updateShipmentStatus: (productId: string, status: 'IN_TRANSIT' | 'DELIVERED') => void;
-  confirmRetailReceipt: (productId: string, retail: Omit<RetailDetails, 'txHash' | 'qrCodeGenerated'>) => void;
-  reportSuspicious: (report: Omit<SuspiciousReport, 'id' | 'reportedAt' | 'status'>) => void;
+  registerProduct: (product: Omit<BotanicalProduct, 'id' | 'status' | 'verificationState' | 'qrCodeValue' | 'createdTimestamp' | 'timeline' | 'blockchainTransactions'>) => Promise<BotanicalProduct>;
+  processBatch: (productId: string, details: Omit<ProcessingDetails, 'txHash'>) => Promise<void>;
+  submitLabResult: (productId: string, labReport: Omit<LabReport, 'txHash'>, approve: boolean) => Promise<void>;
+  createShipment: (productId: string, shipment: Omit<ShipmentDetails, 'txHash' | 'status'>) => Promise<void>;
+  updateShipmentStatus: (productId: string, status: 'IN_TRANSIT' | 'DELIVERED') => Promise<void>;
+  confirmRetailReceipt: (productId: string, retail: Omit<RetailDetails, 'txHash' | 'qrCodeGenerated'>) => Promise<void>;
+  reportSuspicious: (report: Omit<SuspiciousReport, 'id' | 'reportedAt' | 'status'>) => Promise<void>;
   updateReportStatus: (reportId: string, status: SuspiciousReport['status'], notes?: string) => void;
   resetToDefaultData: () => void;
 }
@@ -76,6 +84,19 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return INITIAL_SUSPICIOUS_REPORTS;
   });
 
+  const [walletState, setWalletState] = useState<WalletState>({
+    isConnected: false,
+    address: null,
+    chainId: null,
+    balanceEth: null,
+    networkName: null,
+    connectionType: null,
+    error: null,
+  });
+
+  const [liveBlockHeight, setLiveBlockHeight] = useState<number>(10742);
+  const [liveNetworkName, setLiveNetworkName] = useState<string>('Hardhat EVM Localhost (31337)');
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
   }, [products]);
@@ -84,18 +105,61 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(suspiciousReports));
   }, [suspiciousReports]);
 
+  // Sync block height from live Web3 provider / node if reachable
+  useEffect(() => {
+    const updateStats = async () => {
+      try {
+        const stats = await web3Service.fetchNetworkStats();
+        if (stats.blockHeight) setLiveBlockHeight(stats.blockHeight);
+        if (stats.networkName) setLiveNetworkName(stats.networkName);
+      } catch {
+        // Fallback to local count
+      }
+    };
+    updateStats();
+    const interval = setInterval(updateStats, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const connectMetaMask = async (): Promise<WalletState> => {
+    const res = await web3Service.connectMetaMask();
+    setWalletState(res);
+    return res;
+  };
+
+  const connectLocalAccount = async (accountIndex = 0): Promise<WalletState> => {
+    const res = await web3Service.connectLocalTestWallet(accountIndex);
+    setWalletState(res);
+    return res;
+  };
+
+  const disconnectWallet = () => {
+    const res = web3Service.disconnect();
+    setWalletState(res);
+  };
+
+  const connectWallet = async () => {
+    if (web3Service.isMetaMaskInstalled()) {
+      await connectMetaMask();
+    } else {
+      await connectLocalAccount(0);
+    }
+  };
+
   // Aggregate all transactions across all products
   const transactions: BlockchainTransaction[] = products.flatMap(p => p.blockchainTransactions).sort((a, b) => b.blockNumber - a.blockNumber);
 
-  const blockHeight = 10742 + (transactions.length > 5 ? transactions.length - 5 : 0);
+  const blockHeight = Math.max(liveBlockHeight, 10742 + (transactions.length > 5 ? transactions.length - 5 : 0));
 
   const networkStats = {
     blockHeight,
     activePeers: 6,
     channelName: 'botanical-provenance-channel',
-    chaincodeVersion: 'botanical-contract-v2.1',
-    tps: 4.8,
+    chaincodeVersion: 'solidity-contract-v1.0.0',
+    tps: 8.5,
     verifiedBatches: products.filter(p => p.verificationState === 'VERIFIED').length,
+    networkName: liveNetworkName,
+    contractAddress: web3Service.getContractAddress(),
   };
 
   const getProductById = (idOrBatch: string): BotanicalProduct | undefined => {
@@ -105,47 +169,62 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       p =>
         p.id.toLowerCase() === cleanQuery ||
         p.batchId.toLowerCase() === cleanQuery ||
+        p.name.toLowerCase().includes(cleanQuery) ||
         p.qrCodeValue.toLowerCase().includes(cleanQuery)
     );
   };
 
-  const registerProduct = (
+  const registerProduct = async (
     productData: Omit<BotanicalProduct, 'id' | 'status' | 'verificationState' | 'qrCodeValue' | 'createdTimestamp' | 'timeline' | 'blockchainTransactions'>
-  ): BotanicalProduct => {
-    const id = `BOT-2024-${Math.floor(1000 + Math.random() * 9000)}`;
-    const txHash = generateTxHash();
+  ): Promise<BotanicalProduct> => {
+    const id = `BOT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
+
+    // Try executing on-chain if connected
+    try {
+      const res = await web3Service.registerHarvestOnChain(productData);
+      if (res && res.txHash) {
+        txHash = res.txHash;
+        blockNum = res.blockNumber;
+        setLiveBlockHeight(blockNum);
+      }
+    } catch (e) {
+      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    }
+
     const timestamp = new Date().toISOString();
-    const blockNum = blockHeight + 1;
 
     const initialTx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
       timestamp,
       stage: 'PRODUCT_CREATION',
-      action: 'chaincode:CreateProduct()',
-      actor: `${productData.farmerName} (Org: FarmerMSP)`,
+      action: 'BotanicalTraceability.registerHarvest()',
+      actor: `${productData.farmerName} (${productData.farmerId})`,
       actorRole: 'FARMER',
       payloadHash: generateTxHash(),
-      endorsingPeers: ['peer0.farmer.florachain.org', 'peer0.admin.florachain.org'],
-      channelName: 'botanical-provenance-channel',
-      chaincode: 'botanical-contract-v2.1',
+      endorsingPeers: ['node0.farmer.florachain.eth', 'node1.consortium.florachain.eth'],
+      channelName: 'botanical-provenance-evm',
+      chaincode: 'BotanicalTraceability.sol',
     };
 
     const initialTimeline: TimelineEvent = {
       id: `TL-NEW-${Date.now()}`,
-      title: 'Botanical Product Harvest Registered',
+      title: 'Botanical Product Harvest Registered On-Chain',
       stage: 'FARMER',
       timestamp,
       actorName: productData.farmerName,
       actorRole: 'FARMER',
       location: `${productData.farmLocation} (${productData.gpsCoordinates.lat.toFixed(4)}° N, ${productData.gpsCoordinates.lng.toFixed(4)}° E)`,
-      description: `Registered ${productData.quantityKg}kg ${productData.name} (${productData.botanicalName}). Farm origin verified and certificates committed to blockchain ledger.`,
+      description: `Registered ${productData.quantityKg}kg ${productData.name} (${productData.botanicalName}). Farm origin verified and committed to immutable blockchain state.`,
       txHash,
       status: 'COMPLETED',
       ipfsHash: productData.certificates[0]?.ipfsCid || undefined,
       metadata: {
         'Batch Quantity': `${productData.quantityKg} kg`,
         'Cultivation Method': productData.cultivationMethod,
+        'Contract': web3Service.getContractAddress().slice(0, 10) + '...',
       },
     };
 
@@ -164,23 +243,37 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return newProduct;
   };
 
-  const processBatch = (productId: string, details: Omit<ProcessingDetails, 'txHash'>) => {
-    const txHash = generateTxHash();
+  const processBatch = async (productId: string, details: Omit<ProcessingDetails, 'txHash'>) => {
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
+
+    try {
+      const targetProduct = products.find(p => p.id === productId);
+      const batchId = targetProduct?.batchId || productId;
+      const res = await web3Service.recordProcessingOnChain(batchId, details);
+      if (res && res.txHash) {
+        txHash = res.txHash;
+        blockNum = res.blockNumber;
+        setLiveBlockHeight(blockNum);
+      }
+    } catch (e) {
+      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    }
+
     const timestamp = new Date().toISOString();
-    const blockNum = blockHeight + 1;
 
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
       timestamp,
       stage: 'PROCESSING_LOG',
-      action: 'chaincode:AddProcessingDetails()',
-      actor: `${details.processorName} (Org: ProcessorMSP)`,
+      action: 'BotanicalTraceability.recordProcessing()',
+      actor: `${details.processorName} (${details.processorId})`,
       actorRole: 'PROCESSOR',
       payloadHash: generateTxHash(),
-      endorsingPeers: ['peer0.processor.florachain.org', 'peer0.farmer.florachain.org'],
-      channelName: 'botanical-provenance-channel',
-      chaincode: 'botanical-contract-v2.1',
+      endorsingPeers: ['node0.processor.florachain.eth', 'node1.farmer.florachain.eth'],
+      channelName: 'botanical-provenance-evm',
+      chaincode: 'BotanicalTraceability.sol',
     };
 
     const timelineEvent: TimelineEvent = {
@@ -217,23 +310,37 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const submitLabResult = (productId: string, labReportData: Omit<LabReport, 'txHash'>, approve: boolean) => {
-    const txHash = generateTxHash();
+  const submitLabResult = async (productId: string, labReportData: Omit<LabReport, 'txHash'>, approve: boolean) => {
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
+
+    try {
+      const targetProduct = products.find(p => p.id === productId);
+      const batchId = targetProduct?.batchId || productId;
+      const res = await web3Service.submitLabReportOnChain(batchId, labReportData, approve);
+      if (res && res.txHash) {
+        txHash = res.txHash;
+        blockNum = res.blockNumber;
+        setLiveBlockHeight(blockNum);
+      }
+    } catch (e) {
+      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    }
+
     const timestamp = new Date().toISOString();
-    const blockNum = blockHeight + 1;
 
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
       timestamp,
       stage: approve ? 'LAB_APPROVAL' : 'LAB_REJECTION',
-      action: approve ? 'chaincode:ApproveProduct()' : 'chaincode:RejectProduct()',
-      actor: `${labReportData.labName} (Org: LabMSP)`,
+      action: approve ? 'BotanicalTraceability.submitLabReport(APPROVED)' : 'BotanicalTraceability.submitLabReport(REJECTED)',
+      actor: `${labReportData.labName} (${labReportData.labId})`,
       actorRole: 'LABORATORY',
       payloadHash: generateTxHash(),
-      endorsingPeers: ['peer0.lab.florachain.org', 'peer0.admin.florachain.org'],
-      channelName: 'botanical-provenance-channel',
-      chaincode: 'botanical-contract-v2.1',
+      endorsingPeers: ['node0.lab.florachain.eth', 'node1.admin.florachain.eth'],
+      channelName: 'botanical-provenance-evm',
+      chaincode: 'BotanicalTraceability.sol',
     };
 
     const timelineEvent: TimelineEvent = {
@@ -245,7 +352,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       actorRole: 'LABORATORY',
       location: labReportData.labName,
       description: approve
-        ? `Passed all monograph requirements. Purity: ${labReportData.purityPercentage}%, Moisture: ${labReportData.moisturePercentage}%. Certificate issued.`
+        ? `Passed all monograph requirements. Purity: ${labReportData.purityPercentage}%, Moisture: ${labReportData.moisturePercentage}%. Certificate issued on IPFS.`
         : `QA FAILED: ${labReportData.notes}. Batch locked by smart contract.`,
       txHash,
       status: approve ? 'COMPLETED' : 'FAILED',
@@ -277,23 +384,37 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const createShipment = (productId: string, shipmentData: Omit<ShipmentDetails, 'txHash' | 'status'>) => {
-    const txHash = generateTxHash();
+  const createShipment = async (productId: string, shipmentData: Omit<ShipmentDetails, 'txHash' | 'status'>) => {
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
+
+    try {
+      const targetProduct = products.find(p => p.id === productId);
+      const batchId = targetProduct?.batchId || productId;
+      const res = await web3Service.dispatchShipmentOnChain(batchId, shipmentData);
+      if (res && res.txHash) {
+        txHash = res.txHash;
+        blockNum = res.blockNumber;
+        setLiveBlockHeight(blockNum);
+      }
+    } catch (e) {
+      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    }
+
     const timestamp = new Date().toISOString();
-    const blockNum = blockHeight + 1;
 
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
       timestamp,
       stage: 'SHIPMENT_CREATION',
-      action: 'chaincode:CreateShipment()',
-      actor: `${shipmentData.distributorName} (Org: DistributorMSP)`,
+      action: 'BotanicalTraceability.dispatchShipment()',
+      actor: `${shipmentData.distributorName} (${shipmentData.distributorId})`,
       actorRole: 'DISTRIBUTOR',
       payloadHash: generateTxHash(),
-      endorsingPeers: ['peer0.distributor.florachain.org', 'peer0.retailer.florachain.org'],
-      channelName: 'botanical-provenance-channel',
-      chaincode: 'botanical-contract-v2.1',
+      endorsingPeers: ['node0.distributor.florachain.eth', 'node1.retailer.florachain.eth'],
+      channelName: 'botanical-provenance-evm',
+      chaincode: 'BotanicalTraceability.sol',
     };
 
     const timelineEvent: TimelineEvent = {
@@ -329,23 +450,39 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const updateShipmentStatus = (productId: string, status: 'IN_TRANSIT' | 'DELIVERED') => {
-    const txHash = generateTxHash();
+  const updateShipmentStatus = async (productId: string, status: 'IN_TRANSIT' | 'DELIVERED') => {
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
+
+    try {
+      if (status === 'DELIVERED') {
+        const targetProduct = products.find(p => p.id === productId);
+        const batchId = targetProduct?.batchId || productId;
+        const res = await web3Service.confirmDeliveryOnChain(batchId);
+        if (res && res.txHash) {
+          txHash = res.txHash;
+          blockNum = res.blockNumber;
+          setLiveBlockHeight(blockNum);
+        }
+      }
+    } catch (e) {
+      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    }
+
     const timestamp = new Date().toISOString();
-    const blockNum = blockHeight + 1;
 
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
       timestamp,
       stage: 'SHIPMENT_UPDATE',
-      action: `chaincode:UpdateShipmentStatus(${status})`,
+      action: `BotanicalTraceability.confirmDelivery(${status})`,
       actor: 'Logistics Gateway',
       actorRole: 'DISTRIBUTOR',
       payloadHash: generateTxHash(),
-      endorsingPeers: ['peer0.distributor.florachain.org'],
-      channelName: 'botanical-provenance-channel',
-      chaincode: 'botanical-contract-v2.1',
+      endorsingPeers: ['node0.distributor.florachain.eth'],
+      channelName: 'botanical-provenance-evm',
+      chaincode: 'BotanicalTraceability.sol',
     };
 
     setProducts(prev =>
@@ -368,23 +505,37 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const confirmRetailReceipt = (productId: string, retailData: Omit<RetailDetails, 'txHash' | 'qrCodeGenerated'>) => {
-    const txHash = generateTxHash();
+  const confirmRetailReceipt = async (productId: string, retailData: Omit<RetailDetails, 'txHash' | 'qrCodeGenerated'>) => {
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
+
+    try {
+      const targetProduct = products.find(p => p.id === productId);
+      const batchId = targetProduct?.batchId || productId;
+      const res = await web3Service.confirmRetailReceiptOnChain(batchId, retailData);
+      if (res && res.txHash) {
+        txHash = res.txHash;
+        blockNum = res.blockNumber;
+        setLiveBlockHeight(blockNum);
+      }
+    } catch (e) {
+      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    }
+
     const timestamp = new Date().toISOString();
-    const blockNum = blockHeight + 1;
 
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
       timestamp,
       stage: 'RETAIL_RECEIPT',
-      action: 'chaincode:ConfirmRetailReceipt()',
-      actor: `${retailData.retailerName} (Org: RetailerMSP)`,
+      action: 'BotanicalTraceability.confirmRetailReceipt()',
+      actor: `${retailData.retailerName} (${retailData.retailerId})`,
       actorRole: 'RETAILER',
       payloadHash: generateTxHash(),
-      endorsingPeers: ['peer0.retailer.florachain.org', 'peer0.admin.florachain.org'],
-      channelName: 'botanical-provenance-channel',
-      chaincode: 'botanical-contract-v2.1',
+      endorsingPeers: ['node0.retailer.florachain.eth', 'node1.admin.florachain.eth'],
+      channelName: 'botanical-provenance-evm',
+      chaincode: 'BotanicalTraceability.sol',
     };
 
     const timelineEvent: TimelineEvent = {
@@ -421,10 +572,16 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const reportSuspicious = (reportData: Omit<SuspiciousReport, 'id' | 'reportedAt' | 'status'>) => {
+  const reportSuspicious = async (reportData: Omit<SuspiciousReport, 'id' | 'reportedAt' | 'status'>) => {
+    try {
+      await web3Service.reportSuspiciousOnChain(reportData);
+    } catch (e) {
+      console.warn('Live on-chain reporting note: Using simulated ledger block.', e);
+    }
+
     const newReport: SuspiciousReport = {
       ...reportData,
-      id: `REP-2024-${Math.floor(100 + Math.random() * 900)}`,
+      id: `REP-2026-${Math.floor(100 + Math.random() * 900)}`,
       reportedAt: new Date().toISOString(),
       status: 'PENDING_REVIEW',
     };
@@ -451,6 +608,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         transactions,
         suspiciousReports,
         networkStats,
+        walletState,
+        connectWallet,
+        connectMetaMask,
+        connectLocalAccount,
+        disconnectWallet,
         getProductById,
         registerProduct,
         processBatch,

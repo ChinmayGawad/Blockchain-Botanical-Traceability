@@ -37,8 +37,8 @@ export const BlockchainExplorerPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Hyperledger Fabric Ledger Explorer"
-      subtitle="Public audit explorer for immutable channel transactions, endorsing peer consensus, and chaincode state read/write sets."
+      title="Solidity EVM Blockchain Explorer"
+      subtitle="Public audit explorer for immutable on-chain smart contract transactions, cryptographic event logs, and state proofs."
     >
       <div className="space-y-6">
         {/* Network Metrics Header */}
@@ -51,29 +51,29 @@ export const BlockchainExplorerPage: React.FC = () => {
             <div className="text-3xl font-extrabold font-mono text-white">
               #{networkStats.blockHeight}
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Consensus: Raft Ordering Service</div>
+            <div className="text-[11px] text-slate-400 mt-1">EVM Consensus / Proof of Authority</div>
           </div>
 
           <div className="bg-slate-900 text-white rounded-2xl p-5 border border-slate-800 shadow-sm">
             <div className="text-xs text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-2">
               <Network size={14} />
-              <span>Active Channel</span>
+              <span>Network Protocol</span>
             </div>
             <div className="text-sm font-bold font-mono text-indigo-200 truncate">
-              {networkStats.channelName}
+              {networkStats.networkName || 'Hardhat Localhost (31337)'}
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">6 Endorsing Peer Organizations</div>
+            <div className="text-[11px] text-slate-400 mt-1">RPC: http://127.0.0.1:8545</div>
           </div>
 
           <div className="bg-slate-900 text-white rounded-2xl p-5 border border-slate-800 shadow-sm">
             <div className="text-xs text-teal-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-2">
               <Cpu size={14} />
-              <span>Chaincode Contract</span>
+              <span>Smart Contract</span>
             </div>
-            <div className="text-sm font-bold font-mono text-teal-200">
-              {networkStats.chaincodeVersion}
+            <div className="text-sm font-bold font-mono text-teal-200 truncate">
+              {networkStats.contractAddress ? `${networkStats.contractAddress.substring(0, 8)}...${networkStats.contractAddress.substring(networkStats.contractAddress.length - 6)}` : '0x5FbDB2...'}
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">Java / Spring Boot Fabric Client</div>
+            <div className="text-[11px] text-slate-400 mt-1">Solidity v0.8.24 (IR Optimizer)</div>
           </div>
 
           <div className="bg-slate-900 text-white rounded-2xl p-5 border border-slate-800 shadow-sm">
@@ -84,7 +84,7 @@ export const BlockchainExplorerPage: React.FC = () => {
             <div className="text-3xl font-extrabold font-mono text-white">
               {transactions.length}
             </div>
-            <div className="text-[11px] text-slate-400 mt-1">100% Valid Consensus</div>
+            <div className="text-[11px] text-slate-400 mt-1">100% Cryptographic Verification</div>
           </div>
         </div>
 

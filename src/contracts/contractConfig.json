@@ -1,0 +1,1238 @@
+{
+  "network": "hardhat",
+  "chainId": 31337,
+  "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "deployedAt": "2026-08-26T08:55:55.247Z",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "laboratory",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "LabReportRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "processorName",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "processor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProcessingRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "authority",
+          "type": "address"
+        }
+      ],
+      "name": "ProductRecalled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "botanicalName",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "farmer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProductRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "reportId",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "reporter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "ProductSuspiciousReported",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "retailerName",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "retailer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "RetailReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "actor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum BotanicalTraceability.UserRole",
+          "name": "role",
+          "type": "uint8"
+        }
+      ],
+      "name": "RoleGranted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "shipmentId",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "distributor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "ShipmentDelivered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "shipmentId",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "distributor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "ShipmentDispatched",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        }
+      ],
+      "name": "confirmDelivery",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "retailerId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "retailerName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "storeLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "shelfLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "retailPrice",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.RetailInput",
+          "name": "input",
+          "type": "tuple"
+        }
+      ],
+      "name": "confirmRetailReceipt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "shipmentId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "distributorId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "distributorName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "sourceLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "destinationLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "vehicleNumber",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "transportType",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "temperatureRange",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "trackingNumber",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.ShipmentInput",
+          "name": "input",
+          "type": "tuple"
+        }
+      ],
+      "name": "dispatchShipment",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllBatchIds",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllReports",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "reportId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "reporterName",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "reporterAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "reason",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "evidenceIpfsCid",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "resolved",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "resolutionNotes",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.SuspiciousReport[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        }
+      ],
+      "name": "getProduct",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "botanicalName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "commonName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "category",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "farmLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "coordinates",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "harvestDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "quantityKg",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "cultivationMethod",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "farmerId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "farmerName",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "farmerAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "enum BotanicalTraceability.ProductStatus",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "processorId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "processorName",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "facilityLocation",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "method",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "initialQuantityKg",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "processedQuantityKg",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "yieldLossPercentage",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "processingDate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "equipmentUsed",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "ipfsDocumentCid",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "processorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "notes",
+                  "type": "string"
+                }
+              ],
+              "internalType": "struct BotanicalTraceability.ProcessingDetails",
+              "name": "processing",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "labId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "labName",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "testedBy",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "testDate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "purityPercentage",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "moisturePercentage",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "heavyMetalsPassed",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "microbialTestPassed",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "pesticideResiduePassed",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "string",
+                  "name": "certificateIpfsCid",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "overallApproved",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "address",
+                  "name": "labAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "notes",
+                  "type": "string"
+                }
+              ],
+              "internalType": "struct BotanicalTraceability.LabReport",
+              "name": "labReport",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "shipmentId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "distributorId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "distributorName",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "sourceLocation",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "destinationLocation",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "vehicleNumber",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "transportType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "temperatureRange",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "trackingNumber",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "dispatchDate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "deliveryDate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "distributorAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isDelivered",
+                  "type": "bool"
+                }
+              ],
+              "internalType": "struct BotanicalTraceability.ShipmentDetails",
+              "name": "shipment",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "retailerId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "retailerName",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "storeLocation",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "shelfLocation",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "receivedDate",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "retailPrice",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "retailerAddress",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct BotanicalTraceability.RetailDetails",
+              "name": "retail",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "updatedAt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "exists",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.BotanicalProduct",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        }
+      ],
+      "name": "getReportsForBatch",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "reportId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "reporterName",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "reporterAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "reason",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "evidenceIpfsCid",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "resolved",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "resolutionNotes",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.SuspiciousReport[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTotalBatchesCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "actor",
+          "type": "address"
+        },
+        {
+          "internalType": "enum BotanicalTraceability.UserRole",
+          "name": "role",
+          "type": "uint8"
+        }
+      ],
+      "name": "grantRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isAuthorizedActor",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "recallProduct",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "processorId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "processorName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "facilityLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "method",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "initialQuantityKg",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "processedQuantityKg",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "yieldLossPercentage",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "equipmentUsed",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "ipfsDocumentCid",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "notes",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.ProcessingInput",
+          "name": "input",
+          "type": "tuple"
+        }
+      ],
+      "name": "recordProcessing",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "botanicalName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "commonName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "category",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "farmLocation",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "coordinates",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "harvestDate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "quantityKg",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "cultivationMethod",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "farmerId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "farmerName",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.HarvestInput",
+          "name": "input",
+          "type": "tuple"
+        }
+      ],
+      "name": "registerHarvest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "reportId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "batchId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "reporterName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "evidenceIpfsCid",
+          "type": "string"
+        }
+      ],
+      "name": "reportSuspicious",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "batchId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "labId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "labName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "testedBy",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "purityPercentage",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "moisturePercentage",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "heavyMetalsPassed",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "microbialTestPassed",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "pesticideResiduePassed",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "certificateIpfsCid",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "overallApproved",
+              "type": "bool"
+            },
+            {
+              "internalType": "string",
+              "name": "notes",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct BotanicalTraceability.LabInput",
+          "name": "input",
+          "type": "tuple"
+        }
+      ],
+      "name": "submitLabReport",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "userRoles",
+      "outputs": [
+        {
+          "internalType": "enum BotanicalTraceability.UserRole",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}

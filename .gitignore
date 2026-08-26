@@ -1,11 +1,11 @@
-# Specification / Prompt Reference Markdown Files
+# Specification / Prompt Reference Markdown Files (optional)
 blockchain_botanical_project_scope.md
 blockchain_botanical_tech_stack.md
 blockchain_botanical_traceability_ui_structure.md
 blockchain_botanical_wireframes_and_flowcharts.md
 
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -13,16 +13,30 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies and Build Outputs
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Build Outputs
 dist/
 dist-ssr/
+build/
 *.local
+
+# Hardhat & Smart Contracts
+cache/
+artifacts/
+typechain/
+typechain-types/
+coverage/
+coverage.json
+.openzeppelin/
 
 # Editor & OS files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
@@ -31,14 +45,16 @@ dist-ssr/
 *.sw?
 Thumbs.db
 
-# Environment variables
+# Environment variables & Secrets
 .env
 .env.development.local
 .env.test.local
 .env.production.local
 .env.local
+*.pem
+*.key
 
-# Vite / Cache
+# Vite / Cache / Temporary
 .vite/
 .cache/
 .turbo/
