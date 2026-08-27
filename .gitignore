@@ -1,32 +1,106 @@
-# Specification / Prompt Reference Markdown Files (optional)
+# =============================================================================
+# Specifications & Documentation / Prompt Files (optional local docs)
+# =============================================================================
 blockchain_botanical_project_scope.md
 blockchain_botanical_tech_stack.md
 blockchain_botanical_traceability_ui_structure.md
 blockchain_botanical_wireframes_and_flowcharts.md
+IMPLEMENTATION_PLAN.md
 
-# Dependencies
+# =============================================================================
+# Frontend & Node Dependencies / Build Outputs
+# =============================================================================
 node_modules/
-.pnp
+.pnp/
 .pnp.js
-
-# Build Outputs
 dist/
 dist-ssr/
 build/
-*.local
 out/
+*.local
+.npm/
+.eslintcache
+.stylelintcache
+.prettiercache
+*.tsbuildinfo
 
-# Hardhat & Smart Contracts
+# =============================================================================
+# Java & Spring Boot / Maven / Gradle
+# =============================================================================
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# Maven Wrapper & Metadata
+**/.mvn/wrapper/maven-wrapper.jar
+**/.mvn/timing.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.flattened-pom.xml
+
+# Eclipse / STS IDE artifacts
+bin/
+**/bin/
+.classpath
+**/.classpath
+.project
+**/.project
+.settings/
+**/.settings/
+.factorypath
+**/.factorypath
+.apt_generated/
+**/.apt_generated/
+.springBeans
+.sts4-cache/
+
+# Gradle
+.gradle/
+build/
+
+# =============================================================================
+# Smart Contracts / Hardhat / Web3
+# =============================================================================
 cache/
+**/cache/
 artifacts/
+**/artifacts/
 typechain/
 typechain-types/
 coverage/
 coverage.json
 .openzeppelin/
+hardhat-network-*.log
 
+# =============================================================================
+# Databases & Local Storage
+# =============================================================================
+*.db
+*.sqlite
+*.sqlite3
+*.mv.db
+*.trace.db
+*.h2.db
+h2-data/
+**/h2-data/
+
+# =============================================================================
 # Logs
+# =============================================================================
 logs/
+**/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -34,7 +108,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Environment Variables & Secrets
+# =============================================================================
+# Secrets, Keys & Environment Variables
+# =============================================================================
 .env
 .env.*
 !.env.example
@@ -42,12 +118,22 @@ lerna-debug.log*
 *.key
 *.cert
 *.crt
+*.p12
+*.jks
+*.keystore
+secrets.json
+secret.json
 
+# =============================================================================
 # Editor & IDE Files
+# =============================================================================
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+*.iml
+*.iws
+*.ipr
 *.suo
 *.ntvs*
 *.njsproj
@@ -57,7 +143,9 @@ lerna-debug.log*
 *.swo
 *~
 
-# OS Files
+# =============================================================================
+# OS & System Files
+# =============================================================================
 .DS_Store
 .DS_Store?
 ._*
@@ -67,35 +155,18 @@ Thumbs.db
 ehthumbs.db
 desktop.ini
 
-# Vite, Turbo & Build Caches
+# =============================================================================
+# Vite, Turborepo & Deployment Platforms
+# =============================================================================
 .vite/
-.cache/
 .turbo/
-.eslintcache
-.stylelintcache
-.prettiercache
-
-# Deployment Platforms
 .vercel/
 .netlify/
 
-# Python & Testing Caches
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.pytest_cache/
-.coverage
-htmlcov/
-*.egg-info/
-venv/
-.venv/
-env/
-ENV/
-
-# AI Agent & Tooling Artifacts
+# =============================================================================
+# AI Agents & Tooling Metadata
+# =============================================================================
 .agents/
 .claude/
 .gemini/
 skills-lock.json
-
