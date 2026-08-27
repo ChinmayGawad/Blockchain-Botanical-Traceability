@@ -4,15 +4,6 @@ blockchain_botanical_tech_stack.md
 blockchain_botanical_traceability_ui_structure.md
 blockchain_botanical_wireframes_and_flowcharts.md
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
 # Dependencies
 node_modules/
 .pnp
@@ -23,6 +14,7 @@ dist/
 dist-ssr/
 build/
 *.local
+out/
 
 # Hardhat & Smart Contracts
 cache/
@@ -33,28 +25,77 @@ coverage/
 coverage.json
 .openzeppelin/
 
-# Editor & OS files
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+
+# Editor & IDE Files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea/
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
+desktop.ini
 
-# Environment variables & Secrets
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-*.pem
-*.key
-
-# Vite / Cache / Temporary
+# Vite, Turbo & Build Caches
 .vite/
 .cache/
 .turbo/
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# Deployment Platforms
+.vercel/
+.netlify/
+
+# Python & Testing Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+venv/
+.venv/
+env/
+ENV/
+
+# AI Agent & Tooling Artifacts
+.agents/
+.claude/
+.gemini/
+skills-lock.json
+

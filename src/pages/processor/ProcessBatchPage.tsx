@@ -274,7 +274,7 @@ export const ProcessBatchPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-900 text-white text-xs font-extrabold rounded-xl flex items-center gap-2 transition-all shadow-md"
+                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-900 text-white text-xs font-extrabold rounded-xl flex items-center gap-2 transition-all shadow-md cursor-pointer disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>

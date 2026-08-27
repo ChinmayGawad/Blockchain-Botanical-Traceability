@@ -248,7 +248,7 @@ export const CreateShipmentPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-3 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-900 text-white text-xs font-extrabold rounded-xl flex items-center gap-2 transition-all shadow-md"
+                className="px-8 py-3 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-900 text-white text-xs font-extrabold rounded-xl flex items-center gap-2 transition-all shadow-md cursor-pointer disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
