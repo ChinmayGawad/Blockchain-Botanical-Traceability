@@ -13,6 +13,7 @@ import {
 } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_SUSPICIOUS_REPORTS } from '../data/mockData';
 import web3Service, { WalletState } from '../services/web3Service';
+import apiClient from '../services/api';
 
 interface BlockchainContextType {
   products: BotanicalProduct[];
@@ -105,6 +106,33 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(suspiciousReports));
   }, [suspiciousReports]);
 
+  // Attempt to sync products and stats from Spring Boot backend on mount
+  useEffect(() => {
+    const syncFromBackend = async () => {
+      try {
+        const [prodRes, statsRes, repRes] = await Promise.allSettled([
+          apiClient.get('/products'),
+          apiClient.get('/blockchain/stats'),
+          apiClient.get('/reports')
+        ]);
+
+        if (prodRes.status === 'fulfilled' && prodRes.value.data && Array.isArray(prodRes.value.data) && prodRes.value.data.length > 0) {
+          setProducts(prodRes.value.data);
+        }
+        if (statsRes.status === 'fulfilled' && statsRes.value.data) {
+          if (statsRes.value.data.blockHeight) setLiveBlockHeight(statsRes.value.data.blockHeight);
+          if (statsRes.value.data.networkName) setLiveNetworkName(statsRes.value.data.networkName);
+        }
+        if (repRes.status === 'fulfilled' && repRes.value.data && Array.isArray(repRes.value.data) && repRes.value.data.length > 0) {
+          setSuspiciousReports(repRes.value.data);
+        }
+      } catch {
+        // Run locally with existing state
+      }
+    };
+    syncFromBackend();
+  }, []);
+
   // Sync block height from live Web3 provider / node if reachable
   useEffect(() => {
     const updateStats = async () => {
@@ -113,11 +141,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         if (stats.blockHeight) setLiveBlockHeight(stats.blockHeight);
         if (stats.networkName) setLiveNetworkName(stats.networkName);
       } catch {
-        // Fallback to local count
+        // Fallback
       }
     };
     updateStats();
-    const interval = setInterval(updateStats, 10000);
+    const interval = setInterval(updateStats, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -146,9 +174,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  // Aggregate all transactions across all products
-  const transactions: BlockchainTransaction[] = products.flatMap(p => p.blockchainTransactions).sort((a, b) => b.blockNumber - a.blockNumber);
-
+  const transactions: BlockchainTransaction[] = products.flatMap(p => p.blockchainTransactions || []).sort((a, b) => b.blockNumber - a.blockNumber);
   const blockHeight = Math.max(liveBlockHeight, 10742 + (transactions.length > 5 ? transactions.length - 5 : 0));
 
   const networkStats = {
@@ -177,11 +203,38 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const registerProduct = async (
     productData: Omit<BotanicalProduct, 'id' | 'status' | 'verificationState' | 'qrCodeValue' | 'createdTimestamp' | 'timeline' | 'blockchainTransactions'>
   ): Promise<BotanicalProduct> => {
+    // Try sending to Spring Boot backend
+    try {
+      const res = await apiClient.post('/products', {
+        name: productData.name,
+        botanicalName: productData.botanicalName,
+        batchId: productData.batchId,
+        category: productData.category,
+        cultivationMethod: productData.cultivationMethod,
+        quantityKg: productData.quantityKg,
+        harvestDate: productData.harvestDate,
+        farmLocation: productData.farmLocation,
+        gpsCoordinates: productData.gpsCoordinates,
+        farmerId: productData.farmerId,
+        farmerName: productData.farmerName,
+        farmerOrg: productData.farmerOrg,
+        description: productData.description,
+        imageUrl: productData.imageUrl,
+        activeCompounds: productData.activeCompounds,
+        certificates: productData.certificates,
+      });
+      if (res.data && res.data.id) {
+        setProducts(prev => [res.data, ...prev.filter(p => p.id !== res.data.id)]);
+        return res.data;
+      }
+    } catch {
+      console.info('Backend product registration fallback to local state');
+    }
+
     const id = `BOT-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     let txHash = generateTxHash();
     let blockNum = blockHeight + 1;
 
-    // Try executing on-chain if connected
     try {
       const res = await web3Service.registerHarvestOnChain(productData);
       if (res && res.txHash) {
@@ -189,12 +242,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         blockNum = res.blockNumber;
         setLiveBlockHeight(blockNum);
       }
-    } catch (e) {
-      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    } catch {
+      // Fallback to local
     }
 
     const timestamp = new Date().toISOString();
-
     const initialTx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
@@ -221,11 +273,6 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       txHash,
       status: 'COMPLETED',
       ipfsHash: productData.certificates[0]?.ipfsCid || undefined,
-      metadata: {
-        'Batch Quantity': `${productData.quantityKg} kg`,
-        'Cultivation Method': productData.cultivationMethod,
-        'Contract': web3Service.getContractAddress().slice(0, 10) + '...',
-      },
     };
 
     const newProduct: BotanicalProduct = {
@@ -244,9 +291,19 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const processBatch = async (productId: string, details: Omit<ProcessingDetails, 'txHash'>) => {
+    // Try sending to Spring Boot backend
+    try {
+      const res = await apiClient.post(`/products/${productId}/processing`, details);
+      if (res.data && res.data.id) {
+        setProducts(prev => prev.map(p => p.id === productId ? res.data : p));
+        return;
+      }
+    } catch {
+      console.info('Backend processing fallback to local state');
+    }
+
     let txHash = generateTxHash();
     let blockNum = blockHeight + 1;
-
     try {
       const targetProduct = products.find(p => p.id === productId);
       const batchId = targetProduct?.batchId || productId;
@@ -256,12 +313,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         blockNum = res.blockNumber;
         setLiveBlockHeight(blockNum);
       }
-    } catch (e) {
-      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    } catch {
+      // Fallback
     }
 
     const timestamp = new Date().toISOString();
-
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
@@ -284,14 +340,10 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       actorName: details.processorName,
       actorRole: 'PROCESSOR',
       location: details.facilityLocation,
-      description: `Method: ${details.method}. Input: ${details.initialQuantityKg}kg → Output: ${details.processedQuantityKg}kg (Yield loss: ${details.yieldLossPercentage}%). Sample dispatched to Quality Lab.`,
+      description: `Method: ${details.method}. Input: ${details.initialQuantityKg}kg → Output: ${details.processedQuantityKg}kg (Yield loss: ${details.yieldLossPercentage}%).`,
       txHash,
       status: 'COMPLETED',
       ipfsHash: details.ipfsDocumentCid,
-      metadata: {
-        'Processed Yield': `${details.processedQuantityKg} kg`,
-        'Loss %': `${details.yieldLossPercentage}%`,
-      },
     };
 
     setProducts(prev =>
@@ -311,9 +363,22 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const submitLabResult = async (productId: string, labReportData: Omit<LabReport, 'txHash'>, approve: boolean) => {
+    // Try sending to Spring Boot backend
+    try {
+      const res = await apiClient.post(`/products/${productId}/lab-test`, {
+        ...labReportData,
+        approve,
+      });
+      if (res.data && res.data.id) {
+        setProducts(prev => prev.map(p => p.id === productId ? res.data : p));
+        return;
+      }
+    } catch {
+      console.info('Backend lab submission fallback to local state');
+    }
+
     let txHash = generateTxHash();
     let blockNum = blockHeight + 1;
-
     try {
       const targetProduct = products.find(p => p.id === productId);
       const batchId = targetProduct?.batchId || productId;
@@ -323,12 +388,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         blockNum = res.blockNumber;
         setLiveBlockHeight(blockNum);
       }
-    } catch (e) {
-      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    } catch {
+      // Fallback
     }
 
     const timestamp = new Date().toISOString();
-
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
@@ -352,17 +416,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       actorRole: 'LABORATORY',
       location: labReportData.labName,
       description: approve
-        ? `Passed all monograph requirements. Purity: ${labReportData.purityPercentage}%, Moisture: ${labReportData.moisturePercentage}%. Certificate issued on IPFS.`
-        : `QA FAILED: ${labReportData.notes}. Batch locked by smart contract.`,
+        ? `Passed all monograph requirements. Purity: ${labReportData.purityPercentage}%, Moisture: ${labReportData.moisturePercentage}%.`
+        : `QA FAILED: ${labReportData.notes}. Batch rejected.`,
       txHash,
       status: approve ? 'COMPLETED' : 'FAILED',
       ipfsHash: labReportData.certificateIpfsCid,
-      metadata: {
-        'Purity Score': `${labReportData.purityPercentage}%`,
-        'Heavy Metals': labReportData.heavyMetalsStatus,
-        'Microbial Status': labReportData.microbialTestStatus,
-        'Result': approve ? 'APPROVED' : 'REJECTED',
-      },
     };
 
     setProducts(prev =>
@@ -385,9 +443,21 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const createShipment = async (productId: string, shipmentData: Omit<ShipmentDetails, 'txHash' | 'status'>) => {
+    try {
+      const res = await apiClient.post('/shipments', {
+        productId,
+        ...shipmentData,
+      });
+      if (res.data && res.data.id) {
+        setProducts(prev => prev.map(p => p.id === productId ? res.data : p));
+        return;
+      }
+    } catch {
+      console.info('Backend shipment creation fallback to local state');
+    }
+
     let txHash = generateTxHash();
     let blockNum = blockHeight + 1;
-
     try {
       const targetProduct = products.find(p => p.id === productId);
       const batchId = targetProduct?.batchId || productId;
@@ -397,12 +467,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         blockNum = res.blockNumber;
         setLiveBlockHeight(blockNum);
       }
-    } catch (e) {
-      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    } catch {
+      // Fallback
     }
 
     const timestamp = new Date().toISOString();
-
     const tx: BlockchainTransaction = {
       txId: txHash,
       blockNumber: blockNum,
@@ -425,13 +494,9 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       actorName: shipmentData.distributorName,
       actorRole: 'DISTRIBUTOR',
       location: `${shipmentData.sourceLocation} → ${shipmentData.destinationLocation}`,
-      description: `Dispatched via ${shipmentData.transportType} (Vehicle: ${shipmentData.vehicleNumber}). Temp specs: ${shipmentData.temperatureRange}. Tracking: ${shipmentData.trackingNumber}.`,
+      description: `Dispatched via ${shipmentData.transportType} (Vehicle: ${shipmentData.vehicleNumber}). Temp: ${shipmentData.temperatureRange}. Tracking: ${shipmentData.trackingNumber}.`,
       txHash,
       status: 'IN_PROGRESS',
-      metadata: {
-        'Tracking ID': shipmentData.trackingNumber,
-        'Transport': shipmentData.transportType,
-      },
     };
 
     setProducts(prev =>
@@ -451,24 +516,20 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const updateShipmentStatus = async (productId: string, status: 'IN_TRANSIT' | 'DELIVERED') => {
-    let txHash = generateTxHash();
-    let blockNum = blockHeight + 1;
-
     try {
-      if (status === 'DELIVERED') {
-        const targetProduct = products.find(p => p.id === productId);
-        const batchId = targetProduct?.batchId || productId;
-        const res = await web3Service.confirmDeliveryOnChain(batchId);
-        if (res && res.txHash) {
-          txHash = res.txHash;
-          blockNum = res.blockNumber;
-          setLiveBlockHeight(blockNum);
-        }
+      const targetProduct = products.find(p => p.id === productId);
+      const shipmentId = targetProduct?.shipmentDetails?.shipmentId || productId;
+      const res = await apiClient.put(`/shipments/${shipmentId}/status`, { status });
+      if (res.data && res.data.id) {
+        setProducts(prev => prev.map(p => p.id === productId ? res.data : p));
+        return;
       }
-    } catch (e) {
-      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    } catch {
+      console.info('Backend shipment status fallback to local state');
     }
 
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
     const timestamp = new Date().toISOString();
 
     const tx: BlockchainTransaction = {
@@ -506,22 +567,18 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const confirmRetailReceipt = async (productId: string, retailData: Omit<RetailDetails, 'txHash' | 'qrCodeGenerated'>) => {
-    let txHash = generateTxHash();
-    let blockNum = blockHeight + 1;
-
     try {
-      const targetProduct = products.find(p => p.id === productId);
-      const batchId = targetProduct?.batchId || productId;
-      const res = await web3Service.confirmRetailReceiptOnChain(batchId, retailData);
-      if (res && res.txHash) {
-        txHash = res.txHash;
-        blockNum = res.blockNumber;
-        setLiveBlockHeight(blockNum);
+      const res = await apiClient.post(`/products/${productId}/retail-receive`, retailData);
+      if (res.data && res.data.id) {
+        setProducts(prev => prev.map(p => p.id === productId ? res.data : p));
+        return;
       }
-    } catch (e) {
-      console.warn('Live on-chain execution note: Using simulated cryptographic ledger block.', e);
+    } catch {
+      console.info('Backend retail receipt fallback to local state');
     }
 
+    let txHash = generateTxHash();
+    let blockNum = blockHeight + 1;
     const timestamp = new Date().toISOString();
 
     const tx: BlockchainTransaction = {
@@ -549,10 +606,6 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       description: `Batch verified, shelf QR codes printed. Available for customer scan and authenticity check.`,
       txHash,
       status: 'COMPLETED',
-      metadata: {
-        'Shelf Batch ID': retailData.shelfBatchId,
-        'Retail Price': `$${retailData.unitPrice.toFixed(2)}`,
-      },
     };
 
     setProducts(prev =>
@@ -574,9 +627,13 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const reportSuspicious = async (reportData: Omit<SuspiciousReport, 'id' | 'reportedAt' | 'status'>) => {
     try {
-      await web3Service.reportSuspiciousOnChain(reportData);
-    } catch (e) {
-      console.warn('Live on-chain reporting note: Using simulated ledger block.', e);
+      const res = await apiClient.post('/reports', reportData);
+      if (res.data && res.data.id) {
+        setSuspiciousReports(prev => [res.data, ...prev]);
+        return;
+      }
+    } catch {
+      console.info('Backend suspicious report fallback to local state');
     }
 
     const newReport: SuspiciousReport = {
@@ -588,7 +645,13 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setSuspiciousReports(prev => [newReport, ...prev]);
   };
 
-  const updateReportStatus = (reportId: string, status: SuspiciousReport['status'], notes?: string) => {
+  const updateReportStatus = async (reportId: string, status: SuspiciousReport['status'], notes?: string) => {
+    try {
+      await apiClient.put(`/reports/${reportId}/status`, { status, adminNotes: notes });
+    } catch {
+      console.info('Backend updateReportStatus fallback to local state');
+    }
+
     setSuspiciousReports(prev =>
       prev.map(r => (r.id === reportId ? { ...r, status, adminNotes: notes || r.adminNotes } : r))
     );

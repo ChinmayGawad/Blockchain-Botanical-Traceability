@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserRole } from '../types';
 import { MOCK_USERS } from '../data/mockData';
+import apiClient from '../services/api';
 
 interface AuthContextType {
   currentUser: User;
@@ -8,15 +9,16 @@ interface AuthContextType {
   role: UserRole;
   isAuthenticated: boolean;
   switchRole: (role: UserRole) => void;
-  login: (email: string, role?: UserRole) => boolean;
+  login: (email: string, role?: UserRole, password?: string) => Promise<boolean> | boolean;
   logout: () => void;
-  registerUser: (userData: Omit<User, 'id' | 'status' | 'joinedDate'>) => void;
-  approveUser: (userId: string) => void;
-  rejectUser: (userId: string) => void;
+  registerUser: (userData: Omit<User, 'id' | 'status' | 'joinedDate'>, password?: string) => Promise<void> | void;
+  approveUser: (userId: string) => Promise<void> | void;
+  rejectUser: (userId: string) => Promise<void> | void;
 }
 
 const STORAGE_KEY_USER = 'florachain_current_user';
 const STORAGE_KEY_USERS = 'florachain_users_list';
+const STORAGE_KEY_TOKEN = 'florachain_jwt_token';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -53,6 +55,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(currentUser));
   }, [currentUser]);
 
+  // Attempt to fetch fresh users from backend if admin
+  useEffect(() => {
+    if (currentUser.role === 'ADMIN') {
+      apiClient.get('/auth/users')
+        .then(res => {
+          if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+            setUsers(res.data);
+          }
+        })
+        .catch(() => {
+          // Backend offline, keep local state
+        });
+    }
+  }, [currentUser.role]);
+
   const switchRole = (newRole: UserRole) => {
     if (newRole === 'CONSUMER') {
       const consumerUser: User = {
@@ -88,7 +105,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = (email: string, role?: UserRole): boolean => {
+  const login = async (email: string, role?: UserRole, password?: string): Promise<boolean> => {
+    try {
+      const pwd = password || 'password123';
+      const res = await apiClient.post('/auth/login', { email, password: pwd });
+      if (res.data && res.data.token) {
+        localStorage.setItem(STORAGE_KEY_TOKEN, res.data.token);
+        if (res.data.user) {
+          setCurrentUser(res.data.user);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.info('Backend auth fallback to local session state');
+    }
+
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() || (role && u.role === role));
     if (user) {
       setCurrentUser(user);
@@ -102,10 +133,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    localStorage.removeItem(STORAGE_KEY_TOKEN);
     switchRole('CONSUMER');
   };
 
-  const registerUser = (userData: Omit<User, 'id' | 'status' | 'joinedDate'>) => {
+  const registerUser = async (userData: Omit<User, 'id' | 'status' | 'joinedDate'>, password?: string) => {
+    try {
+      const res = await apiClient.post('/auth/register', {
+        name: userData.name,
+        email: userData.email,
+        password: password || 'password123',
+        role: userData.role,
+        organization: userData.organization,
+        location: userData.location,
+        certifications: userData.certifications,
+        avatarUrl: userData.avatarUrl,
+      });
+      if (res.data && res.data.user) {
+        setUsers(prev => [res.data.user, ...prev]);
+        return;
+      }
+    } catch (e) {
+      console.info('Backend registration fallback to local state');
+    }
+
     const newUser: User = {
       ...userData,
       id: `USR-${userData.role.substring(0, 3)}-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -115,13 +166,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUsers(prev => [newUser, ...prev]);
   };
 
-  const approveUser = (userId: string) => {
+  const approveUser = async (userId: string) => {
+    try {
+      await apiClient.put(`/auth/users/${userId}/approve`);
+    } catch (e) {
+      console.info('Backend approveUser fallback to local state');
+    }
     setUsers(prev =>
       prev.map(u => (u.id === userId ? { ...u, status: 'ACTIVE' as const } : u))
     );
   };
 
-  const rejectUser = (userId: string) => {
+  const rejectUser = async (userId: string) => {
+    try {
+      await apiClient.put(`/auth/users/${userId}/reject`);
+    } catch (e) {
+      console.info('Backend rejectUser fallback to local state');
+    }
     setUsers(prev =>
       prev.map(u => (u.id === userId ? { ...u, status: 'REJECTED' as const } : u))
     );
