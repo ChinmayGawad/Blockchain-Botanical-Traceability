@@ -157,14 +157,14 @@ public class ProductService {
         List<ProductEntity> products = productRepository.findAll();
 
         if (currentUser != null && currentUser.getRole() != null) {
-            String roleStr = currentUser.getRole().toUpperCase();
-            if (roleStr.contains("FARMER")) {
+            UserRole role = currentUser.getRole();
+            if (role == UserRole.FARMER) {
                 products = products.stream()
                         .filter(p -> (p.getFarmerId() != null && p.getFarmerId().equalsIgnoreCase(currentUser.getId()))
                                 || (p.getFarmerOrg() != null && currentUser.getOrganization() != null && p.getFarmerOrg().equalsIgnoreCase(currentUser.getOrganization()))
                                 || (p.getFarmerName() != null && currentUser.getName() != null && p.getFarmerName().toLowerCase().contains(currentUser.getName().toLowerCase())))
                         .collect(Collectors.toList());
-            } else if (roleStr.contains("PROCESSOR")) {
+            } else if (role == UserRole.PROCESSOR) {
                 products = products.stream()
                         .filter(p -> p.getStatus() == ProductStatus.REGISTERED
                                 || (p.getProcessingDetails() != null && (
@@ -172,7 +172,7 @@ public class ProductService {
                                         || (p.getProcessingDetails().getProcessorName() != null && currentUser.getName() != null && p.getProcessingDetails().getProcessorName().toLowerCase().contains(currentUser.getName().toLowerCase()))
                         )))
                         .collect(Collectors.toList());
-            } else if (roleStr.contains("LABORATORY")) {
+            } else if (role == UserRole.LABORATORY) {
                 products = products.stream()
                         .filter(p -> p.getStatus() == ProductStatus.IN_TESTING || p.getStatus() == ProductStatus.PROCESSING
                                 || (p.getLabReport() != null && (
@@ -180,7 +180,7 @@ public class ProductService {
                                         || (p.getLabReport().getLabName() != null && currentUser.getOrganization() != null && p.getLabReport().getLabName().toLowerCase().contains(currentUser.getOrganization().toLowerCase()))
                         )))
                         .collect(Collectors.toList());
-            } else if (roleStr.contains("DISTRIBUTOR")) {
+            } else if (role == UserRole.DISTRIBUTOR) {
                 products = products.stream()
                         .filter(p -> p.getStatus() == ProductStatus.APPROVED
                                 || (p.getShipmentDetails() != null && (
@@ -188,7 +188,7 @@ public class ProductService {
                                         || (p.getShipmentDetails().getDistributorName() != null && currentUser.getName() != null && p.getShipmentDetails().getDistributorName().toLowerCase().contains(currentUser.getName().toLowerCase()))
                         )))
                         .collect(Collectors.toList());
-            } else if (roleStr.contains("RETAILER")) {
+            } else if (role == UserRole.RETAILER) {
                 products = products.stream()
                         .filter(p -> p.getStatus() == ProductStatus.IN_TRANSIT || p.getStatus() == ProductStatus.DELIVERED
                                 || (p.getRetailDetails() != null && (
