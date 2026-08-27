@@ -1,0 +1,33 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: botanical-traceability-backend
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration-ms: 86400000 # 24 hours
+  blockchain:
+    rpc-url: http://127.0.0.1:8545
+    contract-address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+    network-name: Hardhat EVM Localhost (Chain ID 31337)
+  ipfs:
+    gateway-url: https://gateway.pinata.cloud/ipfs/
+    mock-mode: true
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://localhost:3000
+      - http://127.0.0.1:5173
