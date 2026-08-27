@@ -149,17 +149,70 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts(@Nullable ProductStatus status, @Nullable ProductCategory category, @Nullable String search) {
-        List<ProductEntity> products;
+    public List<ProductResponse> getAllProducts(
+            @Nullable ProductStatus status,
+            @Nullable ProductCategory category,
+            @Nullable String search,
+            @Nullable com.florachain.backend.security.UserPrincipal currentUser) {
+        List<ProductEntity> products = productRepository.findAll();
 
+        if (currentUser != null && currentUser.getRole() != null) {
+            String roleStr = currentUser.getRole().toUpperCase();
+            if (roleStr.contains("FARMER")) {
+                products = products.stream()
+                        .filter(p -> (p.getFarmerId() != null && p.getFarmerId().equalsIgnoreCase(currentUser.getId()))
+                                || (p.getFarmerOrg() != null && currentUser.getOrganization() != null && p.getFarmerOrg().equalsIgnoreCase(currentUser.getOrganization()))
+                                || (p.getFarmerName() != null && currentUser.getName() != null && p.getFarmerName().toLowerCase().contains(currentUser.getName().toLowerCase())))
+                        .collect(Collectors.toList());
+            } else if (roleStr.contains("PROCESSOR")) {
+                products = products.stream()
+                        .filter(p -> p.getStatus() == ProductStatus.REGISTERED
+                                || (p.getProcessingDetails() != null && (
+                                (p.getProcessingDetails().getProcessorId() != null && p.getProcessingDetails().getProcessorId().equalsIgnoreCase(currentUser.getId()))
+                                        || (p.getProcessingDetails().getProcessorName() != null && currentUser.getName() != null && p.getProcessingDetails().getProcessorName().toLowerCase().contains(currentUser.getName().toLowerCase()))
+                        )))
+                        .collect(Collectors.toList());
+            } else if (roleStr.contains("LABORATORY")) {
+                products = products.stream()
+                        .filter(p -> p.getStatus() == ProductStatus.IN_TESTING || p.getStatus() == ProductStatus.PROCESSING
+                                || (p.getLabReport() != null && (
+                                (p.getLabReport().getLabId() != null && p.getLabReport().getLabId().equalsIgnoreCase(currentUser.getId()))
+                                        || (p.getLabReport().getLabName() != null && currentUser.getOrganization() != null && p.getLabReport().getLabName().toLowerCase().contains(currentUser.getOrganization().toLowerCase()))
+                        )))
+                        .collect(Collectors.toList());
+            } else if (roleStr.contains("DISTRIBUTOR")) {
+                products = products.stream()
+                        .filter(p -> p.getStatus() == ProductStatus.APPROVED
+                                || (p.getShipmentDetails() != null && (
+                                (p.getShipmentDetails().getDistributorId() != null && p.getShipmentDetails().getDistributorId().equalsIgnoreCase(currentUser.getId()))
+                                        || (p.getShipmentDetails().getDistributorName() != null && currentUser.getName() != null && p.getShipmentDetails().getDistributorName().toLowerCase().contains(currentUser.getName().toLowerCase()))
+                        )))
+                        .collect(Collectors.toList());
+            } else if (roleStr.contains("RETAILER")) {
+                products = products.stream()
+                        .filter(p -> p.getStatus() == ProductStatus.IN_TRANSIT || p.getStatus() == ProductStatus.DELIVERED
+                                || (p.getRetailDetails() != null && (
+                                (p.getRetailDetails().getRetailerId() != null && p.getRetailDetails().getRetailerId().equalsIgnoreCase(currentUser.getId()))
+                                        || (p.getRetailDetails().getRetailerName() != null && currentUser.getName() != null && p.getRetailDetails().getRetailerName().toLowerCase().contains(currentUser.getName().toLowerCase()))
+                        )))
+                        .collect(Collectors.toList());
+            }
+            // ADMIN sees all products
+        }
+
+        if (status != null) {
+            products = products.stream().filter(p -> p.getStatus() == status).collect(Collectors.toList());
+        }
+        if (category != null) {
+            products = products.stream().filter(p -> p.getCategory() == category).collect(Collectors.toList());
+        }
         if (search != null && !search.isBlank()) {
-            products = productRepository.searchProducts(search.trim());
-        } else if (status != null) {
-            products = productRepository.findByStatus(status);
-        } else if (category != null) {
-            products = productRepository.findByCategory(category);
-        } else {
-            products = productRepository.findAll();
+            String query = search.trim().toLowerCase();
+            products = products.stream().filter(p ->
+                    (p.getName() != null && p.getName().toLowerCase().contains(query)) ||
+                    (p.getBatchId() != null && p.getBatchId().toLowerCase().contains(query)) ||
+                    (p.getBotanicalName() != null && p.getBotanicalName().toLowerCase().contains(query))
+            ).collect(Collectors.toList());
         }
 
         return products.stream()

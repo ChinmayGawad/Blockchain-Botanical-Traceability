@@ -16,6 +16,7 @@ import {
   Printer,
   DollarSign,
   Tag,
+  ShieldCheck,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -29,8 +30,17 @@ export const RetailerDashboard: React.FC = () => {
   const [shelfId, setShelfId] = useState('RET-LON-092');
   const [price, setPrice] = useState<number>(29.99);
 
+  // Incoming shipments ready for check-in
   const incomingShipments = products.filter(p => p.status === 'IN_TRANSIT' || p.status === 'DELIVERED');
-  const verifiedShelfProducts = products.filter(p => p.status === 'RETAIL_READY');
+
+  // Shelf inventory verified by this retailer
+  const myRetailInventory = products.filter(
+    p =>
+      p.retailDetails &&
+      (p.retailDetails.retailerId === currentUser.id ||
+        (currentUser.name && p.retailDetails.retailerName.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+        currentUser.role === 'ADMIN')
+  );
 
   const handleConfirmReceipt = (productId: string) => {
     confirmRetailReceipt(productId, {
@@ -52,11 +62,11 @@ export const RetailerDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title="Retailer Apothecary Portal"
-      subtitle="Confirm verified incoming batches, assign retail shelf IDs, and generate high-trust customer QR stickers."
+      subtitle={`Authenticated as ${currentUser.name} (${currentUser.organization || 'Pure Botanical Apothecary'}). Check in verified shipments, assign shelf batch IDs, and print high-trust QR stickers.`}
       action={
         <Link
           to="/retailer/generate-qr"
-          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
         >
           <QrCode size={16} />
           <span>Batch QR Label Studio</span>
@@ -64,15 +74,41 @@ export const RetailerDashboard: React.FC = () => {
       }
     >
       <div className="space-y-6">
+        {/* Node Identity Banner */}
+        <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold shrink-0">
+              <Store size={20} />
+            </div>
+            <div>
+              <div className="font-bold text-slate-900 flex items-center gap-2">
+                <span>{currentUser.organization || 'Pure Botanical Apothecary London'}</span>
+                <span className="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-semibold">
+                  Accredited Retail Partner
+                </span>
+              </div>
+              <p className="text-slate-600 text-[11px]">
+                Retailer ID: <strong className="font-mono text-emerald-800">{currentUser.id}</strong> • Storefront: {currentUser.location || 'Covent Garden, London'}
+              </p>
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-[11px] text-slate-500 block">Ledger Verification Status</span>
+            <span className="font-bold text-emerald-700 inline-flex items-center gap-1">
+              <ShieldCheck size={14} /> Smart Contract Active
+            </span>
+          </div>
+        </div>
+
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            title="Verified Shelf Inventory"
-            value={verifiedShelfProducts.length}
+            title="My Shelf Inventory"
+            value={myRetailInventory.length}
             subtitle="Ready for consumer scan"
             icon={Store}
-            iconColor="text-teal-600"
-            bgColor="bg-teal-50"
+            iconColor="text-emerald-700"
+            bgColor="bg-emerald-50"
           />
           <MetricCard
             title="Incoming Logistics Lots"
@@ -92,7 +128,7 @@ export const RetailerDashboard: React.FC = () => {
           />
           <MetricCard
             title="Avg Retail Unit Price"
-            value="$28.50"
+            value="$29.99"
             subtitle="Certified Organic Botanical"
             icon={DollarSign}
             iconColor="text-emerald-600"
@@ -100,18 +136,18 @@ export const RetailerDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Incoming Shipments Needing Store Receipt Confirmation */}
+        {/* Incoming Logistics Batches Awaiting Receipt */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <span>Incoming Freight Shipments Awaiting Store Intake</span>
+                <span>Incoming Transport Deliveries</span>
                 <span className="text-xs font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">
-                  {incomingShipments.length} Pending Check-In
+                  {incomingShipments.length} Available
                 </span>
               </h3>
               <p className="text-xs text-slate-500">
-                Confirm physical seals, assign retail price, and unlock consumer QR code verification
+                Cold-chain consignments delivered to store ready for retail inventory check-in
               </p>
             </div>
           </div>
@@ -120,154 +156,176 @@ export const RetailerDashboard: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
                 <tr>
-                  <th className="px-5 py-3">Botanical Product</th>
+                  <th className="px-5 py-3">Product Name</th>
                   <th className="px-5 py-3">Batch ID</th>
-                  <th className="px-5 py-3">Distributor Carrier</th>
+                  <th className="px-5 py-3">Carrier / Tracking</th>
                   <th className="px-5 py-3">Status</th>
                   <th className="px-5 py-3 text-right">Store Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {incomingShipments.length > 0 ? (
-                  incomingShipments.map(product => (
-                    <tr key={product.id} className="hover:bg-teal-50/30 transition-colors">
-                      <td className="px-5 py-4">
-                        <div className="font-bold text-slate-900">{product.name}</div>
-                        <div className="text-[11px] text-slate-500 italic font-mono">
-                          {product.botanicalName}
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-4 font-mono font-semibold text-emerald-700">
-                        {product.batchId}
-                      </td>
-
-                      <td className="px-5 py-4 text-slate-600">
-                        <div className="font-medium text-slate-800">
-                          {product.shipmentDetails?.distributorName || 'TransGlobal Logistics'}
-                        </div>
-                        <div className="text-[10px] text-slate-400 font-mono">
-                          Tracking: {product.shipmentDetails?.trackingNumber}
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <StatusBadge status={product.status} size="sm" />
-                      </td>
-
-                      <td className="px-5 py-4 text-right">
-                        {receivingProductId === product.id ? (
-                          <div className="flex items-center justify-end gap-2">
-                            <input
-                              type="text"
-                              placeholder="Shelf Batch ID"
-                              value={shelfId}
-                              onChange={e => setShelfId(e.target.value)}
-                              className="px-2 py-1 text-xs border border-slate-300 rounded font-mono w-28"
-                            />
-                            <input
-                              type="number"
-                              step="0.5"
-                              placeholder="Price"
-                              value={price}
-                              onChange={e => setPrice(Number(e.target.value))}
-                              className="px-2 py-1 text-xs border border-slate-300 rounded font-mono w-20"
-                            />
-                            <button
-                              onClick={() => handleConfirmReceipt(product.id)}
-                              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold"
-                            >
-                              Confirm
-                            </button>
-                            <button
-                              onClick={() => setReceivingProductId(null)}
-                              className="px-2 py-1 text-slate-500 hover:bg-slate-100 rounded text-xs"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setReceivingProductId(product.id)}
-                            className="px-3.5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-2xs"
-                          >
-                            <CheckCircle2 size={14} />
-                            <span>Confirm Receipt & Stock</span>
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
-                      No incoming shipments awaiting intake. Create a shipment in Distributor portal to test.
+                {incomingShipments.map(product => (
+                  <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="px-5 py-4 font-bold text-slate-900">
+                      {product.name}
+                      <span className="block text-[10px] text-slate-400 font-mono">{product.botanicalName}</span>
+                    </td>
+                    <td className="px-5 py-4 font-mono font-semibold text-emerald-700">
+                      {product.batchId}
+                    </td>
+                    <td className="px-5 py-4 text-slate-700">
+                      <div className="font-semibold text-slate-800">{product.shipmentDetails?.distributorName || 'Cold-Chain Transport'}</div>
+                      <div className="text-[10px] text-slate-400 font-mono">Track: {product.shipmentDetails?.trackingNumber || 'N/A'}</div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={product.status} />
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      {product.status === 'RETAIL_READY' ? (
+                        <span className="text-emerald-700 font-bold text-[11px] inline-flex items-center gap-1">
+                          <CheckCircle2 size={13} /> On Shelf
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setReceivingProductId(product.id)}
+                          className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        >
+                          <PackageCheck size={13} />
+                          <span>Accept into Inventory</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Verified Store Inventory Ready for Customer Purchase */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100">
-            <h3 className="text-base font-bold text-slate-900">
-              Verified In-Stock Botanical Inventory
-            </h3>
-            <p className="text-xs text-slate-500">
-              Batches on shelves with active customer QR verification tags
-            </p>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {verifiedShelfProducts.map(product => (
-              <div
-                key={product.id}
-                className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors"
+        {/* Modal / Inline Receive Form */}
+        {receivingProductId && (
+          <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
+                <Tag size={16} className="text-emerald-700" />
+                <span>Confirm Retail Intake & Shelf Tag Assignment</span>
+              </h4>
+              <button
+                onClick={() => setReceivingProductId(null)}
+                className="text-xs text-slate-500 hover:text-slate-800 font-bold"
               >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={product.imageUrl || 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=100&auto=format&fit=crop&q=80'}
-                    alt={product.name}
-                    className="w-12 h-12 rounded-xl object-cover bg-slate-100 shrink-0"
-                  />
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm">{product.name}</span>
-                      <span className="font-mono text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        #{product.batchId}
-                      </span>
-                      <StatusBadge status={product.status} size="sm" />
-                    </div>
-                    <div className="text-xs text-slate-600 flex items-center gap-3">
-                      <span>Shelf ID: <strong className="font-mono text-slate-800">{product.retailDetails?.shelfBatchId || 'RET-LON-089'}</strong></span>
-                      <span>Price: <strong className="text-emerald-700">${product.retailDetails?.unitPrice?.toFixed(2) || '28.50'}</strong></span>
-                      <span>Stock: {product.quantityKg} kg</span>
-                    </div>
-                  </div>
-                </div>
+                ✕ Cancel
+              </button>
+            </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSelectedProductForQR(product)}
-                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-2xs"
-                  >
-                    <QrCode size={14} className="text-emerald-400" />
-                    <span>Print QR Tag</span>
-                  </button>
-
-                  <Link
-                    to={`/verify/${product.id}`}
-                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-semibold transition-colors"
-                  >
-                    Verify View
-                  </Link>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  Retail Shelf Batch Tag:
+                </label>
+                <input
+                  type="text"
+                  value={shelfId}
+                  onChange={e => setShelfId(e.target.value)}
+                  className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-mono font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
+                />
               </div>
-            ))}
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  Shelf Unit Price (USD):
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  value={price}
+                  onChange={e => setPrice(parseFloat(e.target.value) || 0)}
+                  className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="flex items-end">
+                <button
+                  onClick={() => handleConfirmReceipt(receivingProductId)}
+                  className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <CheckCircle2 size={14} />
+                  <span>Commit to Blockchain & Activate QR</span>
+                </button>
+              </div>
+            </div>
           </div>
+        )}
+
+        {/* My Store Shelf Inventory */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-slate-900">
+                My Verified Retail Stock
+              </h3>
+              <p className="text-xs text-slate-500">
+                Products stocked by {currentUser.name} ({currentUser.organization})
+              </p>
+            </div>
+          </div>
+
+          {myRetailInventory.length === 0 ? (
+            <div className="p-8 text-center text-xs text-slate-500">
+              No inventory has been received under this retailer account yet. Accept an incoming delivery above to stock your shelf.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                  <tr>
+                    <th className="px-5 py-3">Product</th>
+                    <th className="px-5 py-3">Shelf Batch ID</th>
+                    <th className="px-5 py-3">Unit Price</th>
+                    <th className="px-5 py-3">Verification State</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {myRetailInventory.map(product => (
+                    <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="px-5 py-4 font-bold text-slate-900">
+                        {product.name}
+                        <span className="block text-[10px] text-slate-400 font-mono">{product.batchId}</span>
+                      </td>
+                      <td className="px-5 py-4 font-mono font-bold text-emerald-800">
+                        {product.retailDetails?.shelfBatchId}
+                      </td>
+                      <td className="px-5 py-4 font-bold text-slate-800">
+                        ${product.retailDetails?.unitPrice.toFixed(2)}
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                          {product.verificationState}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-right space-x-2">
+                        <button
+                          onClick={() => setSelectedProductForQR(product)}
+                          className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        >
+                          <Printer size={12} />
+                          <span>Print QR Tag</span>
+                        </button>
+                        <button
+                          onClick={() => navigate(`/verify/${product.id}`)}
+                          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <span>Trace</span>
+                          <ArrowRight size={12} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
@@ -275,8 +333,8 @@ export const RetailerDashboard: React.FC = () => {
       {selectedProductForQR && (
         <QRModal
           isOpen={!!selectedProductForQR}
-          onClose={() => setSelectedProductForQR(null)}
           product={selectedProductForQR}
+          onClose={() => setSelectedProductForQR(null)}
         />
       )}
     </DashboardLayout>

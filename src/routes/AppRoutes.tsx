@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { ProtectedRoute } from './ProtectedRoute';
 
 // Public Pages
@@ -36,19 +37,30 @@ import { CreateShipmentPage } from '../pages/distributor/CreateShipmentPage';
 import { RetailerDashboard } from '../pages/retailer/RetailerDashboard';
 import { GenerateQRPage } from '../pages/retailer/GenerateQRPage';
 
+// Root Route Handler: Opens Authentication first when launching the web app
+const RootEntryPage: React.FC = () => {
+  const { isAuthenticated, role } = useAuth();
+
+  if (isAuthenticated && role !== 'CONSUMER') {
+    return <Navigate to={`/${role.toLowerCase()}/dashboard`} replace />;
+  }
+  return <LoginPage />;
+};
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public / Consumer Routes */}
-      <Route path="/" element={<HomePage />} />
-      <Route path="/verify" element={<VerifyProductPage />} />
-      <Route path="/verify/:productId" element={<VerifyProductPage />} />
-
-      {/* Auth Routes */}
+      {/* Root Route: Defaults to Authentication First */}
+      <Route path="/" element={<RootEntryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Admin Portal (Protected: ADMIN only) */}
+      {/* Public Pages */}
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/verify" element={<VerifyProductPage />} />
+      <Route path="/verify/:productId" element={<VerifyProductPage />} />
+
+      {/* Admin Portal (Strictly for ADMIN only) */}
       <Route
         path="/admin/dashboard"
         element={
@@ -90,11 +102,11 @@ export const AppRoutes: React.FC = () => {
         }
       />
 
-      {/* Farmer Portal (Protected: FARMER or ADMIN) */}
+      {/* Farmer Portal (Strictly for FARMER only) */}
       <Route
         path="/farmer/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['FARMER', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['FARMER']}>
             <FarmerDashboard />
           </ProtectedRoute>
         }
@@ -102,7 +114,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/farmer/register"
         element={
-          <ProtectedRoute allowedRoles={['FARMER', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['FARMER']}>
             <RegisterProductPage />
           </ProtectedRoute>
         }
@@ -110,17 +122,17 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/farmer/products"
         element={
-          <ProtectedRoute allowedRoles={['FARMER', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['FARMER']}>
             <FarmerDashboard />
           </ProtectedRoute>
         }
       />
 
-      {/* Processor Portal (Protected: PROCESSOR or ADMIN) */}
+      {/* Processor Portal (Strictly for PROCESSOR only) */}
       <Route
         path="/processor/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['PROCESSOR', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['PROCESSOR']}>
             <ProcessorDashboard />
           </ProtectedRoute>
         }
@@ -128,7 +140,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/processor/process"
         element={
-          <ProtectedRoute allowedRoles={['PROCESSOR', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['PROCESSOR']}>
             <ProcessBatchPage />
           </ProtectedRoute>
         }
@@ -136,17 +148,17 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/processor/batches"
         element={
-          <ProtectedRoute allowedRoles={['PROCESSOR', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['PROCESSOR']}>
             <ProcessorDashboard />
           </ProtectedRoute>
         }
       />
 
-      {/* Laboratory Portal (Protected: LABORATORY or ADMIN) */}
+      {/* Laboratory Portal (Strictly for LABORATORY only) */}
       <Route
         path="/laboratory/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['LABORATORY', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['LABORATORY']}>
             <LaboratoryDashboard />
           </ProtectedRoute>
         }
@@ -154,7 +166,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/laboratory/test"
         element={
-          <ProtectedRoute allowedRoles={['LABORATORY', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['LABORATORY']}>
             <TestProductPage />
           </ProtectedRoute>
         }
@@ -162,17 +174,17 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/laboratory/reports"
         element={
-          <ProtectedRoute allowedRoles={['LABORATORY', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['LABORATORY']}>
             <LaboratoryDashboard />
           </ProtectedRoute>
         }
       />
 
-      {/* Distributor Portal (Protected: DISTRIBUTOR or ADMIN) */}
+      {/* Distributor Portal (Strictly for DISTRIBUTOR only) */}
       <Route
         path="/distributor/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['DISTRIBUTOR', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['DISTRIBUTOR']}>
             <DistributorDashboard />
           </ProtectedRoute>
         }
@@ -180,7 +192,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/distributor/create-shipment"
         element={
-          <ProtectedRoute allowedRoles={['DISTRIBUTOR', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['DISTRIBUTOR']}>
             <CreateShipmentPage />
           </ProtectedRoute>
         }
@@ -188,17 +200,17 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/distributor/shipments"
         element={
-          <ProtectedRoute allowedRoles={['DISTRIBUTOR', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['DISTRIBUTOR']}>
             <DistributorDashboard />
           </ProtectedRoute>
         }
       />
 
-      {/* Retailer Portal (Protected: RETAILER or ADMIN) */}
+      {/* Retailer Portal (Strictly for RETAILER only) */}
       <Route
         path="/retailer/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['RETAILER', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['RETAILER']}>
             <RetailerDashboard />
           </ProtectedRoute>
         }
@@ -206,7 +218,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/retailer/inventory"
         element={
-          <ProtectedRoute allowedRoles={['RETAILER', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['RETAILER']}>
             <RetailerDashboard />
           </ProtectedRoute>
         }
@@ -214,7 +226,7 @@ export const AppRoutes: React.FC = () => {
       <Route
         path="/retailer/generate-qr"
         element={
-          <ProtectedRoute allowedRoles={['RETAILER', 'ADMIN']}>
+          <ProtectedRoute allowedRoles={['RETAILER']}>
             <GenerateQRPage />
           </ProtectedRoute>
         }

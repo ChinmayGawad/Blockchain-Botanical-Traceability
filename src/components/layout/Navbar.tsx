@@ -23,18 +23,23 @@ import {
   UserPlus,
   User,
   AlertCircle,
+  PlusCircle,
+  Cog,
+  FlaskConical,
+  Truck,
+  Store,
 } from 'lucide-react';
 import { QRScannerModal } from '../verification/QRScannerModal';
 import { WalletConnectButton } from '../common/WalletConnectButton';
 
 export const Navbar: React.FC = () => {
-  const { currentUser, role, isAuthenticated, switchRole, logout } = useAuth();
+  const { currentUser, role, isAuthenticated, logout } = useAuth();
   const { networkStats, resetToDefaultData } = useBlockchain();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -51,33 +56,24 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const roles: { role: UserRole; label: string; desc: string; color: string; badgeBg: string }[] = [
-    { role: 'CONSUMER', label: 'Public Consumer', desc: 'Scan & verify botanical origin', color: 'text-emerald-700', badgeBg: 'bg-emerald-50 border-emerald-200' },
-    { role: 'FARMER', label: 'Farmer Portal', desc: 'Harvest & GPS registration', color: 'text-teal-700', badgeBg: 'bg-teal-50 border-teal-200' },
-    { role: 'PROCESSOR', label: 'Bio Processor', desc: 'Milling & extraction logs', color: 'text-purple-700', badgeBg: 'bg-purple-50 border-purple-200' },
-    { role: 'LABORATORY', label: 'Testing Lab', desc: 'HPLC potency & certificates', color: 'text-indigo-700', badgeBg: 'bg-indigo-50 border-indigo-200' },
-    { role: 'DISTRIBUTOR', label: 'Distributor', desc: 'Cold-chain GPS transit', color: 'text-sky-700', badgeBg: 'bg-sky-50 border-sky-200' },
-    { role: 'RETAILER', label: 'Retailer', desc: 'Shelf inventory & QR tags', color: 'text-emerald-800', badgeBg: 'bg-emerald-50 border-emerald-300' },
-    { role: 'ADMIN', label: 'Consortium Admin', desc: 'Governance & fraud audit', color: 'text-slate-900', badgeBg: 'bg-slate-100 border-slate-300' },
-  ];
-
-  const handleRoleChange = (newRole: UserRole) => {
-    switchRole(newRole);
-    setIsRoleDropdownOpen(false);
-    setIsMobileMenuOpen(false);
-
-    if (newRole === 'CONSUMER') {
-      navigate('/');
-    } else {
-      navigate(`/${newRole.toLowerCase()}/dashboard`);
-    }
+  const roleConfigs: Record<UserRole, { label: string; icon: React.ElementType; color: string; bg: string; actionPath?: string; actionLabel?: string }> = {
+    CONSUMER: { label: 'Public Consumer', icon: User, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+    FARMER: { label: 'Organic Farmer', icon: Sprout, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', actionPath: '/farmer/register', actionLabel: 'Register Harvest' },
+    PROCESSOR: { label: 'Bio Processor', icon: Cog, color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', actionPath: '/processor/process', actionLabel: 'Process Raw Batch' },
+    LABORATORY: { label: 'QA Testing Lab', icon: FlaskConical, color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200', actionPath: '/laboratory/test', actionLabel: 'Conduct QA Inspection' },
+    DISTRIBUTOR: { label: 'Cold-Chain Distributor', icon: Truck, color: 'text-sky-700', bg: 'bg-sky-50 border-sky-200', actionPath: '/distributor/create-shipment', actionLabel: 'Create Shipment' },
+    RETAILER: { label: 'Apothecary Retailer', icon: Store, color: 'text-emerald-800', bg: 'bg-emerald-50 border-emerald-300', actionPath: '/retailer/generate-qr', actionLabel: 'QR Label Studio' },
+    ADMIN: { label: 'Consortium Admin', icon: ShieldCheck, color: 'text-slate-900', bg: 'bg-slate-100 border-slate-300', actionPath: '/admin/approvals', actionLabel: 'User Approvals' },
   };
+
+  const currentRoleCfg = roleConfigs[role] || roleConfigs.CONSUMER;
+  const RoleIcon = currentRoleCfg.icon;
 
   const handleLogout = () => {
     logout();
-    setIsRoleDropdownOpen(false);
+    setIsUserDropdownOpen(false);
     setIsMobileMenuOpen(false);
-    navigate('/');
+    navigate('/login');
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -87,13 +83,69 @@ export const Navbar: React.FC = () => {
     setSearchQuery('');
   };
 
-  const navLinks = [
-    { to: '/', label: 'Home', isExact: true },
-    { to: '/verify', label: 'Verify Batch', isExact: false },
-    { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
-  ];
+  // Scoped navigation links: ONLY shows features for the authenticated user's role!
+  const getNavLinks = () => {
+    if (!isAuthenticated || role === 'CONSUMER') {
+      return [
+        { to: '/home', label: 'Overview', isExact: true },
+        { to: '/verify', label: 'Verify Batch', isExact: false },
+        { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+      ];
+    }
 
-  const currentRoleInfo = roles.find(r => r.role === role) || roles[0];
+    // Role-specific navigation links strictly for the logged-in role
+    switch (role) {
+      case 'FARMER':
+        return [
+          { to: '/farmer/dashboard', label: '🌾 My Farm Portal', isExact: true, isHighlight: true },
+          { to: '/farmer/register', label: 'Register Harvest', isExact: true },
+          { to: '/verify', label: 'Verify Batch', isExact: false },
+          { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+        ];
+      case 'PROCESSOR':
+        return [
+          { to: '/processor/dashboard', label: '⚙️ Bio-Refining Portal', isExact: true, isHighlight: true },
+          { to: '/processor/process', label: 'Process Raw Batch', isExact: true },
+          { to: '/verify', label: 'Verify Batch', isExact: false },
+          { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+        ];
+      case 'LABORATORY':
+        return [
+          { to: '/laboratory/dashboard', label: '🧪 QA Lab Station', isExact: true, isHighlight: true },
+          { to: '/laboratory/test', label: 'Conduct QA Inspection', isExact: true },
+          { to: '/verify', label: 'Verify Batch', isExact: false },
+          { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+        ];
+      case 'DISTRIBUTOR':
+        return [
+          { to: '/distributor/dashboard', label: '🚚 Logistics Portal', isExact: true, isHighlight: true },
+          { to: '/distributor/create-shipment', label: 'Create Shipment', isExact: true },
+          { to: '/verify', label: 'Verify Batch', isExact: false },
+          { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+        ];
+      case 'RETAILER':
+        return [
+          { to: '/retailer/dashboard', label: '🏪 Apothecary Store', isExact: true, isHighlight: true },
+          { to: '/retailer/generate-qr', label: 'QR Label Studio', isExact: true },
+          { to: '/verify', label: 'Verify Batch', isExact: false },
+          { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+        ];
+      case 'ADMIN':
+        return [
+          { to: '/admin/dashboard', label: '🛡️ Admin Console', isExact: true, isHighlight: true },
+          { to: '/admin/approvals', label: 'User Approvals', isExact: true },
+          { to: '/admin/reports', label: 'Fraud Reports', isExact: true },
+          { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks, isExact: false },
+        ];
+      default:
+        return [
+          { to: '/home', label: 'Overview', isExact: true },
+          { to: '/verify', label: 'Verify Batch', isExact: false },
+        ];
+    }
+  };
+
+  const navLinks = getNavLinks();
 
   return (
     <>
@@ -138,7 +190,7 @@ export const Navbar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo & Brand */}
           <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2.5 group">
+            <Link to={isAuthenticated && role !== 'CONSUMER' ? `/${role.toLowerCase()}/dashboard` : '/'} className="flex items-center gap-2.5 group">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center shadow-md shadow-emerald-900/10 group-hover:scale-105 transition-transform">
                 <Sprout size={22} className="text-emerald-100" />
               </div>
@@ -147,18 +199,19 @@ export const Navbar: React.FC = () => {
                   Flora<span className="text-emerald-600">Chain</span>
                 </span>
                 <span className="block text-[9px] uppercase font-bold tracking-widest text-emerald-800 -mt-0.5">
-                  Botanical Provenance
+                  {isAuthenticated && role !== 'CONSUMER' ? `${role} Portal` : 'Botanical Provenance'}
                 </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Navigation Links (Strictly Scoped per User Role) */}
             <nav className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-slate-600">
               {navLinks.map(link => {
                 const isActive = link.isExact
                   ? location.pathname === link.to
                   : location.pathname.startsWith(link.to);
-                const Icon = link.icon;
+                const Icon = (link as any).icon;
+                const isHighlight = (link as any).isHighlight;
 
                 return (
                   <Link
@@ -166,7 +219,11 @@ export const Navbar: React.FC = () => {
                     to={link.to}
                     className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
                       isActive
-                        ? 'text-emerald-800 bg-emerald-50 border border-emerald-200/80 font-bold shadow-2xs'
+                        ? isHighlight
+                          ? 'text-emerald-900 bg-emerald-100 border border-emerald-300 font-bold shadow-xs'
+                          : 'text-emerald-800 bg-emerald-50 border border-emerald-200/80 font-bold shadow-2xs'
+                        : isHighlight
+                        ? 'text-emerald-700 bg-emerald-50/60 hover:bg-emerald-100/80 border border-emerald-200 font-bold'
                         : 'hover:text-slate-900 hover:bg-slate-100 border border-transparent'
                     }`}
                   >
@@ -197,7 +254,7 @@ export const Navbar: React.FC = () => {
             </span>
           </form>
 
-          {/* Right Action Tools & Interactive Role Switcher */}
+          {/* Right Action Tools & User Profile */}
           <div className="flex items-center gap-2.5">
             {/* Web3 Wallet Connect Button */}
             <div className="hidden sm:block">
@@ -214,126 +271,86 @@ export const Navbar: React.FC = () => {
               <span className="hidden sm:inline">Scan QR</span>
             </button>
 
-            {/* User Profile & Role Switcher Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                className="flex items-center gap-2 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all shadow-sm border border-slate-800 cursor-pointer"
-                title="Manage active stakeholder role"
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${currentUser.status === 'PENDING_APPROVAL' ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`}></span>
-                  <span className="capitalize">{role.toLowerCase()}</span>
-                </div>
-                <ChevronDown size={13} className={`text-slate-400 transition-transform duration-150 ${isRoleDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isRoleDropdownOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsRoleDropdownOpen(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                    {/* User Profile Card */}
-                    <div className="px-3.5 py-3 border-b border-slate-100 bg-slate-50/80 rounded-t-xl">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                          currentUser.status === 'ACTIVE'
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                            : 'bg-amber-100 text-amber-800 border-amber-300'
-                        }`}>
-                          {currentUser.status}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 truncate mt-0.5">{currentUser.organization}</p>
-                      <p className="text-[10px] text-emerald-700 font-mono">{currentUser.email}</p>
-                    </div>
-
-                    <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-                      <span className="flex items-center gap-1">
-                        <Sparkles size={11} className="text-emerald-600" /> Switch Stakeholder Sandbox
-                      </span>
-                    </div>
-
-                    <div className="py-1 space-y-1 max-h-56 overflow-y-auto">
-                      {roles.map(r => {
-                        const isSelected = role === r.role;
-                        return (
-                          <button
-                            key={r.role}
-                            onClick={() => handleRoleChange(r.role)}
-                            className={`w-full flex items-start gap-2.5 px-3 py-2 rounded-xl text-left transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-emerald-50/80 border border-emerald-200 shadow-2xs'
-                                : 'hover:bg-slate-50 border border-transparent'
-                            }`}
-                          >
-                            <span
-                              className={`text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 mt-0.5 border ${r.badgeBg} ${r.color}`}
-                            >
-                              {r.role}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-bold text-slate-900 flex items-center justify-between">
-                                <span>{r.label}</span>
-                                {isSelected && <CheckCircle2 size={13} className="text-emerald-600" />}
-                              </div>
-                              <div className="text-[10px] text-slate-500 truncate">
-                                {r.desc}
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="pt-2 border-t border-slate-100 space-y-1.5">
-                      {role !== 'CONSUMER' ? (
-                        <>
-                          <Link
-                            to={`/${role.toLowerCase()}/dashboard`}
-                            onClick={() => setIsRoleDropdownOpen(false)}
-                            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
-                          >
-                            <LayoutDashboard size={14} />
-                            <span>Open {role} Dashboard</span>
-                          </Link>
-                          <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
-                          >
-                            <LogOut size={13} />
-                            <span>Sign Out ({role})</span>
-                          </button>
-                        </>
-                      ) : (
-                        <div className="grid grid-cols-2 gap-1.5">
-                          <Link
-                            to="/login"
-                            onClick={() => setIsRoleDropdownOpen(false)}
-                            className="flex items-center justify-center gap-1 py-2 px-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors text-center"
-                          >
-                            <LogIn size={13} />
-                            <span>Sign In</span>
-                          </Link>
-                          <Link
-                            to="/register"
-                            onClick={() => setIsRoleDropdownOpen(false)}
-                            className="flex items-center justify-center gap-1 py-2 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors text-center"
-                          >
-                            <UserPlus size={13} />
-                            <span>Register</span>
-                          </Link>
-                        </div>
-                      )}
-                    </div>
+            {/* Authenticated User Profile Dropdown */}
+            {isAuthenticated && role !== 'CONSUMER' ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  className="flex items-center gap-2 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all shadow-sm border border-slate-800 cursor-pointer"
+                  title="My Authenticated Account"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <RoleIcon size={14} className="text-emerald-400" />
+                    <span className="capitalize">{role.toLowerCase()}</span>
                   </div>
-                </>
-              )}
-            </div>
+                  <ChevronDown size={13} className={`text-slate-400 transition-transform duration-150 ${isUserDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isUserDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-3 overflow-hidden animate-in fade-in zoom-in-95 duration-150 space-y-3">
+                      {/* User Identity Card */}
+                      <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            {role}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate">{currentUser.organization}</p>
+                        <p className="text-[10px] text-emerald-700 font-mono">{currentUser.email}</p>
+                        <p className="text-[10px] text-slate-400 truncate">ID: {currentUser.id}</p>
+                      </div>
+
+                      {/* Role Actions */}
+                      <div className="space-y-1 text-xs font-semibold">
+                        <Link
+                          to={`/${role.toLowerCase()}/dashboard`}
+                          onClick={() => setIsUserDropdownOpen(false)}
+                          className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+                        >
+                          <LayoutDashboard size={14} className="text-emerald-600" />
+                          <span>My {role} Dashboard</span>
+                        </Link>
+                        {currentRoleCfg.actionPath && (
+                          <Link
+                            to={currentRoleCfg.actionPath}
+                            onClick={() => setIsUserDropdownOpen(false)}
+                            className="w-full flex items-center gap-2 p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+                          >
+                            <PlusCircle size={14} className="text-emerald-600" />
+                            <span>{currentRoleCfg.actionLabel}</span>
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Sign Out Button */}
+                      <div className="pt-2 border-t border-slate-100">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                        >
+                          <LogOut size={13} />
+                          <span>Sign Out ({role})</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+              >
+                <LogIn size={14} />
+                <span>Sign In</span>
+              </Link>
+            )}
 
             {/* Mobile Menu Toggle Button */}
             <button
@@ -366,53 +383,45 @@ export const Navbar: React.FC = () => {
             </form>
 
             <nav className="space-y-1">
-              <Link
-                to="/"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Home
-              </Link>
-              <Link
-                to="/verify"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Verify Product Batch
-              </Link>
-              <Link
-                to="/admin/explorer"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Hyperledger Explorer
-              </Link>
-              {role !== 'CONSUMER' && (
+              {navLinks.map(link => (
                 <Link
-                  to={`/${role.toLowerCase()}/dashboard`}
+                  key={link.to}
+                  to={link.to}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-sm font-bold text-emerald-800 bg-emerald-50 border border-emerald-200"
+                  className="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
-                  My {role} Dashboard →
+                  {link.label}
                 </Link>
-              )}
+              ))}
             </nav>
 
-            <div className="pt-2 border-t border-slate-100 flex gap-2">
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-1/2 py-2 text-center bg-slate-900 text-white rounded-xl text-xs font-bold"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-1/2 py-2 text-center bg-emerald-600 text-white rounded-xl text-xs font-bold"
-              >
-                Register
-              </Link>
+            <div className="pt-2 border-t border-slate-100">
+              {isAuthenticated && role !== 'CONSUMER' ? (
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
+                >
+                  <LogOut size={13} />
+                  <span>Sign Out ({role})</span>
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-1/2 py-2 text-center bg-slate-900 text-white rounded-xl text-xs font-bold"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-1/2 py-2 text-center bg-emerald-600 text-white rounded-xl text-xs font-bold"
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

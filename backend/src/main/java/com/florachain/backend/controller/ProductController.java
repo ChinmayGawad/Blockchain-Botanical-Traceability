@@ -5,6 +5,7 @@ import com.florachain.backend.dto.ProductDTOs.ProductResponse;
 import com.florachain.backend.dto.VerificationDTOs.TimelineEventDto;
 import com.florachain.backend.enums.ProductCategory;
 import com.florachain.backend.enums.ProductStatus;
+import com.florachain.backend.security.UserPrincipal;
 import com.florachain.backend.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +35,9 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> getAllProducts(
             @RequestParam(required = false) @Nullable ProductStatus status,
             @RequestParam(required = false) @Nullable ProductCategory category,
-            @RequestParam(required = false) @Nullable String search) {
-        return ResponseEntity.ok(productService.getAllProducts(status, category, search));
+            @RequestParam(required = false) @Nullable String search,
+            @AuthenticationPrincipal @Nullable UserPrincipal currentUser) {
+        return ResponseEntity.ok(productService.getAllProducts(status, category, search, currentUser));
     }
 
     @GetMapping("/{id}")
