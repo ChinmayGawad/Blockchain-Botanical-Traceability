@@ -99,6 +99,48 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public AuthResponse switchRole(UserRole targetRole) {
+        List<UserEntity> roleUsers = userRepository.findByRole(targetRole);
+        UserEntity user;
+
+        if (!roleUsers.isEmpty()) {
+            user = roleUsers.get(0);
+        } else {
+            // Create default user for this role if none exists
+            String rolePrefix = targetRole.name().substring(0, Math.min(3, targetRole.name().length()));
+            String generatedId = "USR-" + rolePrefix + "-01";
+            user = UserEntity.builder()
+                    .id(generatedId)
+                    .name(targetRole.name().charAt(0) + targetRole.name().substring(1).toLowerCase() + " Operator")
+                    .email(targetRole.name().toLowerCase() + "@florachain.org")
+                    .password(passwordEncoder.encode("password123"))
+                    .role(targetRole)
+                    .organization(targetRole.name() + " Consortium Hub")
+                    .location("Verified Hub Location")
+                    .status(UserStatus.ACTIVE)
+                    .joinedDate(LocalDate.now())
+                    .certifications(List.of())
+                    .avatarUrl("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150")
+                    .build();
+            user = userRepository.save(user);
+        }
+
+        String jwt = tokenProvider.generateTokenFromUser(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getRole().name(),
+                user.getOrganization()
+        );
+
+        return AuthResponse.builder()
+                .token(jwt)
+                .tokenType("Bearer")
+                .user(mapToUserDto(user))
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public UserDto getCurrentUser(String userId) {
         UserEntity user = userRepository.findById(userId)
@@ -149,4 +191,3 @@ public class AuthService {
                 .build();
     }
 }
-

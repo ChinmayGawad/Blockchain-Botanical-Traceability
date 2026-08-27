@@ -97,7 +97,7 @@ h2-data/
 **/h2-data/
 
 # =============================================================================
-# Logs
+# Logs & Process Outputs
 # =============================================================================
 logs/
 **/logs/
@@ -127,9 +127,8 @@ secret.json
 # =============================================================================
 # Editor & IDE Files
 # =============================================================================
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
+.vscode/
+.vscode/settings.json
 .idea/
 *.iml
 *.iws
@@ -164,9 +163,44 @@ desktop.ini
 .netlify/
 
 # =============================================================================
+# Testing, Coverage & Scratch Dirs
+# =============================================================================
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
+scratch/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# =============================================================================
+# Python & Virtual Environments (if applicable)
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+venv/
+.venv/
+env/
+ENV/
+
+# =============================================================================
 # AI Agents & Tooling Metadata
 # =============================================================================
 .agents/
 .claude/
 .gemini/
+.cursor/
+.windsurf/
+.copilot/
+.aider*
 skills-lock.json

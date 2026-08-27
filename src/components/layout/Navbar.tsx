@@ -18,12 +18,17 @@ import {
   CheckCircle2,
   Cpu,
   ArrowRight,
+  LogOut,
+  LogIn,
+  UserPlus,
+  User,
+  AlertCircle,
 } from 'lucide-react';
 import { QRScannerModal } from '../verification/QRScannerModal';
 import { WalletConnectButton } from '../common/WalletConnectButton';
 
 export const Navbar: React.FC = () => {
-  const { currentUser, role, switchRole } = useAuth();
+  const { currentUser, role, isAuthenticated, switchRole, logout } = useAuth();
   const { networkStats, resetToDefaultData } = useBlockchain();
   const navigate = useNavigate();
   const location = useLocation();
@@ -66,6 +71,13 @@ export const Navbar: React.FC = () => {
     } else {
       navigate(`/${newRole.toLowerCase()}/dashboard`);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsRoleDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+    navigate('/');
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -112,7 +124,7 @@ export const Navbar: React.FC = () => {
                     window.location.reload();
                   }
                 }}
-                className="text-slate-400 hover:text-emerald-300 text-[10px] flex items-center gap-1 font-medium transition-colors"
+                className="text-slate-400 hover:text-emerald-300 text-[10px] flex items-center gap-1 font-medium transition-colors cursor-pointer"
                 title="Reset local state to clean seed data"
               >
                 <RefreshCw size={11} />
@@ -202,15 +214,15 @@ export const Navbar: React.FC = () => {
               <span className="hidden sm:inline">Scan QR</span>
             </button>
 
-            {/* Sandbox Role Switcher Dropdown */}
+            {/* User Profile & Role Switcher Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                 className="flex items-center gap-2 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-all shadow-sm border border-slate-800 cursor-pointer"
-                title="Switch active stakeholder portal persona"
+                title="Manage active stakeholder role"
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span className={`w-2 h-2 rounded-full ${currentUser.status === 'PENDING_APPROVAL' ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`}></span>
                   <span className="capitalize">{role.toLowerCase()}</span>
                 </div>
                 <ChevronDown size={13} className={`text-slate-400 transition-transform duration-150 ${isRoleDropdownOpen ? 'rotate-180' : ''}`} />
@@ -223,21 +235,29 @@ export const Navbar: React.FC = () => {
                     onClick={() => setIsRoleDropdownOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                    <div className="px-3 py-2.5 border-b border-slate-100 bg-slate-50/70 rounded-t-xl">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
-                        <span className="flex items-center gap-1">
-                          <Sparkles size={12} className="text-emerald-600" /> Stakeholder Sandbox
-                        </span>
-                        <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-bold">
-                          1-Click Switch
+                    {/* User Profile Card */}
+                    <div className="px-3.5 py-3 border-b border-slate-100 bg-slate-50/80 rounded-t-xl">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          currentUser.status === 'ACTIVE'
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                            : 'bg-amber-100 text-amber-800 border-amber-300'
+                        }`}>
+                          {currentUser.status}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-                        Switch persona to simulate verified actions across all 5 supply chain nodes:
-                      </p>
+                      <p className="text-[11px] text-slate-500 truncate mt-0.5">{currentUser.organization}</p>
+                      <p className="text-[10px] text-emerald-700 font-mono">{currentUser.email}</p>
                     </div>
 
-                    <div className="py-1.5 space-y-1 max-h-72 overflow-y-auto">
+                    <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Sparkles size={11} className="text-emerald-600" /> Switch Stakeholder Sandbox
+                      </span>
+                    </div>
+
+                    <div className="py-1 space-y-1 max-h-56 overflow-y-auto">
                       {roles.map(r => {
                         const isSelected = role === r.role;
                         return (
@@ -269,18 +289,47 @@ export const Navbar: React.FC = () => {
                       })}
                     </div>
 
-                    {role !== 'CONSUMER' && (
-                      <div className="pt-2 border-t border-slate-100">
-                        <Link
-                          to={`/${role.toLowerCase()}/dashboard`}
-                          onClick={() => setIsRoleDropdownOpen(false)}
-                          className="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
-                        >
-                          <LayoutDashboard size={14} />
-                          <span>Open {role} Dashboard</span>
-                        </Link>
-                      </div>
-                    )}
+                    {/* Actions */}
+                    <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                      {role !== 'CONSUMER' ? (
+                        <>
+                          <Link
+                            to={`/${role.toLowerCase()}/dashboard`}
+                            onClick={() => setIsRoleDropdownOpen(false)}
+                            className="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
+                          >
+                            <LayoutDashboard size={14} />
+                            <span>Open {role} Dashboard</span>
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                          >
+                            <LogOut size={13} />
+                            <span>Sign Out ({role})</span>
+                          </button>
+                        </>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <Link
+                            to="/login"
+                            onClick={() => setIsRoleDropdownOpen(false)}
+                            className="flex items-center justify-center gap-1 py-2 px-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors text-center"
+                          >
+                            <LogIn size={13} />
+                            <span>Sign In</span>
+                          </Link>
+                          <Link
+                            to="/register"
+                            onClick={() => setIsRoleDropdownOpen(false)}
+                            className="flex items-center justify-center gap-1 py-2 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-colors text-center"
+                          >
+                            <UserPlus size={13} />
+                            <span>Register</span>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
@@ -289,7 +338,7 @@ export const Navbar: React.FC = () => {
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl"
+              className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
               aria-label="Toggle Navigation"
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -310,7 +359,7 @@ export const Navbar: React.FC = () => {
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shrink-0"
+                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shrink-0 cursor-pointer"
               >
                 Search
               </button>
@@ -348,6 +397,23 @@ export const Navbar: React.FC = () => {
                 </Link>
               )}
             </nav>
+
+            <div className="pt-2 border-t border-slate-100 flex gap-2">
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-1/2 py-2 text-center bg-slate-900 text-white rounded-xl text-xs font-bold"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-1/2 py-2 text-center bg-emerald-600 text-white rounded-xl text-xs font-bold"
+              >
+                Register
+              </Link>
+            </div>
           </div>
         )}
       </header>

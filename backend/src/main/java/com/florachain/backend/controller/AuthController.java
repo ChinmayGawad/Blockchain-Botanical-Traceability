@@ -1,6 +1,7 @@
 package com.florachain.backend.controller;
 
 import com.florachain.backend.dto.AuthDTOs.*;
+import com.florachain.backend.enums.UserRole;
 import com.florachain.backend.security.UserPrincipal;
 import com.florachain.backend.service.AuthService;
 import jakarta.validation.Valid;
@@ -28,6 +29,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return new ResponseEntity<>(authService.register(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/switch-role")
+    public ResponseEntity<AuthResponse> switchRole(@RequestParam UserRole role) {
+        return ResponseEntity.ok(authService.switchRole(role));
     }
 
     @GetMapping("/me")
