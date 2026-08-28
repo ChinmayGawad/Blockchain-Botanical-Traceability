@@ -44,7 +44,7 @@ const RootEntryPage: React.FC = () => {
   if (isAuthenticated && role !== 'CONSUMER') {
     return <Navigate to={`/${role.toLowerCase()}/dashboard`} replace />;
   }
-  return <LoginPage />;
+  return <Navigate to="/login" replace />;
 };
 
 export const AppRoutes: React.FC = () => {
@@ -54,6 +54,7 @@ export const AppRoutes: React.FC = () => {
       <Route path="/" element={<RootEntryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/signup" element={<Navigate to="/register" replace />} />
 
       {/* Public Pages */}
       <Route path="/home" element={<HomePage />} />

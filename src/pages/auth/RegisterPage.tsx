@@ -72,7 +72,7 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 via-emerald-50/30 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-emerald-50/30 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="max-w-2xl w-full bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
         <div className="text-center space-y-1.5">
           <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-900/10">
@@ -254,10 +254,17 @@ export const RegisterPage: React.FC = () => {
               )}
             </button>
 
-            <div className="text-center pt-2">
-              <Link to="/login" className="text-xs text-slate-600 hover:text-emerald-800 font-bold">
-                Already registered? <span className="text-emerald-700 underline">Sign In instead</span>
-              </Link>
+            <div className="text-center pt-2 space-y-2">
+              <div>
+                <Link to="/login" className="text-xs text-slate-600 hover:text-emerald-800 font-bold">
+                  Already registered? <span className="text-emerald-700 underline">Sign In instead</span>
+                </Link>
+              </div>
+              <div>
+                <Link to="/home" className="text-xs text-slate-500 hover:text-emerald-800 font-medium">
+                  ← Back to Overview
+                </Link>
+              </div>
             </div>
           </form>
         )}

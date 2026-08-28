@@ -63,7 +63,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 via-emerald-50/30 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-emerald-50/30 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200/90 shadow-xl p-6 sm:p-8 space-y-6">
         
         {/* Card Header */}
@@ -183,13 +183,22 @@ export const LoginPage: React.FC = () => {
             </Link>
           </p>
 
-          <Link
-            to="/verify"
-            className="inline-flex items-center gap-1.5 text-slate-600 hover:text-emerald-800 font-bold"
-          >
-            <ShieldCheck size={14} className="text-emerald-700" />
-            <span>Public Consumer Verification (No Login)</span>
-          </Link>
+          <div className="flex items-center justify-center gap-3 text-slate-500 font-medium">
+            <Link
+              to="/home"
+              className="hover:text-emerald-700 font-semibold transition-colors"
+            >
+              ← Back to Overview
+            </Link>
+            <span>•</span>
+            <Link
+              to="/verify"
+              className="inline-flex items-center gap-1 hover:text-emerald-700 font-semibold transition-colors"
+            >
+              <ShieldCheck size={14} className="text-emerald-700" />
+              <span>Public Verification</span>
+            </Link>
+          </div>
         </div>
 
       </div>
