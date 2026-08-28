@@ -75,7 +75,7 @@ export const Sidebar: React.FC = () => {
   const navLinks = getNavLinks();
 
   return (
-    <aside className="w-full lg:w-64 bg-white text-slate-800 flex flex-col justify-between shrink-0 border-r border-slate-200/90 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto shadow-xs z-30">
+    <aside className="w-full lg:w-64 bg-white text-slate-800 flex flex-col justify-between shrink-0 border-r border-slate-200/90 lg:fixed lg:top-[96px] lg:bottom-0 lg:left-0 lg:overflow-y-auto shadow-xs z-30">
       {/* Upper Section */}
       <div className="p-4 sm:p-5 space-y-5">
         {/* Stakeholder Identity Node Badge */}

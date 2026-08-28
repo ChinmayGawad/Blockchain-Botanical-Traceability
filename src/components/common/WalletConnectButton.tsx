@@ -246,15 +246,15 @@ export const WalletConnectButton: React.FC = () => {
       {walletState.isConnected ? (
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 text-xs font-semibold transition-all cursor-pointer shadow-xs shrink-0 whitespace-nowrap"
           title="Click to view connected Web3 Wallet & Smart Contract details"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="font-mono text-emerald-800">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <span className="font-mono text-emerald-800 whitespace-nowrap font-bold">
             {walletState.address?.substring(0, 6)}...{walletState.address?.substring(walletState.address.length - 4)}
           </span>
           {walletState.balanceEth && (
-            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-mono font-bold">
+            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-mono font-bold whitespace-nowrap">
               {walletState.balanceEth} ETH
             </span>
           )}
@@ -262,11 +262,11 @@ export const WalletConnectButton: React.FC = () => {
       ) : (
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white text-xs font-semibold transition-all shadow-sm cursor-pointer border border-slate-700 group"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm cursor-pointer border border-slate-800 group shrink-0 whitespace-nowrap"
           title="Click to open Web3 Wallet & Blockchain connection dialog"
         >
-          <Wallet size={14} className="text-emerald-400 group-hover:scale-110 transition-transform" />
-          <span>Connect Web3 Wallet</span>
+          <Wallet size={14} className="text-emerald-400 group-hover:scale-110 transition-transform shrink-0" />
+          <span className="whitespace-nowrap">Connect Wallet</span>
         </button>
       )}
 

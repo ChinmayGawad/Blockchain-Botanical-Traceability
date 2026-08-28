@@ -19,12 +19,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { currentUser, role } = useAuth();
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)] bg-slate-50">
-      {/* Sticky Docked Sidebar Navigation */}
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-6rem)] bg-slate-50">
+      {/* Fixed Docked Sidebar Navigation */}
       <Sidebar />
 
       {/* Main Content Workspace Canvas */}
-      <main className="flex-1 min-w-0 bg-slate-50/70 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
+      <main className="flex-1 lg:ml-64 min-w-0 bg-slate-50/70 p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Pending Approval Notice if relevant */}
         {currentUser.status === 'PENDING_APPROVAL' && (
           <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-start gap-3 text-amber-900 text-xs shadow-xs">
