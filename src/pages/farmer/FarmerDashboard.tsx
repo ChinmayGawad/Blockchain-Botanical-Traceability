@@ -16,9 +16,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  FlaskConical,
   Scale,
-  ShieldCheck,
 } from 'lucide-react';
 
 export const FarmerDashboard: React.FC = () => {
@@ -44,11 +42,11 @@ export const FarmerDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title="Farmer Botanical Portal"
-      subtitle={`Welcome, ${currentUser.name} (${currentUser.organization || 'Cultivator Node'}). Track your registered harvests, bio-refining stages, and lab testing.`}
+      subtitle={`${currentUser.name} • ${currentUser.organization || 'Organic Farm Cooperative'} (ID: ${currentUser.id}) • ${currentUser.location || 'Certified Farm Parcel'}`}
       action={
         <Link
           to="/farmer/register"
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
         >
           <PlusCircle size={16} />
           <span>Register New Harvest</span>
@@ -56,32 +54,6 @@ export const FarmerDashboard: React.FC = () => {
       }
     >
       <div className="space-y-6">
-        {/* Node Identity Banner */}
-        <div className="p-4 sm:p-5 bg-white border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-bold shrink-0 shadow-sm shadow-emerald-900/10">
-              <Sprout size={24} />
-            </div>
-            <div>
-              <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                <span>{currentUser.organization || 'Organic Farm Cooperative'}</span>
-                <span className="bg-emerald-100 text-emerald-900 text-xs px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">
-                  Accredited Farmer
-                </span>
-              </div>
-              <p className="text-slate-600 text-xs mt-0.5">
-                Farmer ID: <strong className="font-mono text-emerald-800">{currentUser.id}</strong> • Location: {currentUser.location || 'Certified Agricultural Parcel'}
-              </p>
-            </div>
-          </div>
-          <div className="text-left sm:text-right shrink-0">
-            <span className="text-xs text-slate-500 font-medium block">Smart Contract Status</span>
-            <span className="font-bold text-xs text-emerald-700 inline-flex items-center gap-1">
-              <ShieldCheck size={15} /> Active on EVM Ledger
-            </span>
-          </div>
-        </div>
-
         {/* Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
@@ -132,13 +104,6 @@ export const FarmerDashboard: React.FC = () => {
                 Botanical crops registered under your account on the blockchain
               </p>
             </div>
-
-            <Link
-              to="/farmer/register"
-              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
-            >
-              <span>+ Add New Harvest</span>
-            </Link>
           </div>
 
           {farmerProducts.length === 0 ? (

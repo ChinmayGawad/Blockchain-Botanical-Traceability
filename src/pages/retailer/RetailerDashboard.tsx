@@ -16,7 +16,6 @@ import {
   Printer,
   DollarSign,
   Tag,
-  ShieldCheck,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -62,11 +61,11 @@ export const RetailerDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title="Retailer Apothecary Portal"
-      subtitle={`Authenticated as ${currentUser.name} (${currentUser.organization || 'Pure Botanical Apothecary'}). Check in verified shipments, assign shelf batch IDs, and print high-trust QR stickers.`}
+      subtitle={`${currentUser.name} • ${currentUser.organization || 'Pure Botanical Apothecary London'} (ID: ${currentUser.id}) • Storefront: ${currentUser.location || 'Covent Garden, London'}`}
       action={
         <Link
           to="/retailer/generate-qr"
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
         >
           <QrCode size={16} />
           <span>Batch QR Label Studio</span>
@@ -74,32 +73,6 @@ export const RetailerDashboard: React.FC = () => {
       }
     >
       <div className="space-y-6">
-        {/* Node Identity Banner */}
-        <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold shrink-0">
-              <Store size={20} />
-            </div>
-            <div>
-              <div className="font-bold text-slate-900 flex items-center gap-2">
-                <span>{currentUser.organization || 'Pure Botanical Apothecary London'}</span>
-                <span className="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-semibold">
-                  Accredited Retail Partner
-                </span>
-              </div>
-              <p className="text-slate-600 text-[11px]">
-                Retailer ID: <strong className="font-mono text-emerald-800">{currentUser.id}</strong> • Storefront: {currentUser.location || 'Covent Garden, London'}
-              </p>
-            </div>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="text-[11px] text-slate-500 block">Ledger Verification Status</span>
-            <span className="font-bold text-emerald-700 inline-flex items-center gap-1">
-              <ShieldCheck size={14} /> Smart Contract Active
-            </span>
-          </div>
-        </div>
-
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
@@ -115,7 +88,7 @@ export const RetailerDashboard: React.FC = () => {
             value={incomingShipments.length}
             subtitle="Awaiting store check-in"
             icon={PackageCheck}
-            iconColor="text-sky-600"
+            iconColor="text-sky-700"
             bgColor="bg-sky-50"
           />
           <MetricCard
@@ -123,7 +96,7 @@ export const RetailerDashboard: React.FC = () => {
             value="100%"
             subtitle="Zero reported counterfeit"
             icon={CheckCircle2}
-            iconColor="text-emerald-600"
+            iconColor="text-emerald-700"
             bgColor="bg-emerald-50"
           />
           <MetricCard
@@ -131,7 +104,7 @@ export const RetailerDashboard: React.FC = () => {
             value="$29.99"
             subtitle="Certified Organic Botanical"
             icon={DollarSign}
-            iconColor="text-emerald-600"
+            iconColor="text-emerald-700"
             bgColor="bg-emerald-50"
           />
         </div>
@@ -140,13 +113,13 @@ export const RetailerDashboard: React.FC = () => {
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <span>Incoming Transport Deliveries</span>
-                <span className="text-xs font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-bold bg-sky-100 text-sky-900 px-2.5 py-0.5 rounded-full border border-sky-200">
                   {incomingShipments.length} Available
                 </span>
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Cold-chain consignments delivered to store ready for retail inventory check-in
               </p>
             </div>
@@ -154,43 +127,45 @@ export const RetailerDashboard: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+              <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
                 <tr>
-                  <th className="px-5 py-3">Product Name</th>
-                  <th className="px-5 py-3">Batch ID</th>
-                  <th className="px-5 py-3">Carrier / Tracking</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3 text-right">Store Action</th>
+                  <th className="px-5 py-3.5">Product Name</th>
+                  <th className="px-5 py-3.5">Batch ID</th>
+                  <th className="px-5 py-3.5">Carrier / Tracking</th>
+                  <th className="px-5 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Store Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {incomingShipments.map(product => (
-                  <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
+                  <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-4 font-bold text-slate-900">
                       {product.name}
-                      <span className="block text-[10px] text-slate-400 font-mono">{product.botanicalName}</span>
+                      <span className="block text-xs text-slate-500 font-mono italic mt-0.5">{product.botanicalName}</span>
                     </td>
-                    <td className="px-5 py-4 font-mono font-semibold text-emerald-700">
-                      {product.batchId}
+                    <td className="px-5 py-4 font-mono font-bold text-xs text-emerald-900">
+                      <span className="bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
+                        {product.batchId}
+                      </span>
                     </td>
                     <td className="px-5 py-4 text-slate-700">
-                      <div className="font-semibold text-slate-800">{product.shipmentDetails?.distributorName || 'Cold-Chain Transport'}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">Track: {product.shipmentDetails?.trackingNumber || 'N/A'}</div>
+                      <div className="font-semibold text-slate-900">{product.shipmentDetails?.distributorName || 'Cold-Chain Transport'}</div>
+                      <div className="text-xs text-slate-500 font-mono mt-0.5">Track: {product.shipmentDetails?.trackingNumber || 'N/A'}</div>
                     </td>
                     <td className="px-5 py-4">
                       <StatusBadge status={product.status} />
                     </td>
                     <td className="px-5 py-4 text-right">
                       {product.status === 'RETAIL_READY' ? (
-                        <span className="text-emerald-700 font-bold text-[11px] inline-flex items-center gap-1">
-                          <CheckCircle2 size={13} /> On Shelf
+                        <span className="text-emerald-800 font-bold text-xs inline-flex items-center gap-1">
+                          <CheckCircle2 size={14} className="text-emerald-600" /> On Shelf
                         </span>
                       ) : (
                         <button
                           onClick={() => setReceivingProductId(product.id)}
-                          className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                          className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                         >
-                          <PackageCheck size={13} />
+                          <PackageCheck size={14} />
                           <span>Accept into Inventory</span>
                         </button>
                       )}
@@ -212,7 +187,7 @@ export const RetailerDashboard: React.FC = () => {
               </h4>
               <button
                 onClick={() => setReceivingProductId(null)}
-                className="text-xs text-slate-500 hover:text-slate-800 font-bold"
+                className="text-xs text-slate-500 hover:text-slate-800 font-bold cursor-pointer"
               >
                 ✕ Cancel
               </button>
@@ -220,7 +195,7 @@ export const RetailerDashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Retail Shelf Batch Tag:
                 </label>
                 <input
@@ -232,7 +207,7 @@ export const RetailerDashboard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Shelf Unit Price (USD):
                 </label>
                 <input
@@ -250,7 +225,7 @@ export const RetailerDashboard: React.FC = () => {
                   className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <CheckCircle2 size={14} />
-                  <span>Commit to Blockchain & Activate QR</span>
+                  <span>Commit & Stock Shelf</span>
                 </button>
               </div>
             </div>
@@ -261,10 +236,10 @@ export const RetailerDashboard: React.FC = () => {
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-base font-extrabold text-slate-900">
                 My Verified Retail Stock
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Products stocked by {currentUser.name} ({currentUser.organization})
               </p>
             </div>
@@ -277,47 +252,45 @@ export const RetailerDashboard: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
                   <tr>
-                    <th className="px-5 py-3">Product</th>
-                    <th className="px-5 py-3">Shelf Batch ID</th>
-                    <th className="px-5 py-3">Unit Price</th>
-                    <th className="px-5 py-3">Verification State</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
+                    <th className="px-5 py-3.5">Product</th>
+                    <th className="px-5 py-3.5">Shelf Batch ID</th>
+                    <th className="px-5 py-3.5">Unit Price</th>
+                    <th className="px-5 py-3.5">Verification State</th>
+                    <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {myRetailInventory.map(product => (
-                    <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
+                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-5 py-4 font-bold text-slate-900">
                         {product.name}
-                        <span className="block text-[10px] text-slate-400 font-mono">{product.batchId}</span>
+                        <span className="block text-xs text-slate-500 font-mono mt-0.5">{product.batchId}</span>
                       </td>
                       <td className="px-5 py-4 font-mono font-bold text-emerald-800">
                         {product.retailDetails?.shelfBatchId}
                       </td>
-                      <td className="px-5 py-4 font-bold text-slate-800">
+                      <td className="px-5 py-4 font-bold text-slate-900">
                         ${product.retailDetails?.unitPrice.toFixed(2)}
                       </td>
                       <td className="px-5 py-4">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                          {product.verificationState}
-                        </span>
+                        <StatusBadge status={product.verificationState} />
                       </td>
                       <td className="px-5 py-4 text-right space-x-2">
                         <button
                           onClick={() => setSelectedProductForQR(product)}
-                          className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors border border-emerald-200"
                         >
-                          <Printer size={12} />
-                          <span>Print QR Tag</span>
+                          <Printer size={13} />
+                          <span>Print QR</span>
                         </button>
                         <button
                           onClick={() => navigate(`/verify/${product.id}`)}
-                          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <span>Trace</span>
-                          <ArrowRight size={12} />
+                          <ArrowRight size={13} />
                         </button>
                       </td>
                     </tr>
