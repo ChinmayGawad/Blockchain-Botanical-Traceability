@@ -122,7 +122,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         ]);
 
         if (prodRes.status === 'fulfilled' && prodRes.value.data && Array.isArray(prodRes.value.data) && prodRes.value.data.length > 0) {
-          setProducts(prodRes.value.data);
+          const sanitized = prodRes.value.data.map((p: any) => ({
+            ...p,
+            imageUrl: getBotanicalProductImage(p),
+          }));
+          setProducts(sanitized);
         }
         if (statsRes.status === 'fulfilled' && statsRes.value.data) {
           if (statsRes.value.data.blockHeight) setLiveBlockHeight(statsRes.value.data.blockHeight);

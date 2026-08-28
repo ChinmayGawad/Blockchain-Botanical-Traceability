@@ -186,7 +186,11 @@ export interface SuspiciousReport {
   batchId?: string;
   reporterName: string;
   reporterEmail: string;
+  reporterPhone?: string;
   reason: 'INVALID_QR' | 'INFO_MISMATCH' | 'FAILED_LAB' | 'PHYSICAL_SUSPICIOUS' | 'TAMPERED_PACKAGING' | 'OTHER';
+  severity?: 'LOW' | 'MEDIUM' | 'CRITICAL';
+  purchaseLocation?: string;
+  evidenceAttachment?: string;
   description: string;
   reportedAt: string;
   status: 'PENDING_REVIEW' | 'INVESTIGATING' | 'RESOLVED_VALID' | 'CONFIRMED_FRAUD' | 'DISMISSED';

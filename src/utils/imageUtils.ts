@@ -22,7 +22,7 @@ export const BOTANICAL_IMAGES = {
   SHATAVARI: 'https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80',
 
   // Moringa (Moringa oleifera) - Pure green moringa leaf harvest
-  MORINGA: 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=600&auto=format&fit=crop&q=80',
+  MORINGA: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80',
 
   // Botanical Liquid Extracts & Essential Tinctures
   EXTRACT: 'https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=600&auto=format&fit=crop&q=80',
@@ -51,13 +51,7 @@ export function getBotanicalProductImage(product?: {
   const botanicalLower = (product.botanicalName || '').toLowerCase();
   const combined = `${nameLower} ${botanicalLower}`;
 
-  // If a valid custom image URL is provided and it is NOT the legacy broccoli photo
-  if (product.imageUrl && !product.imageUrl.includes(BROCCOLI_LEGACY_FRAGMENT)) {
-    // If the image is the old turmeric or tulsi URL, verify if it fits or return existing
-    return product.imageUrl;
-  }
-
-  // Botanical / Common Name Matching
+  // Priority 1: Botanical / Common Name Matching (always matches known herbs accurately)
   if (combined.includes('ashwagandha') || combined.includes('withania')) {
     return BOTANICAL_IMAGES.ASHWAGANDHA;
   }
@@ -78,6 +72,11 @@ export function getBotanicalProductImage(product?: {
   }
   if (combined.includes('moringa')) {
     return BOTANICAL_IMAGES.MORINGA;
+  }
+
+  // Priority 2: Custom valid image URL if provided and not broccoli
+  if (product.imageUrl && !product.imageUrl.includes(BROCCOLI_LEGACY_FRAGMENT)) {
+    return product.imageUrl;
   }
 
   // Category Matching Fallbacks
