@@ -3,8 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary: #15803d;
+    --color-primary-hover: #14532d;
+    --color-accent: #16a34a;
+    --color-background: #f8fafc;
+    --color-card: #ffffff;
+    --color-border: #e2e8f0;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #334155;
+    --color-text-muted: #64748b;
+  }
+
   body {
-    @apply bg-[#f8fafc] text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white min-h-screen;
+    @apply bg-[#f8fafc] text-slate-900 font-sans antialiased selection:bg-emerald-600 selection:text-white min-h-screen;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -15,11 +27,11 @@
   }
 
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-    @apply outline-none ring-2 ring-emerald-500/50 ring-offset-2 ring-offset-white;
+    @apply outline-none ring-2 ring-emerald-600 ring-offset-2 ring-offset-white;
   }
 }
 
-/* Custom Scrollbars */
+/* Custom Clean Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -38,27 +50,17 @@
   background: #94a3b8;
 }
 
-/* Glassmorphism & Card Utilities */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+/* Subtle Card Glow & Elevation */
+.card-elevation-xs {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
-.glass-panel-dark {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.5);
+.card-elevation-sm {
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
 }
 
-/* Subtle Card Glow */
-.card-hover-glow {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-hover-glow:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px -10px rgba(16, 185, 129, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+.card-elevation-md {
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
 /* Print Styles */

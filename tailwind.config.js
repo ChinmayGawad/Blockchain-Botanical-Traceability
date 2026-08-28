@@ -8,6 +8,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          forest: '#15803d',       // Primary Action
+          'forest-dark': '#14532d',  // Primary Hover
+          emerald: '#16a34a',      // Active Accent
+          'emerald-light': '#dcfce7',
+          surface: '#ffffff',      // Card Background
+          bg: '#f8fafc',           // Page Background
+          'bg-tint': '#f0fdf4',    // Botanical Soft Tint
+          border: '#e2e8f0',       // Card/Table Borders
+          'border-focus': '#15803d', // Focus Rings
+          muted: '#64748b',        // Subtitles / Meta
+          dark: '#0f172a',         // High Contrast Headings
+        },
         botanical: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -21,26 +34,17 @@ export default {
           900: '#14532d',
           950: '#052e16',
         },
-        forest: {
-          DEFAULT: '#064e3b',
-          dark: '#022c22',
-          light: '#047857',
-        },
-        crypto: {
-          DEFAULT: '#2563eb',
-          dark: '#1e40af',
-          light: '#3b82f6',
-        }
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       boxShadow: {
-        'glow': '0 0 25px -5px rgba(34, 197, 94, 0.25)',
-        'subtle': '0 2px 10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
-        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
-      }
+        'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
+        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
+        'card-hover': '0 12px 30px -4px rgba(21, 128, 61, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.04)',
+        'modal': '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+      },
     },
   },
   plugins: [],

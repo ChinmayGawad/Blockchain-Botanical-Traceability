@@ -125,7 +125,7 @@ export const GenerateQRPage: React.FC = () => {
             <div className="pt-2 space-y-2">
               <button
                 onClick={handlePrint}
-                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
                 <Printer size={16} />
                 <span>Print Shelf Sticker Label</span>

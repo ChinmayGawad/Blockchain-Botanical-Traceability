@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { useAuth } from '../../context/AuthContext';
-import { ShieldCheck, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -19,15 +19,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { currentUser, role } = useAuth();
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-6rem)] bg-slate-50">
-      {/* Sidebar Navigation */}
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)] bg-slate-50">
+      {/* Sticky Docked Sidebar Navigation */}
       <Sidebar />
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 overflow-x-hidden">
+      {/* Main Content Workspace Canvas */}
+      <main className="flex-1 min-w-0 bg-slate-50/70 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
         {/* Pending Approval Notice if relevant */}
         {currentUser.status === 'PENDING_APPROVAL' && (
-          <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-start gap-3 text-amber-900 text-xs">
+          <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-start gap-3 text-amber-900 text-xs shadow-xs">
             <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
             <div>
               <div className="font-bold">Stakeholder Membership Under Review</div>
@@ -38,29 +38,29 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </div>
         )}
 
-        {/* Dashboard Title Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        {/* Dashboard Title & Action Bar */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 {title}
               </h1>
-              <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
                 {role}
               </span>
             </div>
             {subtitle && (
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl">
+              <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-3xl leading-relaxed">
                 {subtitle}
               </p>
             )}
           </div>
 
-          {action && <div className="shrink-0">{action}</div>}
+          {action && <div className="shrink-0 flex items-center gap-2">{action}</div>}
         </div>
 
-        {/* Inner Page Content */}
-        <div>{children}</div>
+        {/* Inner Page Content Canvas */}
+        <div className="space-y-6">{children}</div>
       </main>
     </div>
   );

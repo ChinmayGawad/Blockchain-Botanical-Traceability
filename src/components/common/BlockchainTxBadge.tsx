@@ -42,12 +42,12 @@ export const BlockchainTxBadge: React.FC<BlockchainTxBadgeProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={`inline-flex items-center gap-1.5 font-mono text-xs text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300/80 px-2 py-0.5 rounded-md transition-all group shadow-2xs ${className}`}
-        title="View Hyperledger Fabric Transaction Details"
+        className={`inline-flex items-center gap-1.5 font-mono text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg transition-all group shadow-2xs cursor-pointer ${className}`}
+        title="View Blockchain Transaction Proof"
       >
-        <Blocks size={12} className="text-emerald-600 group-hover:rotate-12 transition-transform" />
-        <span className="font-semibold">{displayText}</span>
-        <ExternalLink size={10} className="text-emerald-500 opacity-60 group-hover:opacity-100" />
+        <Blocks size={13} className="text-emerald-700 group-hover:rotate-12 transition-transform" />
+        <span>{displayText}</span>
+        <ExternalLink size={11} className="text-emerald-600 opacity-60 group-hover:opacity-100" />
       </button>
 
       <TransactionViewerModal

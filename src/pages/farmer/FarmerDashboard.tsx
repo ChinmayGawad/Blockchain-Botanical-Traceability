@@ -18,7 +18,6 @@ import {
   Clock,
   FlaskConical,
   Scale,
-  Building,
   ShieldCheck,
 } from 'lucide-react';
 
@@ -45,11 +44,11 @@ export const FarmerDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title="Farmer Botanical Portal"
-      subtitle={`Authenticated as ${currentUser.name} (${currentUser.organization || 'Cultivator Node'}). Register botanical harvests, track bio-refining & QA verification.`}
+      subtitle={`Welcome, ${currentUser.name} (${currentUser.organization || 'Cultivator Node'}). Track your registered harvests, bio-refining stages, and lab testing.`}
       action={
         <Link
           to="/farmer/register"
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
         >
           <PlusCircle size={16} />
           <span>Register New Harvest</span>
@@ -57,28 +56,28 @@ export const FarmerDashboard: React.FC = () => {
       }
     >
       <div className="space-y-6">
-        {/* Farmer Node Identity Banner */}
-        <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0">
-              <Sprout size={20} />
+        {/* Node Identity Banner */}
+        <div className="p-4 sm:p-5 bg-white border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-bold shrink-0 shadow-sm shadow-emerald-900/10">
+              <Sprout size={24} />
             </div>
             <div>
-              <div className="font-bold text-slate-900 flex items-center gap-2">
+              <div className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
                 <span>{currentUser.organization || 'Organic Farm Cooperative'}</span>
-                <span className="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-semibold">
-                  Accredited Farmer Node
+                <span className="bg-emerald-100 text-emerald-900 text-xs px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">
+                  Accredited Farmer
                 </span>
               </div>
-              <p className="text-slate-600 text-[11px]">
+              <p className="text-slate-600 text-xs mt-0.5">
                 Farmer ID: <strong className="font-mono text-emerald-800">{currentUser.id}</strong> • Location: {currentUser.location || 'Certified Agricultural Parcel'}
               </p>
             </div>
           </div>
-          <div className="text-right shrink-0">
-            <span className="text-[11px] text-slate-500 block">Ledger Verification Status</span>
-            <span className="font-bold text-emerald-700 inline-flex items-center gap-1">
-              <ShieldCheck size={14} /> Smart Contract Active
+          <div className="text-left sm:text-right shrink-0">
+            <span className="text-xs text-slate-500 font-medium block">Smart Contract Status</span>
+            <span className="font-bold text-xs text-emerald-700 inline-flex items-center gap-1">
+              <ShieldCheck size={15} /> Active on EVM Ledger
             </span>
           </div>
         </div>
@@ -86,11 +85,11 @@ export const FarmerDashboard: React.FC = () => {
         {/* Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            title="My Harvested Volume"
+            title="Harvested Volume"
             value={`${totalKg.toLocaleString()} kg`}
             subtitle="Across your registered crops"
             icon={Scale}
-            iconColor="text-emerald-600"
+            iconColor="text-emerald-700"
             bgColor="bg-emerald-50"
           />
           <MetricCard
@@ -98,36 +97,39 @@ export const FarmerDashboard: React.FC = () => {
             value={farmerProducts.length}
             subtitle="Committed to blockchain"
             icon={Sprout}
-            iconColor="text-teal-600"
+            iconColor="text-teal-700"
             bgColor="bg-teal-50"
           />
           <MetricCard
-            title="Lab Certified Batches"
+            title="Verified & Approved"
             value={approvedBatches}
-            subtitle="QA verified & approved"
+            subtitle="Passed QA lab assay"
             icon={CheckCircle2}
-            iconColor="text-emerald-600"
+            iconColor="text-emerald-700"
             bgColor="bg-emerald-50"
           />
           <MetricCard
-            title="In Processing / Transit"
+            title="In Pipeline"
             value={inProgressBatches}
-            subtitle="Downstream supply chain"
+            subtitle="Processing / Testing"
             icon={Clock}
-            iconColor="text-amber-600"
+            iconColor="text-amber-700"
             bgColor="bg-amber-50"
           />
         </div>
 
-        {/* Registered Crops Table & Quick Actions */}
+        {/* Crops Data Table */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">
-                My Registered Botanical Crops
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <span>My Registered Botanical Crops</span>
+                <span className="text-xs font-bold bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  {farmerProducts.length} Batches
+                </span>
               </h3>
-              <p className="text-xs text-slate-500">
-                Only crops registered under your farmer account are listed here
+              <p className="text-xs text-slate-600 mt-0.5">
+                Botanical crops registered under your account on the blockchain
               </p>
             </div>
 
@@ -135,98 +137,79 @@ export const FarmerDashboard: React.FC = () => {
               to="/farmer/register"
               className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
             >
-              <span>+ Register Another Crop</span>
+              <span>+ Add New Harvest</span>
             </Link>
           </div>
 
           {farmerProducts.length === 0 ? (
-            <div className="p-12 text-center space-y-4">
-              <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-100">
-                <Sprout size={32} />
+            <div className="p-10 text-center space-y-3">
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto">
+                <Sprout size={28} />
               </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">No Harvest Batches Registered Yet</h4>
-                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                  You haven't recorded any botanical crop batches under <strong>{currentUser.email}</strong>. Register your harvest to stamp its GPS origin coordinates onto the immutable blockchain ledger.
-                </p>
-              </div>
+              <h4 className="text-sm font-bold text-slate-900">No Harvests Registered Yet</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                You haven't registered any botanical batches under this farmer account yet. Register your first crop to mint it onto the blockchain.
+              </p>
               <Link
                 to="/farmer/register"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer shadow-sm"
               >
                 <PlusCircle size={15} />
-                <span>Register First Botanical Harvest</span>
+                <span>Register First Harvest</span>
               </Link>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
                   <tr>
-                    <th className="px-5 py-3">Crop Name & Botanical</th>
-                    <th className="px-5 py-3">Batch ID</th>
-                    <th className="px-5 py-3">Quantity</th>
-                    <th className="px-5 py-3">Harvest Origin</th>
-                    <th className="px-5 py-3">Current Status</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
+                    <th className="px-5 py-3.5">Botanical Crop</th>
+                    <th className="px-5 py-3.5">Batch Code</th>
+                    <th className="px-5 py-3.5">Harvest Date & Origin</th>
+                    <th className="px-5 py-3.5">Quantity</th>
+                    <th className="px-5 py-3.5">Supply Status</th>
+                    <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {farmerProducts.map(product => (
-                    <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
+                  {farmerProducts.map((product) => (
+                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={product.imageUrl || 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=100&auto=format&fit=crop&q=80'}
-                            alt={product.name}
-                            className="w-10 h-10 rounded-lg object-cover bg-slate-100 shrink-0"
-                          />
-                          <div>
-                            <div className="font-bold text-slate-900">{product.name}</div>
-                            <div className="text-[11px] text-slate-500 italic font-mono">
-                              {product.botanicalName}
-                            </div>
-                          </div>
-                        </div>
+                        <div className="font-bold text-sm text-slate-900">{product.name}</div>
+                        <div className="text-xs font-mono text-slate-500 italic mt-0.5">{product.botanicalName}</div>
                       </td>
-
-                      <td className="px-5 py-4 font-mono font-semibold text-emerald-700">
-                        {product.batchId}
-                      </td>
-
-                      <td className="px-5 py-4 font-bold text-slate-800">
-                        {product.quantityKg} kg
-                        <span className="block text-[10px] font-normal text-slate-500">
-                          {product.cultivationMethod}
+                      <td className="px-5 py-4">
+                        <span className="font-mono font-bold text-xs text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
+                          {product.batchId}
                         </span>
                       </td>
-
-                      <td className="px-5 py-4 text-slate-600">
-                        <div className="flex items-center gap-1 font-medium text-slate-900">
-                          <MapPin size={13} className="text-rose-500 shrink-0" />
-                          <span className="truncate max-w-xs">{product.farmLocation}</span>
+                      <td className="px-5 py-4 text-slate-700">
+                        <div className="flex items-center gap-1.5 font-medium">
+                          <Calendar size={13} className="text-slate-400" />
+                          <span>{product.harvestDate}</span>
                         </div>
-                        <div className="text-[10px] text-slate-400 font-mono">
-                          {product.gpsCoordinates.lat.toFixed(4)}°N, {product.gpsCoordinates.lng.toFixed(4)}°E
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+                          <MapPin size={13} className="text-emerald-700" />
+                          <span>{product.farmLocation}</span>
                         </div>
                       </td>
-
+                      <td className="px-5 py-4 font-bold text-slate-900">
+                        {product.quantityKg.toLocaleString()} kg
+                      </td>
                       <td className="px-5 py-4">
                         <StatusBadge status={product.status} />
                       </td>
-
                       <td className="px-5 py-4 text-right space-x-2">
                         <button
                           onClick={() => setSelectedProductForQR(product)}
-                          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
-                          title="Generate QR Tag"
+                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-emerald-200"
                         >
                           <QrCode size={13} />
-                          <span>QR</span>
+                          <span>QR Tag</span>
                         </button>
                         <button
                           onClick={() => navigate(`/verify/${product.id}`)}
-                          className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 transition-colors cursor-pointer"
                         >
                           <span>Trace</span>
                           <ArrowRight size={13} />

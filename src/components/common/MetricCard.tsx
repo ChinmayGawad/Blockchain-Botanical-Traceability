@@ -20,32 +20,32 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   subtitle,
   icon: Icon,
   trend,
-  iconColor = 'text-emerald-600',
+  iconColor = 'text-emerald-700',
   bgColor = 'bg-emerald-50',
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-emerald-300 transition-colors">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
           {title}
         </span>
-        <div className={`p-2.5 rounded-xl ${bgColor} ${iconColor}`}>
+        <div className={`p-2.5 rounded-xl border border-slate-100 ${bgColor} ${iconColor}`}>
           <Icon size={20} />
         </div>
       </div>
 
       <div className="mt-3">
-        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
           {value}
         </div>
 
         {(subtitle || trend) && (
-          <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+          <div className="mt-1.5 flex items-center justify-between text-xs text-slate-500 font-medium">
             {subtitle && <span>{subtitle}</span>}
             {trend && (
               <span
-                className={`font-semibold ${
-                  trend.isPositive ? 'text-emerald-600' : 'text-rose-600'
+                className={`font-bold ${
+                  trend.isPositive ? 'text-emerald-700' : 'text-rose-700'
                 }`}
               >
                 {trend.value}

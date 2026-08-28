@@ -517,14 +517,14 @@ export const RegisterProductPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-slate-900 text-white rounded-2xl p-4 text-left font-mono text-xs space-y-2">
-              <div className="text-slate-400 text-[11px] uppercase tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl p-5 text-left font-mono text-xs space-y-2">
+              <div className="text-slate-500 text-xs uppercase font-extrabold tracking-wider">
                 Blockchain Transaction Receipt:
               </div>
-              <div className="text-emerald-400 break-all text-[11px]">
+              <div className="text-emerald-800 font-bold break-all text-xs">
                 TxID: {createdProduct.blockchainTransactions[0]?.txId}
               </div>
-              <div className="text-slate-300 text-[11px]">
+              <div className="text-slate-600 text-xs">
                 Endorsing Peers: peer0.farmer.florachain.org, peer0.admin.florachain.org
               </div>
             </div>

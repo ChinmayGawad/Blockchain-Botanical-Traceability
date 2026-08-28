@@ -50,32 +50,32 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Report Suspicious Botanical Product"
-      subtitle="Your incident report will be flagged to consortium compliance officers & admin oversight."
+      title="Report Suspicious Botanical Batch"
+      subtitle="Flag potential counterfeit packaging, broken seals, or assay mismatches to consortium compliance officers."
       maxWidth="md"
     >
       {submitted ? (
-        <div className="py-8 text-center space-y-3">
-          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+        <div className="py-8 text-center space-y-3 bg-emerald-50 rounded-2xl border border-emerald-200 p-6">
+          <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto border border-emerald-300">
             <CheckCircle2 size={36} />
           </div>
           <h3 className="text-xl font-bold text-slate-900">Report Filed Successfully</h3>
-          <p className="text-sm text-slate-600 max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
             Thank you for protecting botanical consumer safety. Compliance administrators have received your report ID.
           </p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-3 text-amber-900 text-xs">
-            <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+          <div className="bg-amber-50 border border-amber-300 rounded-2xl p-3.5 flex items-start gap-3 text-amber-950 text-xs">
+            <AlertTriangle size={18} className="text-amber-700 shrink-0 mt-0.5" />
             <div>
               <span className="font-bold">Consortium Integrity Protocol:</span> Reports are recorded on the compliance database and trigger audit investigations for stakeholder licenses.
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-slate-700">
                 Product ID / QR Code:
               </label>
               <input
@@ -83,11 +83,11 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 value={formProduct}
                 onChange={e => setFormProduct(e.target.value)}
                 placeholder="e.g. BOT-2024-8901"
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-mono font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-slate-700">
                 Batch Number:
               </label>
               <input
@@ -95,14 +95,14 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 value={formBatch}
                 onChange={e => setFormBatch(e.target.value)}
                 placeholder="e.g. ASH-2024-089"
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-mono font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-slate-700">
                 Your Full Name: *
               </label>
               <input
@@ -111,11 +111,11 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="e.g. Alex Morgan"
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-slate-700">
                 Your Contact Email: *
               </label>
               <input
@@ -124,19 +124,19 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="alex@example.com"
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <div className="space-y-1">
+            <label className="block text-xs font-bold text-slate-700">
               Primary Reason for Report:
             </label>
             <select
               value={reason}
               onChange={e => setReason(e.target.value as any)}
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white text-slate-800"
+              className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 focus:outline-none"
             >
               <option value="INVALID_QR">QR Code Does Not Work / Invalid Signature</option>
               <option value="INFO_MISMATCH">Physical Packaging Does Not Match Blockchain Record</option>
@@ -147,8 +147,8 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <div className="space-y-1">
+            <label className="block text-xs font-bold text-slate-700">
               Detailed Description of Issue: *
             </label>
             <textarea
@@ -157,21 +157,21 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Describe where purchased, batch code discrepancies, broken seals, or irregularities..."
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
             ></textarea>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center gap-1.5 transition-colors shadow-sm"
+              className="px-5 py-2.5 text-xs font-bold bg-rose-700 hover:bg-rose-800 text-white rounded-xl flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
             >
               <Send size={14} />
               <span>Submit Report to Admin</span>

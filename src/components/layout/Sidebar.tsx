@@ -31,7 +31,7 @@ export const Sidebar: React.FC = () => {
           { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Overview Dashboard' },
           { to: '/admin/approvals', icon: Users, label: 'Stakeholder Approvals' },
           { to: '/admin/products', icon: Package, label: 'Consortium Batches' },
-          { to: '/admin/explorer', icon: Blocks, label: 'Hyperledger Explorer' },
+          { to: '/admin/explorer', icon: Blocks, label: 'Ledger Explorer' },
           { to: '/admin/reports', icon: AlertTriangle, label: 'Fraud / Suspicious Reports' },
         ];
       case 'FARMER':
@@ -66,7 +66,7 @@ export const Sidebar: React.FC = () => {
         ];
       default:
         return [
-          { to: '/', icon: LayoutDashboard, label: 'Home Landing' },
+          { to: '/home', icon: LayoutDashboard, label: 'Home Landing' },
           { to: '/verify', icon: ShieldCheck, label: 'Verify Product' },
         ];
     }
@@ -75,84 +75,86 @@ export const Sidebar: React.FC = () => {
   const navLinks = getNavLinks();
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800 min-h-[calc(100vh-6rem)]">
-      {/* Upper Navigation */}
-      <div className="p-4 space-y-6">
-        {/* User Card */}
-        <div className="bg-slate-800/80 rounded-2xl p-3.5 border border-slate-700/60 flex items-center gap-3">
+    <aside className="w-full lg:w-64 bg-white text-slate-800 flex flex-col justify-between shrink-0 border-r border-slate-200/90 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto shadow-xs z-30">
+      {/* Upper Section */}
+      <div className="p-4 sm:p-5 space-y-5">
+        {/* Stakeholder Identity Node Badge */}
+        <div className="bg-gradient-to-br from-slate-50 to-emerald-50/40 rounded-2xl p-3.5 border border-slate-200 shadow-2xs flex items-center gap-3">
           {currentUser.avatarUrl ? (
             <img
               src={currentUser.avatarUrl}
               alt={currentUser.name}
-              className="w-10 h-10 rounded-xl object-cover ring-2 ring-emerald-500/50 shrink-0"
+              className="w-10 h-10 rounded-xl object-cover ring-2 ring-emerald-600/30 shrink-0"
             />
           ) : (
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-sm shadow-emerald-900/10">
               {currentUser.name.charAt(0)}
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <h4 className="text-xs font-bold text-white truncate">
+            <h4 className="text-xs font-bold text-slate-900 truncate">
               {currentUser.name}
             </h4>
-            <div className="text-[11px] text-emerald-400 font-medium truncate flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              {role} Node
+            <div className="text-[11px] text-emerald-800 font-bold truncate flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              {role} Node Active
             </div>
-            <div className="text-[10px] text-slate-400 truncate">
+            <div className="text-[10px] text-slate-500 font-medium truncate">
               {currentUser.organization}
             </div>
           </div>
         </div>
 
-        {/* Links Menu */}
+        {/* Navigation Group */}
         <div className="space-y-1">
-          <div className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-            {role} Operations
+          <div className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">
+            {role} Navigation
           </div>
-          {navLinks.map(link => {
-            const Icon = link.icon;
-            return (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                    isActive
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
-                  }`
-                }
-              >
-                <Icon size={16} />
-                <span>{link.label}</span>
-              </NavLink>
-            );
-          })}
+          <nav className="space-y-1">
+            {navLinks.map(link => {
+              const Icon = link.icon;
+              return (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all relative ${
+                      isActive
+                        ? 'bg-emerald-50 text-emerald-950 border border-emerald-300/80 shadow-2xs font-extrabold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-emerald-700 before:rounded-r'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                    }`
+                  }
+                >
+                  <Icon size={16} className="shrink-0 text-emerald-700" />
+                  <span>{link.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
         </div>
       </div>
 
-      {/* Bottom Public Links & Logout */}
-      <div className="p-4 border-t border-slate-800 space-y-2 text-xs">
+      {/* Bottom Footer Section */}
+      <div className="p-4 sm:p-5 border-t border-slate-200/80 space-y-2 text-xs font-bold bg-slate-50/50">
         <NavLink
           to="/verify"
-          className="flex items-center justify-between px-3.5 py-2 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-colors"
+          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-700 hover:text-emerald-900 hover:bg-white border border-transparent hover:border-slate-200 transition-all shadow-2xs"
         >
           <span className="flex items-center gap-2">
-            <ShieldCheck size={16} /> Consumer Verification
+            <ShieldCheck size={16} className="text-emerald-700" /> Public Verification
           </span>
-          <ExternalLink size={12} />
+          <ExternalLink size={13} className="text-slate-400" />
         </NavLink>
 
         <button
           onClick={() => {
             logout();
-            navigate('/');
+            navigate('/login');
           }}
-          className="w-full flex items-center gap-2 px-3.5 py-2 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 transition-colors"
+          className="w-full flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-rose-700 hover:text-rose-800 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
         >
           <LogOut size={16} />
-          <span>Exit to Public Portal</span>
+          <span>Sign Out ({role})</span>
         </button>
       </div>
     </aside>
