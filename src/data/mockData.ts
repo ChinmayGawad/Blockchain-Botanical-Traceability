@@ -1,4 +1,5 @@
 import { BotanicalProduct, User, SuspiciousReport, BlockchainTransaction } from '../types';
+import { BOTANICAL_IMAGES } from '../utils/imageUtils';
 
 export const MOCK_USERS: User[] = [
   {
@@ -111,7 +112,7 @@ export const INITIAL_PRODUCTS: BotanicalProduct[] = [
     description: 'High-potency, slow-shade dried full-spectrum Withania somnifera root sustainably harvested under certified regenerative organic standards. Standardized to 5.4% Withanolides.',
     activeCompounds: ['Withanolides 5.4%', 'Withaferin A 0.8%', 'Alkaloids 1.2%'],
     createdTimestamp: '2024-06-15T08:30:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80',
+    imageUrl: BOTANICAL_IMAGES.ASHWAGANDHA,
     certificates: [
       {
         id: 'CERT-001',
@@ -360,7 +361,7 @@ export const INITIAL_PRODUCTS: BotanicalProduct[] = [
     description: 'World renowned Lakadong variety with exceptional natural curcumin content (>8.0%). Sun-cured and vacuum packaged in nitrogen atmosphere.',
     activeCompounds: ['Curcumin 8.4%', 'Demethoxycurcumin 1.2%', 'Essential Oils 4.1%'],
     createdTimestamp: '2024-07-22T09:00:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=600&auto=format&fit=crop&q=80',
+    imageUrl: BOTANICAL_IMAGES.TURMERIC,
     certificates: [
       {
         id: 'CERT-003',
@@ -510,7 +511,7 @@ export const INITIAL_PRODUCTS: BotanicalProduct[] = [
     description: 'Dark purple Krishna Tulsi leaves rich in Eugenol and Ursolic acid. Grown following Demeter biodynamic lunar planting calendar.',
     activeCompounds: ['Eugenol 68%', 'Ursolic Acid 2.1%', 'Caryophyllene'],
     createdTimestamp: '2024-08-16T11:00:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80',
+    imageUrl: BOTANICAL_IMAGES.TULSI,
     certificates: [
       {
         id: 'CERT-004',
@@ -587,7 +588,7 @@ export const INITIAL_PRODUCTS: BotanicalProduct[] = [
     qrCodeValue: 'https://florachain.verify/BOT-2024-9981',
     description: 'Raw Neem leaf batch flagged during multi-residue GC-MS laboratory screening due to synthetic organophosphate traces from adjacent non-organic spray drift.',
     createdTimestamp: '2024-07-06T10:00:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80',
+    imageUrl: BOTANICAL_IMAGES.NEEM,
     certificates: [],
     labReport: {
       labId: 'USR-LAB-01',
@@ -674,7 +675,7 @@ export const INITIAL_PRODUCTS: BotanicalProduct[] = [
     description: 'First flush organic tea buds plucked before sunrise at 1,900 meters elevation in the Nilgiri cloud forest. High L-theanine and EGCG polyphenol profile.',
     activeCompounds: ['EGCG 12.8%', 'L-Theanine 3.4%', 'Caffeine 2.1%'],
     createdTimestamp: '2024-08-22T06:30:00Z',
-    imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80',
+    imageUrl: BOTANICAL_IMAGES.TEA,
     certificates: [
       {
         id: 'CERT-005',

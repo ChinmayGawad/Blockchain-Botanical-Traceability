@@ -195,7 +195,7 @@ public class DataInitializer implements CommandLineRunner {
                 .verificationState(VerificationState.VERIFIED)
                 .qrCodeValue("https://florachain.verify/BOT-2024-8901")
                 .description("High-potency, slow-shade dried full-spectrum Withania somnifera root sustainably harvested under certified regenerative organic standards. Standardized to 5.4% Withanolides.")
-                .imageUrl("https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600")
+                .imageUrl("https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600")
                 .createdTimestamp(LocalDateTime.of(2024, 6, 15, 8, 30))
                 .activeCompounds(Arrays.asList("Withanolides 5.4%", "Withaferin A 0.8%", "Alkaloids 1.2%"))
                 .certificates(new ArrayList<>())

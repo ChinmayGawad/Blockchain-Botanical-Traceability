@@ -19,6 +19,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { getBotanicalProductImage } from '../../utils/imageUtils';
 
 export const RegisterProductPage: React.FC = () => {
   const { registerProduct } = useBlockchain();
@@ -90,7 +91,7 @@ export const RegisterProductPage: React.FC = () => {
         description,
         activeCompounds: activeCompounds.split(',').map(s => s.trim()).filter(Boolean),
         certificates: [cert],
-        imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80',
+        imageUrl: getBotanicalProductImage({ name, botanicalName, category }),
       });
 
       setIsSubmitting(false);

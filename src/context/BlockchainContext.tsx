@@ -12,6 +12,7 @@ import {
   TimelineEvent,
 } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_SUSPICIOUS_REPORTS } from '../data/mockData';
+import { getBotanicalProductImage } from '../utils/imageUtils';
 import web3Service, { WalletState } from '../services/web3Service';
 import apiClient from '../services/api';
 
@@ -65,7 +66,11 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed: BotanicalProduct[] = JSON.parse(saved);
+        return parsed.map(p => ({
+          ...p,
+          imageUrl: getBotanicalProductImage(p),
+        }));
       } catch (e) {
         console.error('Failed to parse products from localStorage', e);
       }
@@ -275,9 +280,12 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       ipfsHash: productData.certificates[0]?.ipfsCid || undefined,
     };
 
+    const resolvedImageUrl = getBotanicalProductImage(productData);
+
     const newProduct: BotanicalProduct = {
       ...productData,
       id,
+      imageUrl: resolvedImageUrl,
       status: 'REGISTERED',
       verificationState: 'IN_PROGRESS',
       qrCodeValue: `https://florachain.verify/${id}`,

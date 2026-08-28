@@ -92,7 +92,7 @@ public class ProductService {
                 .verificationState(VerificationState.IN_PROGRESS)
                 .qrCodeValue(qrCodeValue)
                 .description(request.getDescription() != null ? request.getDescription() : "Freshly harvested certified botanical batch.")
-                .imageUrl(request.getImageUrl() != null && !request.getImageUrl().isBlank() ? request.getImageUrl() : "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600")
+                .imageUrl(request.getImageUrl() != null && !request.getImageUrl().isBlank() ? request.getImageUrl() : "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600")
                 .createdTimestamp(LocalDateTime.now())
                 .activeCompounds(request.getActiveCompounds() != null ? request.getActiveCompounds() : List.of("Standard Botanical Extract"))
                 .certificates(new ArrayList<>())

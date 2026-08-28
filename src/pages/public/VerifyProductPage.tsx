@@ -32,6 +32,7 @@ import { QRModal } from '../../components/common/QRModal';
 import { QRScannerModal } from '../../components/verification/QRScannerModal';
 import { ReportSuspiciousModal } from '../../components/verification/ReportSuspiciousModal';
 import { Footer } from '../../components/layout/Footer';
+import { getBotanicalProductImage } from '../../utils/imageUtils';
 import confetti from 'canvas-confetti';
 
 export const VerifyProductPage: React.FC = () => {
@@ -144,7 +145,7 @@ export const VerifyProductPage: React.FC = () => {
                 <div className="lg:col-span-4 space-y-4">
                   <div className="relative rounded-2xl overflow-hidden bg-slate-900 aspect-4/3 border border-slate-100 shadow-inner">
                     <img
-                      src={currentProduct.imageUrl || 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80'}
+                      src={getBotanicalProductImage(currentProduct)}
                       alt={currentProduct.name}
                       className="w-full h-full object-cover"
                     />
