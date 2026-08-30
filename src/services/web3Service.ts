@@ -387,7 +387,7 @@ class Web3Service {
       retailerName: retail.retailerName,
       storeLocation: retail.storeLocation,
       shelfLocation: retail.shelfBatchId || 'Aisle 1',
-      retailPrice: `$${retail.unitPrice.toFixed(2)}`,
+      retailPrice: `₹${retail.unitPrice.toFixed(2)}`,
     };
 
     const tx = await contract.confirmRetailReceipt(input);

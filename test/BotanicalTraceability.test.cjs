@@ -350,7 +350,7 @@ describe("BotanicalTraceability Smart Contract", function () {
       retailerName: "Arogya Wellness Flagship Store",
       storeLocation: "Indiranagar, Bengaluru",
       shelfLocation: "Aisle 4, Shelf B - Herbal Extracts",
-      retailPrice: "$24.99"
+      retailPrice: "₹850.00"
     });
 
     product = await botanicalContract.getProduct(batchId);

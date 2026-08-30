@@ -39,7 +39,7 @@ export const RegisterPage: React.FC = () => {
     { role: 'PROCESSOR', label: 'Bio Processor', icon: Cog, color: 'text-purple-800 bg-purple-50 border-purple-300', placeholder: 'e.g. PhytoExtracts Bio-Refining Ltd', extraLabel: 'Extraction Facility Equipment (e.g. SFE-CO2)' },
     { role: 'LABORATORY', label: 'Testing Lab', icon: FlaskConical, color: 'text-indigo-800 bg-indigo-50 border-indigo-300', placeholder: 'e.g. Eurofins AgriBio Analytics Lab', extraLabel: 'Accreditation ID (e.g. ISO/IEC 17025)' },
     { role: 'DISTRIBUTOR', label: 'Distributor', icon: Truck, color: 'text-sky-800 bg-sky-50 border-sky-300', placeholder: 'e.g. TransGlobal Cold-Chain Logistics', extraLabel: 'Refrigerated Vehicle Fleet Numbers' },
-    { role: 'RETAILER', label: 'Retailer', icon: Store, color: 'text-teal-800 bg-teal-50 border-teal-300', placeholder: 'e.g. Pure Botanical Apothecary London', extraLabel: 'Physical Storefront Address & Bay ID' },
+    { role: 'RETAILER', label: 'Retailer', icon: Store, color: 'text-teal-800 bg-teal-50 border-teal-300', placeholder: 'e.g. Arogya Ayurvedic Wellness Stores, Bengaluru', extraLabel: 'Physical Storefront Address & Bay ID' },
   ];
 
   const currentRoleOpt = roleOptions.find(r => r.role === role) || roleOptions[0];
@@ -208,7 +208,7 @@ export const RegisterPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="e.g. NPOP Organic, USDA-NOP, GMP-Certified, ISO/IEC 17025"
+                placeholder="e.g. India Organic (NPOP), FSSAI Jaivik Bharat, AYUSH Premium Mark, ISO/IEC 17025 NABL"
                 value={certifications}
                 onChange={(e) => setCertifications(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"

@@ -32,7 +32,7 @@ export const TestProductPage: React.FC = () => {
   const [microbial, setMicrobial] = useState<'PASS' | 'FAIL'>('PASS');
   const [pesticides, setPesticides] = useState<'PASS' | 'FAIL'>('PASS');
   const [testedBy, setTestedBy] = useState('Dr. Ananya Sharma, Lead Biochemist');
-  const [notes, setNotes] = useState('Batch passed all USP <561> botanical monograph criteria. Zero synthetic pesticide residue detected (<0.001 mg/kg limit of quantification).');
+  const [notes, setNotes] = useState('Batch passed all Ayurvedic Pharmacopoeia of India (API) & FSSAI 2023 botanical monograph criteria. Zero synthetic pesticide residue detected (<0.001 mg/kg limit of quantification).');
   const [ipfsCid, setIpfsCid] = useState('QmLabReport' + Math.random().toString(36).substring(2, 12));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,7 +87,7 @@ export const TestProductPage: React.FC = () => {
         selectedProductId,
         {
           labId: currentUser.id,
-          labName: currentUser.organization || 'Eurofins AgriBio Analytics Lab',
+          labName: currentUser.organization || 'Eurofins NABL Analytical Testing Lab',
           testDate: new Date().toISOString(),
           testedBy,
           purityPercentage: purity,
@@ -98,7 +98,7 @@ export const TestProductPage: React.FC = () => {
           parameters,
           certificateIpfsCid: ipfsCid,
           overallResult: approve ? 'APPROVED' : 'REJECTED',
-          notes: approve ? notes : 'CRITICAL FAILURE: Pesticide / microbial contamination exceeds allowed international pharmacopeia limits. Smart contract locked batch.',
+          notes: approve ? notes : 'CRITICAL FAILURE: Pesticide / microbial contamination exceeds allowed Ayurvedic Pharmacopoeia of India (API) & FSSAI limits. Smart contract locked batch.',
         },
         approve
       );

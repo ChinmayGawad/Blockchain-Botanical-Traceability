@@ -47,8 +47,8 @@ export const RegisterProductPage: React.FC = () => {
   const [cultivationMethod, setCultivationMethod] = useState<CultivationMethod>('ORGANIC');
 
   // Certificates
-  const [certType, setCertType] = useState('USDA Organic & NPOP India');
-  const [certNumber, setCertNumber] = useState(`ORG-IND-2024-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [certType, setCertType] = useState('India Organic (NPOP) & FSSAI Jaivik Bharat');
+  const [certNumber, setCertNumber] = useState(`NPOP-IND-2024-${Math.floor(1000 + Math.random() * 9000)}`);
   const [ipfsHash, setIpfsHash] = useState('QmShatavariCert' + Math.random().toString(36).substring(2, 12));
 
   const handleNext = (e: React.FormEvent) => {
@@ -67,7 +67,7 @@ export const RegisterProductPage: React.FC = () => {
       id: `CERT-${Date.now()}`,
       type: certType,
       certificateNumber: certNumber,
-      issuingAuthority: 'OneCert International / APEDA',
+      issuingAuthority: 'APEDA / OneCert International India',
       issueDate: '2024-01-15',
       expiryDate: '2025-01-14',
       ipfsCid: ipfsHash,
@@ -376,7 +376,7 @@ export const RegisterProductPage: React.FC = () => {
                   required
                   value={certType}
                   onChange={e => setCertType(e.target.value)}
-                  placeholder="e.g. USDA Organic / NPOP / FairWild"
+                  placeholder="e.g. India Organic (NPOP) / FSSAI Jaivik Bharat / AYUSH Premium"
                   className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
               </div>

@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Printer,
-  DollarSign,
+  IndianRupee,
   Tag,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -26,8 +26,8 @@ export const RetailerDashboard: React.FC = () => {
 
   const [selectedProductForQR, setSelectedProductForQR] = useState<BotanicalProduct | null>(null);
   const [receivingProductId, setReceivingProductId] = useState<string | null>(null);
-  const [shelfId, setShelfId] = useState('RET-LON-092');
-  const [price, setPrice] = useState<number>(29.99);
+  const [shelfId, setShelfId] = useState('RET-BLR-092');
+  const [price, setPrice] = useState<number>(850.00);
 
   // Incoming shipments ready for check-in
   const incomingShipments = products.filter(p => p.status === 'IN_TRANSIT' || p.status === 'DELIVERED');
@@ -44,8 +44,8 @@ export const RetailerDashboard: React.FC = () => {
   const handleConfirmReceipt = (productId: string) => {
     confirmRetailReceipt(productId, {
       retailerId: currentUser.id,
-      retailerName: `${currentUser.name} (${currentUser.organization || 'Pure Botanical Apothecary'})`,
-      storeLocation: currentUser.location || 'Covent Garden, London',
+      retailerName: `${currentUser.name} (${currentUser.organization || 'Arogya Pure Herbals'})`,
+      storeLocation: currentUser.location || 'Indiranagar, Bengaluru, Karnataka',
       receivedDate: new Date().toISOString(),
       shelfBatchId: shelfId,
       unitPrice: price,
@@ -61,7 +61,7 @@ export const RetailerDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title="Retailer Apothecary Portal"
-      subtitle={`${currentUser.name} • ${currentUser.organization || 'Pure Botanical Apothecary London'} (ID: ${currentUser.id}) • Storefront: ${currentUser.location || 'Covent Garden, London'}`}
+      subtitle={`${currentUser.name} • ${currentUser.organization || 'Arogya Pure Herbals Bengaluru'} (ID: ${currentUser.id}) • Storefront: ${currentUser.location || 'Indiranagar, Bengaluru'}`}
       action={
         <Link
           to="/retailer/generate-qr"
@@ -101,9 +101,9 @@ export const RetailerDashboard: React.FC = () => {
           />
           <MetricCard
             title="Avg Retail Unit Price"
-            value="$29.99"
+            value="₹850.00"
             subtitle="Certified Organic Botanical"
-            icon={DollarSign}
+            icon={IndianRupee}
             iconColor="text-emerald-700"
             bgColor="bg-emerald-50"
           />
@@ -208,11 +208,11 @@ export const RetailerDashboard: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Shelf Unit Price (USD):
+                  Shelf Unit Price (₹ INR):
                 </label>
                 <input
                   type="number"
-                  step="0.5"
+                  step="10"
                   value={price}
                   onChange={e => setPrice(parseFloat(e.target.value) || 0)}
                   className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
@@ -256,7 +256,7 @@ export const RetailerDashboard: React.FC = () => {
                   <tr>
                     <th className="px-5 py-3.5">Product</th>
                     <th className="px-5 py-3.5">Shelf Batch ID</th>
-                    <th className="px-5 py-3.5">Unit Price</th>
+                    <th className="px-5 py-3.5">Unit Price (INR)</th>
                     <th className="px-5 py-3.5">Verification State</th>
                     <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
@@ -272,7 +272,7 @@ export const RetailerDashboard: React.FC = () => {
                         {product.retailDetails?.shelfBatchId}
                       </td>
                       <td className="px-5 py-4 font-bold text-slate-900">
-                        ${product.retailDetails?.unitPrice.toFixed(2)}
+                        ₹{product.retailDetails?.unitPrice.toFixed(2)}
                       </td>
                       <td className="px-5 py-4">
                         <StatusBadge status={product.verificationState} />

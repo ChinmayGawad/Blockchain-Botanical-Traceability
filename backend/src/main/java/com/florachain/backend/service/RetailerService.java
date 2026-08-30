@@ -73,7 +73,7 @@ public class RetailerService {
                 "Product Stocked & QR Generated",
                 retailerName,
                 UserRole.RETAILER,
-                "Retailer: " + retailerName + ", Price: $" + unitPrice + ", ShelfBatch: " + shelfBatchId
+                "Retailer: " + retailerName + ", Price: ₹" + unitPrice + ", ShelfBatch: " + shelfBatchId
         );
 
         RetailDetailsEntity retail = RetailDetailsEntity.builder()
@@ -106,7 +106,7 @@ public class RetailerService {
                 .actorName(retailerName)
                 .actorRole(UserRole.RETAILER)
                 .location(storeLocation)
-                .description("Inbound physical inspection passed. Placed on shelf under Batch " + shelfBatchId + ". Unit Price: $" + unitPrice + ". Verification QR activated.")
+                .description("Inbound physical inspection passed. Placed on shelf under Batch " + shelfBatchId + ". Unit Price: ₹" + unitPrice + ". Verification QR activated.")
                 .txHash(tx.getTxId())
                 .status("COMPLETED")
                 .product(product)

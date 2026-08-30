@@ -82,9 +82,9 @@ export const HomePage: React.FC = () => {
       icon: Sprout,
       color: 'text-emerald-800 bg-emerald-50 border-emerald-300',
       badge: 'Genesis Block',
-      desc: 'GPS farm telemetry, harvest date, soil assay, and USDA Organic certificate CID pinned to IPFS.',
+      desc: 'GPS farm telemetry, harvest date, soil assay, and India Organic (NPOP) certificate CID pinned to IPFS.',
       techProof: 'Smart Contract: CreateProduct() • Signed with Farmer Node Key',
-      metrics: ['Precision GPS Geotag', 'USDA Organic CID', 'Harvest Timestamp'],
+      metrics: ['Precision GPS Geotag', 'NPOP Organic CID', 'Harvest Timestamp'],
     },
     {
       step: '02',

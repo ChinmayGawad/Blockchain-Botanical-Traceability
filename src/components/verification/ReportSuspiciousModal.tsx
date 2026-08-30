@@ -382,7 +382,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                   type="text"
                   value={purchaseLocation}
                   onChange={e => setPurchaseLocation(e.target.value)}
-                  placeholder="e.g. Covent Garden Organic Market, London"
+                  placeholder="e.g. Arogya Wellness Store, Indiranagar, Bengaluru"
                   className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 pl-8 pr-3 py-2 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
                 />
               </div>

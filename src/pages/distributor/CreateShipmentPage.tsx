@@ -25,12 +25,12 @@ export const CreateShipmentPage: React.FC = () => {
   const initialBatchId = searchParams.get('batch') || eligibleProducts[0]?.id || '';
 
   const [selectedProductId, setSelectedProductId] = useState(initialBatchId);
-  const [sourceLocation, setSourceLocation] = useState('Bangalore Central Bio-Pharma Logistics Terminal, India');
-  const [destinationLocation, setDestinationLocation] = useState('Pure Botanical Apothecary London Hub, Heathrow Terminal 4');
-  const [vehicleNumber, setVehicleNumber] = useState(`KA-01-TG-${Math.floor(1000 + Math.random() * 9000)} / LH-Cargo-844`);
+  const [sourceLocation, setSourceLocation] = useState('Bangalore Central Bio-Pharma Logistics Terminal, Nelamangala Hub, Karnataka');
+  const [destinationLocation, setDestinationLocation] = useState('Arogya Ayurvedic Wellness Retail Depot, Indiranagar, Bengaluru, Karnataka');
+  const [vehicleNumber, setVehicleNumber] = useState(`KA-01-TG-${Math.floor(1000 + Math.random() * 9000)}`);
   const [transportType, setTransportType] = useState<'REFRIGERATED_TRUCK' | 'STANDARD_LOGISTICS' | 'AIR_FREIGHT'>('REFRIGERATED_TRUCK');
   const [tempRange, setTempRange] = useState('18°C - 22°C (Strict GDP Standard)');
-  const [trackingNumber, setTrackingNumber] = useState(`TG-CC-2024-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [trackingNumber, setTrackingNumber] = useState(`TG-IND-2024-${Math.floor(100000 + Math.random() * 900000)}`);
   const [dispatchDate, setDispatchDate] = useState(new Date().toISOString().split('T')[0]);
   const [expectedDate, setExpectedDate] = useState(
     new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
