@@ -60,7 +60,7 @@ export const RegisterProductPage: React.FC = () => {
     setStep(prev => Math.max(1, prev - 1));
   };
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = async () => {
     setIsSubmitting(true);
 
     const cert: Certificate = {
@@ -74,8 +74,8 @@ export const RegisterProductPage: React.FC = () => {
       status: 'VALID',
     };
 
-    setTimeout(() => {
-      const newProd = registerProduct({
+    try {
+      const newProd = await registerProduct({
         batchId,
         name,
         botanicalName,
@@ -99,7 +99,10 @@ export const RegisterProductPage: React.FC = () => {
       try {
         confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
       } catch (e) {}
-    }, 1500);
+    } catch (err) {
+      console.error('Registration failed:', err);
+      setIsSubmitting(false);
+    }
   };
 
   return (

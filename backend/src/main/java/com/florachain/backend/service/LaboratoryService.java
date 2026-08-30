@@ -42,8 +42,11 @@ public class LaboratoryService {
     public ProductResponse submitLabReport(String productId, LabTestRequest request) {
         ProductEntity product = productService.getProductEntityByIdOrBatch(productId);
 
-        if (product.getStatus() != ProductStatus.PROCESSED && product.getStatus() != ProductStatus.IN_TESTING && product.getStatus() != ProductStatus.REGISTERED) {
-            throw new BadRequestException("Product cannot undergo laboratory testing in its current status: " + product.getStatus());
+        if (product.getStatus() != ProductStatus.PROCESSED && product.getStatus() != ProductStatus.IN_TESTING) {
+            throw new BadRequestException("Product cannot undergo laboratory testing in its current status: " + product.getStatus() + ". Batch must be processed first.");
+        }
+        if (product.getLabReport() != null) {
+            throw new BadRequestException("A laboratory quality report has already been recorded for this batch.");
         }
 
         double purity = request.getPurityPercentage() != null ? request.getPurityPercentage() : 0.0;

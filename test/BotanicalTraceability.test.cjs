@@ -94,7 +94,7 @@ describe("BotanicalTraceability Smart Contract", function () {
     expect(product.processing.processedQuantityKg).to.equal(880n);
   });
 
-  it("Should allow laboratory to test and approve batch", async function () {
+  it("Should allow laboratory to test and approve batch after processing", async function () {
     const batchId = "TURM-2026-003";
     await botanicalContract.connect(farmer).registerHarvest({
       batchId,
@@ -110,6 +110,40 @@ describe("BotanicalTraceability Smart Contract", function () {
       farmerName: "Suresh Kumar"
     });
 
+    // Attempting lab test before processing must revert
+    await expect(
+      botanicalContract.connect(lab).submitLabReport({
+        batchId,
+        labId: "LAB-901",
+        labName: "Apex Phytochemical Testing Labs",
+        testedBy: "Dr. Vandana Rao",
+        purityPercentage: 9870,
+        moisturePercentage: 650,
+        heavyMetalsPassed: true,
+        microbialTestPassed: true,
+        pesticideResiduePassed: true,
+        certificateIpfsCid: "QmLabCertificateHash999",
+        overallApproved: true,
+        notes: "Meets all pharmacopoeia standards"
+      })
+    ).to.be.revertedWith("Invalid state: Product must be PROCESSED before laboratory testing");
+
+    // Process batch
+    await botanicalContract.connect(processor).recordProcessing({
+      batchId,
+      processorId: "PROC-99",
+      processorName: "Turmeric Milling Unit",
+      facilityLocation: "Erode Processing Plant",
+      method: "Solar Vacuum Dehydration",
+      initialQuantityKg: 500,
+      processedQuantityKg: 450,
+      yieldLossPercentage: 1000,
+      equipmentUsed: "Milling Line 1",
+      ipfsDocumentCid: "QmProcTurm",
+      notes: "Fine powder obtained"
+    });
+
+    // Now lab test succeeds
     await botanicalContract.connect(lab).submitLabReport({
       batchId,
       labId: "LAB-901",
@@ -148,6 +182,20 @@ describe("BotanicalTraceability Smart Contract", function () {
       farmerName: "Karan Singh"
     });
 
+    await botanicalContract.connect(processor).recordProcessing({
+      batchId,
+      processorId: "PROC-99",
+      processorName: "Tulsi Extract Unit",
+      facilityLocation: "Varanasi Plant",
+      method: "Cryogenic Milling",
+      initialQuantityKg: 200,
+      processedQuantityKg: 180,
+      yieldLossPercentage: 1000,
+      equipmentUsed: "Cryo Mill",
+      ipfsDocumentCid: "QmProcTulsi",
+      notes: "Processed"
+    });
+
     await botanicalContract.connect(lab).submitLabReport({
       batchId,
       labId: "LAB-901",
@@ -166,6 +214,60 @@ describe("BotanicalTraceability Smart Contract", function () {
     const product = await botanicalContract.getProduct(batchId);
     expect(product.status).to.equal(5); // REJECTED
     expect(product.labReport.overallApproved).to.be.false;
+  });
+
+  it("Should strictly prevent distributor from skipping processing and lab stages", async function () {
+    const batchId = "SKIP-TEST-001";
+    await botanicalContract.connect(farmer).registerHarvest({
+      batchId,
+      botanicalName: "Centella asiatica",
+      commonName: "Gotu Kola",
+      category: "Herbs",
+      farmLocation: "Assam Fields",
+      coordinates: "26.20° N, 92.93° E",
+      harvestDate: 0,
+      quantityKg: 300,
+      cultivationMethod: "ORGANIC",
+      farmerId: "FARM-ASSAM",
+      farmerName: "Bhaben Das"
+    });
+
+    // Attempting distributor dispatch on REGISTERED batch must revert
+    await expect(
+      botanicalContract.connect(distributor).dispatchShipment({
+        batchId,
+        shipmentId: "SHIP-SKIP-1",
+        distributorId: "DIST-01",
+        distributorName: "Illegal Fast Shipper",
+        sourceLocation: "Assam",
+        destinationLocation: "Delhi",
+        vehicleNumber: "DL-01-9999",
+        transportType: "REFRIGERATED_TRUCK",
+        temperatureRange: "15°C - 20°C",
+        trackingNumber: "TRK-SKIP"
+      })
+    ).to.be.revertedWith("Product must be approved by laboratory before shipment");
+  });
+
+  it("Should strictly reject unauthorized callers without the appropriate supply chain role", async function () {
+    const batchId = "ROLE-TEST-001";
+    
+    // Consumer (role = none) cannot register harvest
+    await expect(
+      botanicalContract.connect(consumer).registerHarvest({
+        batchId,
+        botanicalName: "Fake Herb",
+        commonName: "Fake",
+        category: "Fake",
+        farmLocation: "Unknown",
+        coordinates: "0,0",
+        harvestDate: 0,
+        quantityKg: 100,
+        cultivationMethod: "UNKNOWN",
+        farmerId: "HACKER",
+        farmerName: "Hacker"
+      })
+    ).to.be.revertedWith("Unauthorized role for this operation");
   });
 
   it("Should execute complete supply chain lifecycle from Harvest to Retail Ready", async function () {

@@ -22,9 +22,10 @@ export const TestProductPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const initialBatchId = searchParams.get('batch') || products.find(p => p.status === 'IN_TESTING' || p.status === 'PROCESSING')?.id || products[0]?.id;
+  const eligibleProducts = products.filter(p => p.status === 'PROCESSED' || p.status === 'IN_TESTING');
+  const initialBatchId = searchParams.get('batch') || eligibleProducts[0]?.id || '';
 
-  const [selectedProductId, setSelectedProductId] = useState(initialBatchId || '');
+  const [selectedProductId, setSelectedProductId] = useState(initialBatchId);
   const [purity, setPurity] = useState<number>(99.5);
   const [moisture, setMoisture] = useState<number>(5.4);
   const [heavyMetals, setHeavyMetals] = useState<'PASS' | 'FAIL'>('PASS');
@@ -206,17 +207,23 @@ export const TestProductPage: React.FC = () => {
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Select Botanical Sample Batch to Inspect: *
               </label>
-              <select
-                value={selectedProductId}
-                onChange={e => setSelectedProductId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-mono"
-              >
-                {products.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} • Batch #{p.batchId} [{p.status}]
-                  </option>
-                ))}
-              </select>
+              {eligibleProducts.length === 0 ? (
+                <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                  ⚠️ No batches currently in <strong>PROCESSED</strong> or <strong>IN_TESTING</strong> status. Harvested crops must first be processed before quality assurance testing can be conducted.
+                </div>
+              ) : (
+                <select
+                  value={selectedProductId}
+                  onChange={e => setSelectedProductId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-mono"
+                >
+                  {eligibleProducts.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} • Batch #{p.batchId} [{p.status}]
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* Assay Parameters Grid */}

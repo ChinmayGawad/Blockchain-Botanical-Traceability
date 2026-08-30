@@ -42,8 +42,11 @@ public class ShipmentService {
     public ProductResponse createShipment(CreateShipmentRequest request) {
         ProductEntity product = productService.getProductEntityByIdOrBatch(request.getProductId());
 
-        if (product.getStatus() != ProductStatus.APPROVED && product.getStatus() != ProductStatus.PROCESSED) {
-            throw new BadRequestException("Product must be APPROVED or PROCESSED before dispatching shipment. Current status: " + product.getStatus());
+        if (product.getStatus() != ProductStatus.APPROVED) {
+            throw new BadRequestException("Product must be APPROVED by laboratory before dispatching shipment. Current status: " + product.getStatus());
+        }
+        if (product.getShipmentDetails() != null) {
+            throw new BadRequestException("A shipment has already been created for this product batch.");
         }
 
         String trackingNumber = request.getTrackingNumber() != null && !request.getTrackingNumber().isBlank() ?

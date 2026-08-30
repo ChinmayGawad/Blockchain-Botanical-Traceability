@@ -40,6 +40,9 @@ public class ProcessingService {
         if (product.getStatus() != ProductStatus.REGISTERED && product.getStatus() != ProductStatus.PROCESSING) {
             throw new BadRequestException("Product cannot be processed in its current status: " + product.getStatus());
         }
+        if (product.getProcessingDetails() != null) {
+            throw new BadRequestException("Processing details have already been recorded for this batch.");
+        }
 
         double initialQty = request.getInitialQuantityKg() != null ? request.getInitialQuantityKg() : (product.getQuantityKg() != null ? product.getQuantityKg() : 0.0);
         double processedQty = request.getProcessedQuantityKg() != null ? request.getProcessedQuantityKg() : initialQty;

@@ -233,6 +233,19 @@ contract BotanicalTraceability {
         userRoles[msg.sender] = UserRole.ADMIN;
         isAuthorizedActor[msg.sender] = true;
         emit RoleGranted(msg.sender, UserRole.ADMIN);
+
+        // Pre-authorize standard consortium addresses for local development & demonstration
+        _seedRole(0x70997970C51812dc3A010C7d01b50e0d17dc79C8, UserRole.FARMER);
+        _seedRole(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC, UserRole.PROCESSOR);
+        _seedRole(0x90F79bf6EB2c4f870365E785982E1f101E93b906, UserRole.LABORATORY);
+        _seedRole(0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65, UserRole.DISTRIBUTOR);
+        _seedRole(0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc, UserRole.RETAILER);
+    }
+
+    function _seedRole(address actor, UserRole role) private {
+        userRoles[actor] = role;
+        isAuthorizedActor[actor] = true;
+        emit RoleGranted(actor, role);
     }
 
     /**
@@ -247,7 +260,7 @@ contract BotanicalTraceability {
     /**
      * @dev 1. Farmer registers a newly harvested botanical batch
      */
-    function registerHarvest(HarvestInput calldata input) external {
+    function registerHarvest(HarvestInput calldata input) external onlyRole(UserRole.FARMER) {
         require(!products[input.batchId].exists, "Batch with this ID already registered");
         require(bytes(input.batchId).length > 0, "Batch ID cannot be empty");
 
@@ -277,9 +290,10 @@ contract BotanicalTraceability {
     /**
      * @dev 2. Processor records processing / extraction details
      */
-    function recordProcessing(ProcessingInput calldata input) external batchExists(input.batchId) {
+    function recordProcessing(ProcessingInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.PROCESSOR) {
         BotanicalProduct storage p = products[input.batchId];
-        require(p.status == ProductStatus.REGISTERED || p.status == ProductStatus.PROCESSING, "Invalid state for processing");
+        require(p.status == ProductStatus.REGISTERED || p.status == ProductStatus.PROCESSING, "Invalid state: Batch must be in REGISTERED state for processing");
+        require(p.processing.processingDate == 0, "Processing details already recorded for this batch");
 
         p.processing = ProcessingDetails({
             processorId: input.processorId,
@@ -305,12 +319,13 @@ contract BotanicalTraceability {
     /**
      * @dev 3. Laboratory submits QC testing results & certification
      */
-    function submitLabReport(LabInput calldata input) external batchExists(input.batchId) {
+    function submitLabReport(LabInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.LABORATORY) {
         BotanicalProduct storage p = products[input.batchId];
         require(
-            p.status == ProductStatus.PROCESSED || p.status == ProductStatus.IN_TESTING || p.status == ProductStatus.REGISTERED,
-            "Invalid state for lab testing"
+            p.status == ProductStatus.PROCESSED || p.status == ProductStatus.IN_TESTING,
+            "Invalid state: Product must be PROCESSED before laboratory testing"
         );
+        require(p.labReport.testDate == 0, "Lab report already submitted for this batch");
 
         p.labReport = LabReport({
             labId: input.labId,
@@ -337,9 +352,10 @@ contract BotanicalTraceability {
     /**
      * @dev 4. Distributor dispatches shipment
      */
-    function dispatchShipment(ShipmentInput calldata input) external batchExists(input.batchId) {
+    function dispatchShipment(ShipmentInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.DISTRIBUTOR) {
         BotanicalProduct storage p = products[input.batchId];
         require(p.status == ProductStatus.APPROVED, "Product must be approved by laboratory before shipment");
+        require(p.shipment.dispatchDate == 0, "Shipment already dispatched for this batch");
 
         p.shipment = ShipmentDetails({
             shipmentId: input.shipmentId,
@@ -366,7 +382,7 @@ contract BotanicalTraceability {
     /**
      * @dev 4b. Distributor confirms shipment arrival / delivery
      */
-    function confirmDelivery(string memory batchId) external batchExists(batchId) {
+    function confirmDelivery(string memory batchId) external batchExists(batchId) onlyRole(UserRole.DISTRIBUTOR) {
         BotanicalProduct storage p = products[batchId];
         require(p.status == ProductStatus.IN_TRANSIT, "Product is not currently in transit");
 
@@ -381,12 +397,13 @@ contract BotanicalTraceability {
     /**
      * @dev 5. Retailer confirms receipt and places product on retail shelves
      */
-    function confirmRetailReceipt(RetailInput calldata input) external batchExists(input.batchId) {
+    function confirmRetailReceipt(RetailInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.RETAILER) {
         BotanicalProduct storage p = products[input.batchId];
         require(
-            p.status == ProductStatus.DELIVERED || p.status == ProductStatus.IN_TRANSIT || p.status == ProductStatus.APPROVED,
-            "Product not ready for retail receipt"
+            p.status == ProductStatus.DELIVERED,
+            "Product must be DELIVERED by distributor before retail receipt"
         );
+        require(p.retail.receivedDate == 0, "Retail receipt already recorded for this batch");
 
         p.retail = RetailDetails({
             retailerId: input.retailerId,

@@ -37,8 +37,11 @@ public class RetailerService {
     public ProductResponse receiveProductAtRetail(String productId, RetailReceiveRequest request) {
         ProductEntity product = productService.getProductEntityByIdOrBatch(productId);
 
-        if (product.getStatus() == ProductStatus.REJECTED || product.getStatus() == ProductStatus.RECALLED) {
-            throw new BadRequestException("Cannot accept rejected or recalled product for retail: " + product.getStatus());
+        if (product.getStatus() != ProductStatus.DELIVERED && product.getStatus() != ProductStatus.IN_TRANSIT) {
+            throw new BadRequestException("Product must be delivered by distributor before retail receipt. Current status: " + product.getStatus());
+        }
+        if (product.getRetailDetails() != null) {
+            throw new BadRequestException("Retail receipt has already been recorded for this product batch.");
         }
 
         String batch = product.getBatchId() != null ? product.getBatchId() : product.getId();

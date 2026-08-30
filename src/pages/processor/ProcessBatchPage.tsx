@@ -22,10 +22,10 @@ export const ProcessBatchPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Find incoming batch or available product
-  const initialBatchId = searchParams.get('batch') || products.find(p => p.status === 'REGISTERED')?.id || products[0]?.id;
+  const eligibleProducts = products.filter(p => p.status === 'REGISTERED' || p.status === 'PROCESSING');
+  const initialBatchId = searchParams.get('batch') || eligibleProducts[0]?.id || '';
 
-  const [selectedProductId, setSelectedProductId] = useState(initialBatchId || '');
+  const [selectedProductId, setSelectedProductId] = useState(initialBatchId);
   const [method, setMethod] = useState('Cryogenic Milling & Low-Temperature Solar Vacuum Dehydration (45°C)');
   const [facilityLocation, setFacilityLocation] = useState('PhytoExtracts Cleanroom Facility #3, Bangalore Biotech Hub');
   const [initialQty, setInitialQty] = useState<number>(300);
@@ -147,17 +147,23 @@ export const ProcessBatchPage: React.FC = () => {
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Select Raw Botanical Harvest Batch: *
               </label>
-              <select
-                value={selectedProductId}
-                onChange={e => setSelectedProductId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white font-mono"
-              >
-                {products.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.botanicalName}) • Batch #{p.batchId} [{p.status}]
-                  </option>
-                ))}
-              </select>
+              {eligibleProducts.length === 0 ? (
+                <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                  ⚠️ No batches currently in <strong>REGISTERED</strong> status awaiting processing. Newly registered harvest batches will appear here.
+                </div>
+              ) : (
+                <select
+                  value={selectedProductId}
+                  onChange={e => setSelectedProductId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white font-mono"
+                >
+                  {eligibleProducts.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.botanicalName}) • Batch #{p.batchId} [{p.status}]
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {selectedProduct && (

@@ -21,9 +21,10 @@ export const CreateShipmentPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const initialBatchId = searchParams.get('batch') || products.find(p => p.status === 'APPROVED')?.id || products[0]?.id;
+  const eligibleProducts = products.filter(p => p.status === 'APPROVED');
+  const initialBatchId = searchParams.get('batch') || eligibleProducts[0]?.id || '';
 
-  const [selectedProductId, setSelectedProductId] = useState(initialBatchId || '');
+  const [selectedProductId, setSelectedProductId] = useState(initialBatchId);
   const [sourceLocation, setSourceLocation] = useState('Bangalore Central Bio-Pharma Logistics Terminal, India');
   const [destinationLocation, setDestinationLocation] = useState('Pure Botanical Apothecary London Hub, Heathrow Terminal 4');
   const [vehicleNumber, setVehicleNumber] = useState(`KA-01-TG-${Math.floor(1000 + Math.random() * 9000)} / LH-Cargo-844`);
@@ -43,6 +44,11 @@ export const CreateShipmentPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProductId) return;
+
+    if (selectedProduct && selectedProduct.status !== 'APPROVED') {
+      alert('Security Validation: Product must be APPROVED by a certified QA Laboratory before dispatching.');
+      return;
+    }
 
     setIsSubmitting(true);
     setTimeout(() => {
@@ -139,17 +145,23 @@ export const CreateShipmentPage: React.FC = () => {
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Select QA Approved Botanical Batch: *
               </label>
-              <select
-                value={selectedProductId}
-                onChange={e => setSelectedProductId(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white font-mono"
-              >
-                {products.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} • Batch #{p.batchId} [{p.status}]
-                  </option>
-                ))}
-              </select>
+              {eligibleProducts.length === 0 ? (
+                <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                  ⚠️ No batches currently in <strong>APPROVED</strong> status. Batches must be processed and verified by an accredited testing laboratory before shipment dispatch can occur.
+                </div>
+              ) : (
+                <select
+                  value={selectedProductId}
+                  onChange={e => setSelectedProductId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white font-mono"
+                >
+                  {eligibleProducts.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} • Batch #{p.batchId} [{p.status}]
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
