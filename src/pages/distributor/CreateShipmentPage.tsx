@@ -41,7 +41,7 @@ export const CreateShipmentPage: React.FC = () => {
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProductId) return;
 
@@ -51,8 +51,8 @@ export const CreateShipmentPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      createShipment(selectedProductId, {
+    try {
+      await createShipment(selectedProductId, {
         shipmentId: `SHP-2024-${Math.floor(1000 + Math.random() * 9000)}`,
         distributorId: currentUser.id,
         distributorName: `${currentUser.name} (${currentUser.organization || 'TransGlobal Cold-Chain'})`,
@@ -71,7 +71,10 @@ export const CreateShipmentPage: React.FC = () => {
       try {
         confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
       } catch (e) {}
-    }, 1200);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    }
   };
 
   return (

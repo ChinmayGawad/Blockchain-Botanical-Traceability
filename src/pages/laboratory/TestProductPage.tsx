@@ -40,11 +40,11 @@ export const TestProductPage: React.FC = () => {
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
 
-  const handleDecision = (approve: boolean) => {
+  const handleDecision = async (approve: boolean) => {
     if (!selectedProductId) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
       const parameters = [
         {
           name: 'Active Phytochemical Potency (HPLC)',
@@ -83,7 +83,7 @@ export const TestProductPage: React.FC = () => {
         },
       ];
 
-      submitLabResult(
+      await submitLabResult(
         selectedProductId,
         {
           labId: currentUser.id,
@@ -111,7 +111,10 @@ export const TestProductPage: React.FC = () => {
           confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
         } catch (e) {}
       }
-    }, 1200);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    }
   };
 
   return (

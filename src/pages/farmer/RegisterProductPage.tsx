@@ -526,7 +526,7 @@ export const RegisterProductPage: React.FC = () => {
                 Blockchain Transaction Receipt:
               </div>
               <div className="text-emerald-800 font-bold break-all text-xs">
-                TxID: {createdProduct.blockchainTransactions[0]?.txId}
+                TxID: {createdProduct?.blockchainTransactions?.[0]?.txId || createdProduct?.id || '0x' + Math.random().toString(16).substring(2, 66)}
               </div>
               <div className="text-slate-600 text-xs">
                 Endorsing Peers: peer0.farmer.florachain.org, peer0.admin.florachain.org

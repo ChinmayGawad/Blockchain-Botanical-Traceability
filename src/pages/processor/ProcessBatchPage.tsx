@@ -48,13 +48,13 @@ export const ProcessBatchPage: React.FC = () => {
 
   const yieldLoss = initialQty > 0 ? Math.max(0, Math.round(((initialQty - processedQty) / initialQty) * 100)) : 10;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProductId) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      processBatch(selectedProductId, {
+    try {
+      await processBatch(selectedProductId, {
         processorId: currentUser.id,
         processorName: `${currentUser.name} (${currentUser.organization || 'PhytoExtracts'})`,
         processingDate: new Date().toISOString(),
@@ -73,7 +73,10 @@ export const ProcessBatchPage: React.FC = () => {
       try {
         confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
       } catch (e) {}
-    }, 1200);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    }
   };
 
   return (
