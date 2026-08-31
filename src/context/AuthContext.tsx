@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Failed to parse user from localStorage', e);
       }
     }
-    return MOCK_USERS[0]; // Dr. Evelyn Vance (Admin) by default
+    return users.find(u => u.role === 'CONSUMER') || users[6];
   });
 
   useEffect(() => {
