@@ -1,8 +1,8 @@
 {
-  "network": "hardhat",
+  "network": "localhost",
   "chainId": 31337,
   "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-  "deployedAt": "2026-08-26T08:55:55.247Z",
+  "deployedAt": "2026-09-01T14:18:13.498Z",
   "abi": [
     {
       "inputs": [],
