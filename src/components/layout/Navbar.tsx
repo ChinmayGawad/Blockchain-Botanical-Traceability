@@ -21,6 +21,8 @@ import {
   Truck,
   Store,
   Sparkles,
+  Menu,
+  X,
 } from 'lucide-react';
 import { QRScannerModal } from '../verification/QRScannerModal';
 import { WalletConnectButton } from '../common/WalletConnectButton';
@@ -33,6 +35,7 @@ export const Navbar: React.FC = () => {
 
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Keyboard shortcut listener for CMD+K search
@@ -149,8 +152,16 @@ export const Navbar: React.FC = () => {
         {/* Main Navbar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-6 shrink-0">
-            <Link to={isAuthenticated && role !== 'CONSUMER' ? `/${role.toLowerCase()}/dashboard` : '/home'} className="flex items-center gap-3 group">
+          <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="md:hidden p-1.5 -ml-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open Menu"
+            >
+              <Menu size={22} />
+            </button>
+            <Link to={isAuthenticated && role !== 'CONSUMER' ? `/${role.toLowerCase()}/dashboard` : '/home'} className="flex items-center gap-2 sm:gap-3 group">
               <div className="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-900/10 group-hover:scale-105 transition-transform shrink-0">
                 <Sprout size={22} />
               </div>
@@ -313,6 +324,108 @@ export const Navbar: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-50 flex">
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            {/* Drawer */}
+            <div className="relative w-4/5 max-w-sm bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                <span className="font-black text-slate-900">Menu</span>
+                <button 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Search in Drawer */}
+                <form onSubmit={(e) => { handleSearchSubmit(e); setIsMobileMenuOpen(false); }} className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search Batch ID..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  />
+                </form>
+
+                {/* Public Links */}
+                {(!isAuthenticated || role === 'CONSUMER') && (
+                  <nav className="space-y-1">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block px-2">Navigation</span>
+                    {publicLinks.map(link => (
+                      <Link
+                        key={link.to}
+                        to={link.to}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                          location.pathname === link.to ? 'bg-emerald-50 text-emerald-900' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        {link.icon && <link.icon size={18} className={location.pathname === link.to ? 'text-emerald-700' : 'text-slate-400'} />}
+                        <span>{link.label}</span>
+                      </Link>
+                    ))}
+                  </nav>
+                )}
+
+                {/* Demo Role Switcher */}
+                <div className="space-y-3 pt-4 border-t border-slate-100">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block px-2">Demo Tools</span>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[11px] font-bold text-slate-500">Switch Role</label>
+                      <select
+                        value={role}
+                        onChange={(e) => {
+                          const newRole = e.target.value as UserRole;
+                          switchRole(newRole);
+                          if (newRole === 'CONSUMER') {
+                            navigate('/home');
+                          } else {
+                            navigate(`/${newRole.toLowerCase()}/dashboard`);
+                          }
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full bg-white border border-slate-300 rounded-lg px-2 py-2 text-sm font-medium focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="FARMER">🌾 Farmer (Rajesh)</option>
+                        <option value="PROCESSOR">⚙️ Processor (Dr. Sunita)</option>
+                        <option value="LABORATORY">🧪 Lab QA (Marcus)</option>
+                        <option value="DISTRIBUTOR">🚚 Logistics (Klaus)</option>
+                        <option value="RETAILER">🏪 Retailer (Emma)</option>
+                        <option value="ADMIN">🛡️ Admin (Dr. Evelyn)</option>
+                        <option value="CONSUMER">👤 Consumer Guest</option>
+                      </select>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Reset all demo state to initial seed data?')) {
+                          resetToDefaultData();
+                          window.location.reload();
+                        }
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 transition-colors"
+                    >
+                      <RefreshCw size={14} />
+                      <span>Reset Demo State</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* QR Scanner Modal */}
