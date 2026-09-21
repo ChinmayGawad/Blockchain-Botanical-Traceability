@@ -23,9 +23,86 @@ export interface NetworkStats {
   contractAddress: string;
 }
 
-const LOCAL_RPC_URL = 'http://127.0.0.1:8545';
+// ─────────────────────────────────────────────────────────
+// Network Definitions
+// Priority 1: runtime env-vars injected by Vite (VITE_*)
+// Priority 2: contractConfig.json written by deploy script
+// Priority 3: Hardhat localhost fallback
+// ─────────────────────────────────────────────────────────
+export const SUPPORTED_NETWORKS: Record<number, {
+  name: string;
+  rpcUrl: string;
+  explorerUrl: string;
+  nativeCurrency: string;
+}> = {
+  31337: {
+    name: 'Hardhat Localhost',
+    rpcUrl: 'http://127.0.0.1:8545',
+    explorerUrl: '',
+    nativeCurrency: 'ETH',
+  },
+  80002: {
+    name: 'Polygon Amoy Testnet',
+    rpcUrl: 'https://polygon-amoy-bor-rpc.publicnode.com',
+    explorerUrl: 'https://amoy.polygonscan.com',
+    nativeCurrency: 'POL',
+  },
+  137: {
+    name: 'Polygon PoS Mainnet',
+    rpcUrl: 'https://polygon-rpc.com',
+    explorerUrl: 'https://polygonscan.com',
+    nativeCurrency: 'POL',
+  },
+  11155111: {
+    name: 'Ethereum Sepolia Testnet',
+    rpcUrl: 'https://rpc.sepolia.org',
+    explorerUrl: 'https://sepolia.etherscan.io',
+    nativeCurrency: 'SepoliaETH',
+  },
+  421614: {
+    name: 'Arbitrum Sepolia Testnet',
+    rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
+    explorerUrl: 'https://sepolia.arbiscan.io',
+    nativeCurrency: 'ETH',
+  },
+  84532: {
+    name: 'Base Sepolia Testnet',
+    rpcUrl: 'https://sepolia.base.org',
+    explorerUrl: 'https://sepolia.basescan.org',
+    nativeCurrency: 'ETH',
+  },
+};
 
-// Hardhat default test private keys for local node connection
+// Resolved network configuration (env-var > contractConfig.json > localhost fallback)
+const ACTIVE_CHAIN_ID: number = (() => {
+  const envChainId = import.meta.env.VITE_CHAIN_ID;
+  if (envChainId) return Number(envChainId);
+  return (contractConfig as any).chainId || 31337;
+})();
+
+const ACTIVE_RPC_URL: string = (() => {
+  const envRpc = import.meta.env.VITE_RPC_URL;
+  if (envRpc) return envRpc;
+  const net = SUPPORTED_NETWORKS[ACTIVE_CHAIN_ID];
+  return net ? net.rpcUrl : 'http://127.0.0.1:8545';
+})();
+
+const ACTIVE_EXPLORER_URL: string = (() => {
+  const envExplorer = import.meta.env.VITE_EXPLORER_URL;
+  if (envExplorer) return envExplorer;
+  const configExplorer = (contractConfig as any).explorerUrl;
+  if (configExplorer) return configExplorer;
+  const net = SUPPORTED_NETWORKS[ACTIVE_CHAIN_ID];
+  return net ? net.explorerUrl : '';
+})();
+
+const IS_LOCAL_NETWORK = ACTIVE_CHAIN_ID === 31337;
+
+// ─────────────────────────────────────────────────────────
+// Local Hardhat Demo Accounts (for local development only)
+// NEVER expose real private keys here; only use well-known
+// Hardhat default test accounts that have no real funds.
+// ─────────────────────────────────────────────────────────
 export const HARDHAT_DEMO_ACCOUNTS = [
   {
     role: 'ADMIN',
@@ -65,32 +142,108 @@ export const HARDHAT_DEMO_ACCOUNTS = [
   },
 ];
 
+/** Returns a Polygonscan / Etherscan transaction URL for the active network */
+export function getTransactionExplorerUrl(txHash: string): string {
+  if (!ACTIVE_EXPLORER_URL || !txHash) return '';
+  return `${ACTIVE_EXPLORER_URL}/tx/${txHash}`;
+}
+
+/** Returns a block explorer address URL for the active network */
+export function getAddressExplorerUrl(address: string): string {
+  if (!ACTIVE_EXPLORER_URL || !address) return '';
+  return `${ACTIVE_EXPLORER_URL}/address/${address}`;
+}
+
 class Web3Service {
   private provider: ethers.Provider | null = null;
   private signer: ethers.Signer | null = null;
   private contract: ethers.Contract | null = null;
 
   public getContractAddress(): string {
-    return contractConfig.contractAddress || '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+    const envAddr = import.meta.env.VITE_CONTRACT_ADDRESS;
+    if (envAddr) return envAddr;
+    return (contractConfig as any).contractAddress || '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+  }
+
+  public getChainId(): number {
+    return ACTIVE_CHAIN_ID;
+  }
+
+  public getNetworkInfo() {
+    return SUPPORTED_NETWORKS[ACTIVE_CHAIN_ID] || SUPPORTED_NETWORKS[31337];
+  }
+
+  public isLocalNetwork(): boolean {
+    return IS_LOCAL_NETWORK;
   }
 
   public isMetaMaskInstalled(): boolean {
     return typeof window !== 'undefined' && typeof (window as any).ethereum !== 'undefined';
   }
 
+  /**
+   * Returns a read-only provider.
+   * On public networks, uses the configured public RPC so consumers without MetaMask
+   * can still query the blockchain for QR code verification.
+   */
   public async getProvider(): Promise<ethers.Provider> {
     if (this.provider) return this.provider;
 
     if (this.isMetaMaskInstalled()) {
       this.provider = new ethers.BrowserProvider((window as any).ethereum);
     } else {
-      this.provider = new ethers.JsonRpcProvider(LOCAL_RPC_URL);
+      // Public read-only RPC — safe for consumers scanning QR codes without a wallet
+      this.provider = new ethers.JsonRpcProvider(ACTIVE_RPC_URL);
     }
     return this.provider;
   }
 
   /**
-   * Connect with MetaMask Browser Extension
+   * Prompt MetaMask to switch to the target production network.
+   * If the network isn't in MetaMask yet, it adds it automatically.
+   */
+  private async ensureCorrectNetwork(browserProvider: ethers.BrowserProvider): Promise<void> {
+    if (IS_LOCAL_NETWORK) return; // no switching needed for local dev
+
+    const network = await browserProvider.getNetwork();
+    if (Number(network.chainId) === ACTIVE_CHAIN_ID) return;
+
+    const chainIdHex = `0x${ACTIVE_CHAIN_ID.toString(16)}`;
+    const netInfo = SUPPORTED_NETWORKS[ACTIVE_CHAIN_ID];
+
+    try {
+      await (window as any).ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainIdHex }],
+      });
+    } catch (switchError: any) {
+      // Error 4902 = the chain hasn't been added to MetaMask yet
+      if (switchError.code === 4902) {
+        await (window as any).ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: chainIdHex,
+              chainName: netInfo?.name || 'Custom Network',
+              rpcUrls: [ACTIVE_RPC_URL],
+              nativeCurrency: {
+                name: netInfo?.nativeCurrency || 'ETH',
+                symbol: netInfo?.nativeCurrency || 'ETH',
+                decimals: 18,
+              },
+              blockExplorerUrls: netInfo?.explorerUrl ? [netInfo.explorerUrl] : [],
+            },
+          ],
+        });
+      } else {
+        throw switchError;
+      }
+    }
+  }
+
+  /**
+   * Connect with MetaMask Browser Extension.
+   * Automatically prompts to switch to the configured production network.
    */
   public async connectMetaMask(): Promise<WalletState> {
     if (!this.isMetaMaskInstalled()) {
@@ -101,19 +254,27 @@ class Web3Service {
         balanceEth: null,
         networkName: null,
         connectionType: null,
-        error: 'MetaMask extension not found in this browser. You can connect using a Local Hardhat Test Account below.',
+        error: IS_LOCAL_NETWORK
+          ? 'MetaMask extension not found. You can connect using a Local Hardhat Test Account below.'
+          : 'MetaMask extension not found. Please install MetaMask from https://metamask.io to interact with the FloraChain network.',
       };
     }
 
     try {
       const browserProvider = new ethers.BrowserProvider((window as any).ethereum);
       await browserProvider.send('eth_requestAccounts', []);
-      const signer = await browserProvider.getSigner();
-      const address = await signer.getAddress();
-      const network = await browserProvider.getNetwork();
-      const balance = await browserProvider.getBalance(address);
 
-      this.provider = browserProvider;
+      // Ensure MetaMask is on our target network
+      await this.ensureCorrectNetwork(browserProvider);
+
+      // Re-instantiate provider after potential network switch
+      const finalProvider = new ethers.BrowserProvider((window as any).ethereum);
+      const signer = await finalProvider.getSigner();
+      const address = await signer.getAddress();
+      const network = await finalProvider.getNetwork();
+      const balance = await finalProvider.getBalance(address);
+
+      this.provider = finalProvider;
       this.signer = signer;
       this.contract = new ethers.Contract(
         this.getContractAddress(),
@@ -121,12 +282,13 @@ class Web3Service {
         signer
       );
 
+      const netInfo = SUPPORTED_NETWORKS[Number(network.chainId)];
       return {
         isConnected: true,
         address,
         chainId: Number(network.chainId),
-        balanceEth: ethers.formatEther(balance).substring(0, 6),
-        networkName: network.name === 'unknown' ? 'EVM Local / Hardhat' : network.name,
+        balanceEth: parseFloat(ethers.formatEther(balance)).toFixed(4),
+        networkName: netInfo?.name || network.name || `Chain ${network.chainId}`,
         connectionType: 'METAMASK',
         error: null,
       };
@@ -145,13 +307,26 @@ class Web3Service {
   }
 
   /**
-   * Connect using Local Hardhat Test Wallet
+   * Connect using a local Hardhat development test wallet.
+   * Only enabled when running against a local node (chainId 31337).
    */
   public async connectLocalTestWallet(accountIndex = 0): Promise<WalletState> {
+    if (!IS_LOCAL_NETWORK) {
+      return {
+        isConnected: false,
+        address: null,
+        chainId: null,
+        balanceEth: null,
+        networkName: null,
+        connectionType: null,
+        error: 'Local test wallet accounts are only available when running against a local Hardhat node (Chain ID 31337). On production networks, please connect with MetaMask.',
+      };
+    }
+
     const acc = HARDHAT_DEMO_ACCOUNTS[accountIndex] || HARDHAT_DEMO_ACCOUNTS[0];
 
     try {
-      const rpcProvider = new ethers.JsonRpcProvider(LOCAL_RPC_URL);
+      const rpcProvider = new ethers.JsonRpcProvider(ACTIVE_RPC_URL);
       const wallet = new ethers.Wallet(acc.privateKey, rpcProvider);
 
       this.provider = rpcProvider;
@@ -165,40 +340,39 @@ class Web3Service {
       let balanceEth = '10000.0';
       try {
         const bal = await rpcProvider.getBalance(acc.address);
-        balanceEth = ethers.formatEther(bal).substring(0, 7);
+        balanceEth = parseFloat(ethers.formatEther(bal)).toFixed(4);
       } catch {
-        // If node offline, simulated balance
+        // Node offline — simulate balance
       }
 
       return {
         isConnected: true,
         address: acc.address,
         chainId: 31337,
-        balanceEth: balanceEth,
+        balanceEth,
         networkName: `Hardhat Local Node (${acc.role})`,
         connectionType: 'LOCAL_HARDHAT',
         error: null,
       };
     } catch (err: any) {
-      // Fallback simulated connected state
+      // Fallback simulated state
       return {
         isConnected: true,
         address: acc.address,
         chainId: 31337,
         balanceEth: '10000.0',
-        networkName: `Simulated Node (${acc.role})`,
+        networkName: `Simulated Local Node (${acc.role})`,
         connectionType: 'SIMULATED',
         error: null,
       };
     }
   }
 
-  /**
-   * Disconnect active wallet
-   */
+  /** Disconnect active wallet */
   public disconnect(): WalletState {
     this.signer = null;
     this.contract = null;
+    this.provider = null;
     return {
       isConnected: false,
       address: null,
@@ -222,6 +396,7 @@ class Web3Service {
       return this.contract;
     }
 
+    // Public read-only — uses JsonRpcProvider so consumers without a wallet can verify batches
     const provider = await this.getProvider();
     return new ethers.Contract(
       this.getContractAddress(),
@@ -235,15 +410,17 @@ class Web3Service {
       const provider = await this.getProvider();
       const blockNumber = await provider.getBlockNumber();
       const network = await provider.getNetwork();
+      const netInfo = SUPPORTED_NETWORKS[Number(network.chainId)];
       return {
         blockHeight: blockNumber,
-        networkName: network.name === 'unknown' ? 'Hardhat Localhost (31337)' : network.name,
+        networkName: netInfo?.name || `Chain ${network.chainId}`,
         contractAddress: this.getContractAddress(),
       };
-    } catch (e) {
+    } catch {
+      const netInfo = this.getNetworkInfo();
       return {
-        blockHeight: 12085,
-        networkName: 'EVM Localhost (31337)',
+        blockHeight: 0,
+        networkName: netInfo?.name || 'Unknown Network',
         contractAddress: this.getContractAddress(),
       };
     }
@@ -419,6 +596,11 @@ class Web3Service {
     };
   }
 
+  /**
+   * Public read-only query — works without a connected wallet.
+   * Uses the configured public RPC so end consumers can verify batches
+   * from a standard browser without any Web3 wallet.
+   */
   public async getProductFromChain(batchId: string): Promise<any | null> {
     try {
       const contract = await this.getContract(false);

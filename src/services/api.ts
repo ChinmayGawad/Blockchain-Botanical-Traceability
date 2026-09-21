@@ -30,6 +30,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       console.warn('Authentication token expired or unauthorized.');
+      localStorage.removeItem('florachain_jwt_token');
     }
     return Promise.reject(error);
   }

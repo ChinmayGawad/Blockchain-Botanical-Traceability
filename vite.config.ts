@@ -13,5 +13,19 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
+    watch: {
+      ignored: [
+        '**/*tmpdir*/**',
+        '**/*.tmp*',
+        '**/backend/**',
+        '**/artifacts/**',
+        '**/cache/**',
+        '**/contracts/**',
+        '**/scripts/**',
+        '**/test/**',
+        '**/tests/**',
+        '**/docs/**',
+      ],
+    },
   },
 });

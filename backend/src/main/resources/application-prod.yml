@@ -16,6 +16,26 @@ spring:
       ddl-auto: update
     show-sql: false
 
+app:
+  jwt:
+    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  blockchain:
+    rpc-url: ${BLOCKCHAIN_RPC_URL:https://rpc-amoy.polygon.technology}
+    contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0x5FbDB2315678afecb367f032d93F642f64180aa3}
+    network-name: ${BLOCKCHAIN_NETWORK_NAME:Polygon Amoy Testnet (Chain ID 80002)}
+  ipfs:
+    gateway-url: ${IPFS_GATEWAY_URL:https://gateway.pinata.cloud/ipfs/}
+    pinata-api-key: ${PINATA_API_KEY:}
+    pinata-secret-key: ${PINATA_SECRET_KEY:}
+    pinata-jwt: ${PINATA_JWT:}
+    mock-mode: ${IPFS_MOCK_MODE:false}
+  cors:
+    allowed-origins:
+      - ${CORS_FRONTEND_URL:http://localhost:5173}
+      - https://florachain.vercel.app
+      - https://florachain.netlify.app
+
 logging:
   level:
     root: INFO

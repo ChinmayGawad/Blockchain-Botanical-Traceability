@@ -20,9 +20,9 @@ app:
     secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     expiration-ms: 86400000 # 24 hours
   blockchain:
-    rpc-url: http://127.0.0.1:8545
-    contract-address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-    network-name: Hardhat EVM Localhost (Chain ID 31337)
+    rpc-url: ${BLOCKCHAIN_RPC_URL:https://ethereum-sepolia-rpc.publicnode.com}
+    contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0xFc06C5eeF51Cc050D2A663120E7d86745cF51745}
+    network-name: ${BLOCKCHAIN_NETWORK_NAME:Ethereum Sepolia Testnet (Chain ID 11155111)}
   ipfs:
     gateway-url: https://gateway.pinata.cloud/ipfs/
     mock-mode: true

@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity)](https://soliditylang.org/)
+[![Ethereum Sepolia](https://img.shields.io/badge/Ethereum-Sepolia_Testnet-627EEA?logo=ethereum&logoColor=white)](https://sepolia.etherscan.io/address/0xFc06C5eeF51Cc050D2A663120E7d86745cF51745)
+[![Polygon PoS](https://img.shields.io/badge/Polygon-Amoy_%26_Mainnet-8247E5?logo=polygon&logoColor=white)](https://polygon.technology/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.3-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-20%2B-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -13,6 +15,17 @@
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
 **FloraChain** is an enterprise-grade, decentralized botanical supply chain provenance and anti-counterfeiting platform. It guarantees end-to-end transparency, regulatory compliance, and immutable quality verification for medicinal herbs, organic extracts, botanicals, and herbal health formulations from agricultural harvest to the end consumer.
+
+---
+
+## 🌐 Live On-Chain Smart Contract
+
+| Parameter | Value |
+| :--- | :--- |
+| **Network** | **Ethereum Sepolia Testnet (Chain ID: `11155111`)** |
+| **Contract Address** | [`0xFc06C5eeF51Cc050D2A663120E7d86745cF51745`](https://sepolia.etherscan.io/address/0xFc06C5eeF51Cc050D2A663120E7d86745cF51745) |
+| **Explorer Link** | 🔗 [View on Etherscan](https://sepolia.etherscan.io/address/0xFc06C5eeF51Cc050D2A663120E7d86745cF51745) |
+| **Supported Networks** | Localhost (`31337`), Ethereum Sepolia (`11155111`), Polygon Amoy (`80002`), Polygon PoS Mainnet (`137`) |
 
 ---
 
@@ -28,11 +41,10 @@
 - [Backend REST API Overview](#-backend-rest-api-overview)
 - [Project Directory Structure](#-project-directory-structure)
 - [Prerequisites](#-prerequisites)
-- [Getting Started \& Local Setup](#-getting-started--local-setup)
-  - [1. Smart Contract \& Local EVM Node](#1-smart-contract--local-evm-node)
-  - [2. Spring Boot 3 Backend](#2-spring-boot-3-backend)
-  - [3. React + Vite Frontend](#3-react--vite-frontend)
-  - [4. Docker Compose (Full Stack)](#4-docker-compose-full-stack)
+- [Quick Start \& Development Guide](#-quick-start--development-guide)
+  - [1. Running Locally (Zero-Config / Dev Mode)](#1-running-locally-zero-config--dev-mode)
+  - [2. Deploying to Public Blockchain (Sepolia / Polygon)](#2-deploying-to-public-blockchain-sepolia--polygon)
+  - [3. Full Stack Docker Deployment](#3-full-stack-docker-deployment)
 - [Pre-Seeded Demo Credentials](#-pre-seeded-demo-credentials)
 - [Testing \& Verification](#-testing--verification)
 - [Security \& Data Integrity](#-security--data-integrity)
@@ -45,8 +57,8 @@
 
 - **Immutable On-Chain Ledger**: Core supply chain milestones are anchored onto an EVM smart contract (`BotanicalTraceability.sol`), creating an unalterable audit trail.
 - **Multi-Stakeholder Role-Based Access Control (RBAC)**: Secure multi-tenant architecture strictly partitioning operations for **Farmers**, **Processors**, **Laboratories**, **Distributors**, **Retailers**, and **Consortium Admins**.
-- **Cryptographic Laboratory Proofs & IPFS Off-Chain Storage**: Full assay documentation, certificates of analysis (CoA), heavy metal assays, and microbial tests are cryptographically hashed and linked via IPFS CID references.
-- **Consumer Instant Verification**: Public portal enabling consumers to scan a batch QR code or input a Batch ID to instantly view complete farm-to-shelf provenance, geo-coordinates, lab results, and blockchain transaction receipts.
+- **Cryptographic Laboratory Proofs & IPFS Off-Chain Storage**: Full assay documentation, certificates of analysis (CoA), heavy metal assays, and microbial tests are cryptographically hashed and linked via Pinata IPFS CID references.
+- **Consumer Instant Verification**: Public portal enabling consumers to scan a batch QR code or input a Batch ID to instantly view complete farm-to-shelf provenance, geo-coordinates, lab results, and blockchain transaction receipts without requiring crypto or a wallet.
 - **Anti-Counterfeit & Anomaly Alerting**: Built-in suspicious batch flagging, multi-stage dispute reporting, and admin recall mechanisms.
 - **Enterprise Spring Boot 3 Backend**: High-performance RESTful API with stateless JWT security, Web3j blockchain integration, H2 in-memory zero-config dev database, and PostgreSQL production readiness.
 - **Premium Reactive UI/UX**: Built with React 18, Vite, TypeScript, and modern glassmorphic Tailwind CSS with animated milestone progress trackers and real-time blockchain telemetry.
@@ -64,7 +76,7 @@
 
 ### 🛡️ The FloraChain Solution
 ```
-[ 🧑‍🌾 Cultivator / Farmer ]
+[ 🧑🌾 Cultivator / Farmer ]
          │  Registers raw botanical harvest with geo-coordinates, yield & organic certs
          ▼
 [ ⚙️ Extraction Processor ]
@@ -92,25 +104,23 @@
 |                                 CLIENT LAYER                                      |
 |  React 18 + TypeScript + Vite + Tailwind CSS + Lucide Icons + QR Scanner / Gen    |
 +-----------------------------------------------------------------------------------+
-                                         │  HTTP / REST (JWT Auth)
-                                         ▼
-+-----------------------------------------------------------------------------------+
-|                             APPLICATION LAYER                                     |
-|  Spring Boot 3.3.x (Java 20) REST API                                             |
-|  ├── Spring Security 6 + JJWT Filter (Stateless RBAC)                             |
-|  ├── Controllers (Auth, Product, Lab, Shipment, Retail, Blockchain, Reports)      |
-|  ├── Service Layer (Product, Verification, IPFS Mock/Gateway, Blockchain Bridge)  |
-|  └── Spring Data JPA Repositories (Entity Relationships & Query Projections)       |
-+-----------------------------------------------------------------------------------+
-                 │                                                │
-                 │ JSON-RPC (Web3j 4.10.3)                        │ JPA / JDBC
-                 ▼                                                ▼
+                       │ (Ethers.js v6 / MetaMask)       │ (REST / JWT)
+                       ▼                                 ▼
 +------------------------------------+          +-----------------------------------+
-|         BLOCKCHAIN LAYER           |          |          DATA / STORAGE           |
-|  Hardhat Local EVM Node / Ethereum |          |  • PostgreSQL 16 (Production)     |
-|  Smart Contract:                   |          |  • H2 In-Memory DB (Dev Profile)  |
-|  `BotanicalTraceability.sol`       |          |  • IPFS Gateway (Pinata / Storage)|
+|         BLOCKCHAIN LAYER           |          |         APPLICATION LAYER         |
+|  • Ethereum Sepolia / Polygon Amoy |◄─────────┤  • Spring Boot 3.3.3 (Java 20)    |
+|  • Smart Contract:                 |  Web3j   |  • Security & RBAC Enforcement   |
+|    BotanicalTraceability.sol       | JSON-RPC |  • PostgreSQL / H2 Database       |
 +------------------------------------+          +-----------------------------------+
+                       │                                         │
+                       └───────────────────┬─────────────────────┘
+                                           ▼
+                                +---------------------+
+                                |   STORAGE / IPFS    |
+                                |  • Lab CoA Assays   |
+                                |  • Organic Cert CIDs|
+                                |  • Pinata IPFS API  |
+                                +---------------------+
 ```
 
 ---
@@ -164,7 +174,7 @@ stateDiagram-v2
 - **Routing**: [React Router DOM 6.26.2](https://reactrouter.com/) (with custom `ProtectedRoute` RBAC guards)
 - **Icons & Visuals**: [Lucide React 0.446.0](https://lucide.dev/), Canvas Confetti
 - **QR Utilities**: `qrcode.react` (SVG & Canvas rendering)
-- **Web3 Integration**: [Ethers.js v6.17.0](https://docs.ethers.org/v6/)
+- **Web3 Integration**: [Ethers.js v6.17.0](https://docs.ethers.org/v6/) (MetaMask + Multi-chain switching)
 
 ### Backend
 - **Framework**: [Spring Boot 3.3.3](https://spring.io/projects/spring-boot)
@@ -180,11 +190,7 @@ stateDiagram-v2
 ### Smart Contract & Blockchain
 - **Smart Contract Language**: [Solidity ^0.8.24](https://soliditylang.org/)
 - **Development & Testing Framework**: [Hardhat 2.29.1](https://hardhat.org/) + Hardhat Toolbox
-- **EVM Networks**: Hardhat Localhost Node (Chain ID `31337`), Ethereum / Polygon compatible
-
-### DevOps & Infrastructure
-- **Containerization**: Docker & Docker Compose
-- **IPFS Storage**: Pinata / IPFS Gateway bridge
+- **EVM Networks**: Ethereum Sepolia (`11155111`), Polygon Amoy (`80002`), Polygon PoS (`137`), Hardhat Localhost (`31337`)
 
 ---
 
@@ -198,46 +204,24 @@ The smart contract `contracts/BotanicalTraceability.sol` encapsulates all busine
 - `LabReport`: Purity %, moisture %, heavy metals / pesticides / microbial pass-fail flags, IPFS certificate hash.
 - `ShipmentDetails`: Courier, transport type, temperature parameters, tracking number, delivery verification.
 - `RetailDetails`: Store ID, shelf location, retail price, receipt timestamp.
-- `SuspiciousReport`: Reporter address, incident description, evidence IPFS CID, resolution state.
-
-### Role Authorization & Security Modifiers
-```solidity
-modifier onlyRole(UserRole _role)
-modifier onlyAdmin()
-modifier validBatch(string memory _batchId)
-modifier batchInStatus(string memory _batchId, ProductStatus _requiredStatus)
-```
+- `SuspiciousReport`: Report ID, reporter address, reason, evidence IPFS hash, resolution state.
 
 ---
 
 ## 🔌 Backend REST API Overview
 
-All secured endpoints require the header `Authorization: Bearer <JWT_TOKEN>`.
-
-### Authentication (`/api/auth`)
 | Method | Endpoint | Description | Access |
 |:---|:---|:---|:---|
-| `POST` | `/api/auth/register` | Register a new user/organization | Public |
-| `POST` | `/api/auth/login` | Authenticate and obtain JWT Bearer token | Public |
-| `GET` | `/api/auth/me` | Retrieve profile of authenticated user | Authenticated |
-| `POST` | `/api/auth/switch-role` | Demo endpoint to swap personas in development | Authenticated |
-
-### Products & Traceability (`/api/products`)
-| Method | Endpoint | Description | Access |
-|:---|:---|:---|:---|
-| `GET` | `/api/products` | Get products (Scoped by caller's role) | Authenticated |
-| `GET` | `/api/products/{id}` | Get product details by ID or Batch ID | Public / Auth |
-| `POST` | `/api/products/harvest` | Register new botanical crop harvest | `FARMER`, `ADMIN` |
-| `POST` | `/api/products/{id}/process` | Record extraction & processing stage | `PROCESSOR`, `ADMIN` |
-| `POST` | `/api/products/{id}/lab-test` | Submit certified laboratory analysis | `LABORATORY`, `ADMIN` |
-| `POST` | `/api/products/{id}/shipment` | Dispatch cold-chain shipment | `DISTRIBUTOR`, `ADMIN` |
-| `POST` | `/api/products/{id}/delivery` | Confirm shipment delivery receipt | `DISTRIBUTOR`, `RETAILER`, `ADMIN` |
-| `POST` | `/api/products/{id}/retail` | Stock product into retail store | `RETAILER`, `ADMIN` |
-| `POST` | `/api/products/{id}/report` | Flag batch as suspicious / counterfeit | Authenticated |
-
-### Public Verification & Blockchain (`/api/verify`, `/api/blockchain`)
-| Method | Endpoint | Description | Access |
-|:---|:---|:---|:---|
+| `POST` | `/api/auth/register` | Register new stakeholder | Public |
+| `POST` | `/api/auth/login` | Authenticate and obtain JWT token | Public |
+| `GET` | `/api/products` | Retrieve catalog of botanical batches | Authenticated |
+| `POST` | `/api/products` | Register a new botanical harvest batch | `ROLE_FARMER` |
+| `POST` | `/api/products/{id}/processing` | Record extraction & processing metrics | `ROLE_PROCESSOR` |
+| `POST` | `/api/products/{id}/lab-test` | Record lab assays & issue approval/rejection | `ROLE_LABORATORY` |
+| `POST` | `/api/products/{id}/shipment` | Dispatch cold-chain shipment | `ROLE_DISTRIBUTOR` |
+| `PUT` | `/api/products/{id}/shipment/status` | Confirm transport arrival & delivery | `ROLE_DISTRIBUTOR` |
+| `POST` | `/api/products/{id}/retail` | Stock batch into retail inventory | `ROLE_RETAILER` |
+| `POST` | `/api/reports` | Submit suspicious product dispute | Public |
 | `GET` | `/api/verify/{batchId}` | Public lookup of full provenance timeline | Public |
 | `GET` | `/api/blockchain/stats` | Network status, block height & total txs | Public |
 | `GET` | `/api/blockchain/transactions` | Query recent on-chain transactions | Public |
@@ -247,12 +231,14 @@ All secured endpoints require the header `Authorization: Bearer <JWT_TOKEN>`.
 ## 📁 Project Directory Structure
 
 ```
-Blockchain Botanical Traceability/
-├── contracts/                        # Smart Contracts
-│   └── BotanicalTraceability.sol     # Main Solidity Traceability Contract
-├── scripts/                          # Hardhat Deployment & Seeding Scripts
-│   └── deploy.cjs                    # Deploys contract and seeds initial on-chain batch
-├── test/                             # Hardhat Test Suite
+Blockchain-Botanical-Traceability/
+├── contracts/                        # Solidity Smart Contracts
+│   └── BotanicalTraceability.sol     # Core Supply Chain Traceability Contract
+├── scripts/                          # Deployment & Automation Scripts
+│   ├── deploy.cjs                    # Multi-network deployment (Local, Sepolia, Polygon)
+│   ├── generate-wallet.cjs           # Helper to generate fresh deployer wallet
+│   └── check-balance.cjs             # Checks testnet token balance on target network
+├── test/                             # Smart Contract Automated Tests
 │   └── BotanicalTraceability.test.cjs
 ├── backend/                          # Spring Boot 3 Java Backend
 │   ├── src/main/java/com/florachain/backend/
@@ -264,18 +250,19 @@ Blockchain Botanical Traceability/
 │   │   ├── exception/                # Global Exception Handler & Custom Errors
 │   │   ├── repository/               # Spring Data JPA Repositories
 │   │   ├── security/                 # JWT Authentication Filter & Token Provider
-│   │   └── service/                  # Business Services & Web3j Blockchain Bridge
+│   │   └── service/                  # Business Services, IPFS & Web3j Blockchain Bridge
 │   ├── src/main/resources/           # application.yml, application-dev.yml, application-prod.yml
 │   ├── Dockerfile                    # Multi-stage Maven backend container build
 │   └── pom.xml                       # Maven Dependencies (Spring Boot, Web3j, JJWT, Postgres)
 ├── src/                              # React 18 Frontend
 │   ├── components/                   # Reusable UI Components
 │   │   ├── blockchain/               # Blockchain explorer & transaction cards
-│   │   ├── common/                   # Modal, Badge, StatCard, PageHeader
+│   │   ├── common/                   # Modal, Badge, StatCard, PageHeader, WalletConnectButton
 │   │   ├── layout/                   # Navbar, Footer, AppLayout
 │   │   ├── timeline/                 # Interactive Supply Chain Timeline
-│   │   └── verification/             # QR Scanner & Certificate Viewer
+│   │   └── verification/             # QR Scanner, TrustSeal & Certificate Viewer
 │   ├── context/                      # AuthContext & BlockchainContext
+│   ├── contracts/                    # contractConfig.json (Auto-generated on deployment)
 │   ├── data/                         # Mock & Initial Seed Data
 │   ├── pages/                        # Role-Specific Dashboard Pages
 │   │   ├── admin/                    # Admin Dashboard, User Approvals, Explorer, Reports
@@ -287,13 +274,13 @@ Blockchain Botanical Traceability/
 │   │   ├── public/                   # Landing Page, Verify Product Page
 │   │   └── retailer/                 # Retailer Dashboard, Generate QR
 │   ├── routes/                       # AppRoutes.tsx & ProtectedRoute.tsx
-│   ├── services/                     # Axios API Client & Web3 Ethers Service
+│   ├── services/                     # Axios API Client & Ethers.js Web3 Service
 │   ├── types/                        # TypeScript Interfaces & Enums
 │   ├── App.tsx                       # Root Component
 │   ├── main.tsx                      # Application Entry Point
 │   └── index.css                     # Tailwind CSS & Global Styles
 ├── docker-compose.yml                # Multi-container orchestration (PostgreSQL & Backend)
-├── hardhat.config.cjs                # Hardhat Configuration
+├── hardhat.config.cjs                # Hardhat Configuration (Sepolia, Amoy, Polygon, Local)
 ├── package.json                      # Node.js Dependencies & NPM Scripts
 ├── tailwind.config.js                # Tailwind Theme & Color Customizations
 ├── tsconfig.json                     # TypeScript Configuration
@@ -305,79 +292,78 @@ Blockchain Botanical Traceability/
 ## 📦 Prerequisites
 
 Ensure you have the following installed on your workstation:
-- **Node.js**: `v18.x` or `v20.x` ([Download](https://nodejs.org/))
+- **Node.js**: `v18.x`, `v20.x`, or `v22+` ([Download](https://nodejs.org/))
 - **Java Development Kit (JDK)**: `JDK 17` or `JDK 20+` ([Download OpenJDK](https://adoptium.net/))
-- **Apache Maven**: `3.9+` (or use the included `./mvnw` / `mvnw.cmd` wrapper)
 - **Git**: For version control
-- **Docker & Docker Compose** *(Optional, for containerized deployment)*
+- **Docker & Docker Compose** *(Optional, for PostgreSQL container)*
 
 ---
 
-## 🚀 Getting Started & Local Setup
+## 🚀 Quick Start & Development Guide
 
-You can run the entire platform locally using the following steps:
+### 1. Running Locally (Zero-Config / Dev Mode)
 
-### 1. Smart Contract & Local EVM Node
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-In the project root directory:
+2. **Start Local EVM Node & Deploy Contract**:
+   ```bash
+   # Terminal 1: Start local node
+   npm run node:blockchain
 
-```bash
-# Install Node.js dependencies
-npm install
+   # Terminal 2: Deploy and seed local contract
+   npm run deploy:contracts
+   ```
 
-# Compile the Solidity smart contracts
-npm run compile
+3. **Start Spring Boot Backend**:
+   ```bash
+   # Terminal 3:
+   cd backend
+   ./mvnw spring-boot:run
+   ```
 
-# Launch a local Hardhat EVM blockchain node (Keep this terminal running)
-npm run node:blockchain
-```
-
-In a second terminal, deploy the smart contract and seed initial test records:
-
-```bash
-npm run deploy:contracts
-```
-> Note the deployed contract address (typically `0x5FbDB2315678afecb367f032d93F642f64180aa3`).
-
----
-
-### 2. Spring Boot 3 Backend
-
-The backend is configured by default to run with the `dev` profile using an in-memory **H2 database** and connects to your local Hardhat node at `http://127.0.0.1:8545`.
-
-Navigate to the `backend` folder:
-
-```bash
-cd backend
-
-# On Windows:
-.\mvnw.cmd spring-boot:run
-
-# On Linux / macOS:
-./mvnw spring-boot:run
-```
-
-The Spring Boot backend will start on **`http://localhost:8080`**.
-- H2 Web Console: `http://localhost:8080/h2-console`
-  - JDBC URL: `jdbc:h2:mem:florachain_db`
-  - Username: `sa` | Password: *(blank)*
+4. **Start React Frontend**:
+   ```bash
+   # Terminal 4:
+   npm run dev
+   ```
+   Open **`http://localhost:5173`** in your browser.
 
 ---
 
-### 3. React + Vite Frontend
+### 2. Deploying to Public Blockchain (Sepolia / Polygon)
 
-In the root directory, launch the Vite development server:
+1. **Configure Environment Variables**:
+   Copy `.env.example` to `.env` and fill in your deployer wallet private key:
+   ```env
+   PRIVATE_KEY=your_metamask_private_key_here
+   ```
 
-```bash
-# Start the frontend dev server
-npm run dev
-```
+2. **Check Wallet Balance**:
+   ```bash
+   npm run wallet:balance -- --network sepolia
+   ```
 
-Open your browser at **`http://localhost:5173`**.
+3. **Deploy to Ethereum Sepolia**:
+   ```bash
+   npm run deploy:sepolia
+   ```
+   *(Or deploy to Polygon Amoy using `npm run deploy:amoy`)*.
+
+4. **Start Frontend & Backend**:
+   ```bash
+   # Backend:
+   cd backend && ./mvnw spring-boot:run
+
+   # Frontend:
+   npm run dev
+   ```
 
 ---
 
-### 4. Docker Compose (Full Stack)
+### 3. Full Stack Docker Deployment
 
 To run the full stack with **PostgreSQL 16** and the **Spring Boot backend** containerized:
 
@@ -417,9 +403,9 @@ cd backend
 ./mvnw test
 ```
 
-### Frontend Typecheck & Build Validation
+### Frontend Typecheck Validation
 ```bash
-npm run build
+npx tsc --noEmit
 ```
 
 ---
@@ -437,10 +423,12 @@ npm run build
 ## 🗺️ Roadmap
 
 - [x] Hardhat EVM Smart Contract (`BotanicalTraceability.sol`)
+- [x] Live Public Testnet Deployment (Ethereum Sepolia: `0xFc06C5eeF51Cc050D2A663120E7d86745cF51745`)
 - [x] Multi-Role Authentication with Spring Security 6 & JWT
 - [x] Spring Boot REST API & Web3j Blockchain Bridge
 - [x] Role-Scoped Dashboards (Admin, Farmer, Processor, Lab, Distributor, Retailer)
 - [x] Public Consumer Verification Portal & QR Code Generator
+- [x] Decentralized Pinata IPFS Assay Storage Integration
 - [ ] Automated IoT Temperature & Humidity Sensor Telemetry via MQTT
 - [ ] Zero-Knowledge Proofs (ZK-SNARKs) for proprietary extraction formula confidentiality
 - [ ] Native Mobile App (React Native / Flutter) for offline barcode scanning at farm gates
