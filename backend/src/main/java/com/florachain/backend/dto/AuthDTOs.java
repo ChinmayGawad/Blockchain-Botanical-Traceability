@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.List;
@@ -48,6 +49,9 @@ public class AuthDTOs {
         private String location;
         private List<String> certifications;
         private String avatarUrl;
+
+        @Pattern(regexp = "^$|^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$", message = "Invalid Aadhaar Number format")
+        private String aadhaarNumber;
     }
 
     @Data
@@ -76,5 +80,6 @@ public class AuthDTOs {
         private List<String> certifications;
         private String avatarUrl;
         private String walletAddress;
+        private String aadhaarNumber;
     }
 }

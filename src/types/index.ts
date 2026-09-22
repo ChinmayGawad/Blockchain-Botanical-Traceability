@@ -35,6 +35,7 @@ export interface User {
   joinedDate: string;
   certifications?: string[];
   avatarUrl?: string;
+  aadhaarNumber?: string;
 }
 
 export interface LabTestParameter {

@@ -63,4 +63,7 @@ public class UserEntity {
 
     @Column(name = "wallet_address", length = 64)
     private String walletAddress;
+
+    @Column(name = "aadhaar_number", length = 12)
+    private String aadhaarNumber;
 }

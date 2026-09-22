@@ -148,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         location: userData.location,
         certifications: userData.certifications,
         avatarUrl: userData.avatarUrl,
+        aadhaarNumber: userData.aadhaarNumber,
       });
       if (res.data && res.data.user) {
         setUsers(prev => [res.data.user, ...prev]);

@@ -5,19 +5,49 @@ import { UserRole } from '../../types';
 import {
   Sprout,
   ShieldCheck,
-  Building,
-  Mail,
-  User,
-  MapPin,
-  ArrowRight,
-  CheckCircle2,
-  Lock,
   Cog,
   FlaskConical,
   Truck,
   Store,
-  Award,
+  ArrowRight,
+  CheckCircle2,
+  Fingerprint,
 } from 'lucide-react';
+
+// Verhoeff algorithm logic for Aadhaar Validation
+const d = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+  [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+  [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+  [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+  [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+  [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+  [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+  [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+];
+const p = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+  [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+  [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+  [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+  [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+  [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+];
+const inv = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9];
+
+function validateAadhaar(aadhaar: string) {
+  if (aadhaar.length !== 12 || !/^\d{12}$/.test(aadhaar)) return false;
+  let c = 0;
+  let invertedArray = aadhaar.split('').reverse().map(Number);
+  for (let i = 0; i < invertedArray.length; i++) {
+    c = d[c][p[i % 8][invertedArray[i]]];
+  }
+  return c === 0;
+}
 
 export const RegisterPage: React.FC = () => {
   const { registerUser, switchRole } = useAuth();
@@ -31,6 +61,14 @@ export const RegisterPage: React.FC = () => {
   const [location, setLocation] = useState('');
   const [certifications, setCertifications] = useState('');
   const [extraDetail, setExtraDetail] = useState('');
+  
+  // Aadhaar specific state
+  const [aadhaar, setAadhaar] = useState('');
+  const [aadhaarError, setAadhaarError] = useState('');
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,9 +82,36 @@ export const RegisterPage: React.FC = () => {
 
   const currentRoleOpt = roleOptions.find(r => r.role === role) || roleOptions[0];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const initiateRegistration = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !organization) return;
+    
+    if (aadhaar) {
+      if (!validateAadhaar(aadhaar)) {
+        setAadhaarError('Invalid Aadhaar Number. Please check the 12 digits.');
+        return;
+      }
+      setAadhaarError('');
+      // Simulate sending OTP via Mock third-party e-KYC sandbox API
+      setShowOtpScreen(true);
+    } else {
+      // Proceed without Aadhaar (if optional for this region)
+      completeRegistration();
+    }
+  };
+
+  const handleOtpVerification = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Sandbox Mock OTP verification (123456 is valid)
+    if (otp !== '123456') {
+      setOtpError('Invalid OTP. For sandbox testing, use 123456.');
+      return;
+    }
+    setOtpError('');
+    completeRegistration();
+  };
+
+  const completeRegistration = async () => {
     setIsLoading(true);
 
     const certList = certifications.split(',').map(s => s.trim()).filter(Boolean);
@@ -62,10 +127,12 @@ export const RegisterPage: React.FC = () => {
         organization,
         location,
         certifications: certList,
+        aadhaarNumber: aadhaar || undefined
       }, password);
       setIsSuccess(true);
+      setShowOtpScreen(false);
     } catch {
-      // Handled
+      // Handled in context
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +161,7 @@ export const RegisterPage: React.FC = () => {
             <div>
               <h3 className="text-xl font-bold text-slate-900">Application Submitted Successfully</h3>
               <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
-                Your <strong>{role}</strong> node profile has been queued for verification. Consortium Administrators review all botanical accreditation credentials before activating smart contract signing privileges.
+                Your <strong>{role}</strong> node profile has been queued for verification. {aadhaar ? "Your Aadhaar identity has been e-verified." : ""}
               </p>
             </div>
 
@@ -116,8 +183,51 @@ export const RegisterPage: React.FC = () => {
               </Link>
             </div>
           </div>
+        ) : showOtpScreen ? (
+          <form onSubmit={handleOtpVerification} className="space-y-4 max-w-sm mx-auto bg-slate-50 p-6 rounded-2xl border border-slate-200">
+             <div className="text-center space-y-2 mb-4">
+               <Fingerprint className="mx-auto text-emerald-600" size={32} />
+               <h3 className="text-lg font-bold">Aadhaar e-KYC Verification</h3>
+               <p className="text-xs text-slate-500">An OTP has been sent to the mobile number registered with Aadhaar ending in {aadhaar.slice(-4)}.</p>
+               <p className="text-[10px] text-amber-600 bg-amber-50 p-2 rounded">Sandbox Mode: Use OTP 123456</p>
+             </div>
+             
+             <div className="space-y-1">
+                <input
+                  type="text"
+                  required
+                  placeholder="Enter 6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  maxLength={6}
+                  className="w-full text-center tracking-widest bg-white border border-slate-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-lg font-medium text-slate-900 focus:outline-none"
+                />
+                {otpError && <p className="text-xs text-red-500 font-bold text-center mt-1">{otpError}</p>}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Verify OTP & Register</span>
+                  </>
+                )}
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setShowOtpScreen(false)}
+                className="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+              >
+                Cancel
+              </button>
+          </form>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={initiateRegistration} className="space-y-4">
             {/* Role Radio Group */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-800">
@@ -200,6 +310,23 @@ export const RegisterPage: React.FC = () => {
                 />
               </div>
             </div>
+            
+            {/* Aadhaar Input */}
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
+                <Fingerprint size={14} className="text-slate-500" />
+                Aadhaar Number (Optional / e-KYC Verification)
+              </label>
+              <input
+                type="text"
+                maxLength={12}
+                placeholder="12-digit Aadhaar Number"
+                value={aadhaar}
+                onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, ''))}
+                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              />
+              {aadhaarError && <p className="text-xs text-red-500 font-bold mt-1">{aadhaarError}</p>}
+            </div>
 
             {/* Certifications and Role-Specific Detail */}
             <div className="space-y-1">
@@ -208,7 +335,7 @@ export const RegisterPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="e.g. India Organic (NPOP), FSSAI Jaivik Bharat, AYUSH Premium Mark, ISO/IEC 17025 NABL"
+                placeholder="e.g. India Organic (NPOP), FSSAI Jaivik Bharat"
                 value={certifications}
                 onChange={(e) => setCertifications(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
@@ -248,7 +375,7 @@ export const RegisterPage: React.FC = () => {
               ) : (
                 <>
                   <ShieldCheck size={16} />
-                  <span>Submit Node Accreditation Application</span>
+                  <span>{aadhaar ? 'Verify via OTP & Submit' : 'Submit Node Accreditation Application'}</span>
                   <ArrowRight size={16} />
                 </>
               )}

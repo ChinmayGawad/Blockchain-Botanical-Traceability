@@ -80,6 +80,7 @@ public class AuthService {
                 .joinedDate(LocalDate.now())
                 .certifications(request.getCertifications() != null ? request.getCertifications() : List.of())
                 .avatarUrl(request.getAvatarUrl() != null ? request.getAvatarUrl() : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150")
+                .aadhaarNumber(request.getAadhaarNumber())
                 .build();
 
         UserEntity savedUser = userRepository.save(Objects.requireNonNull(user));
@@ -188,6 +189,7 @@ public class AuthService {
                 .certifications(user.getCertifications() != null ? user.getCertifications() : List.of())
                 .avatarUrl(user.getAvatarUrl())
                 .walletAddress(user.getWalletAddress())
+                .aadhaarNumber(user.getAadhaarNumber())
                 .build();
     }
 }
