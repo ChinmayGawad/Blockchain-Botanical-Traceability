@@ -7,6 +7,8 @@ blockchain_botanical_traceability_ui_structure.md
 blockchain_botanical_wireframes_and_flowcharts.md
 IMPLEMENTATION_PLAN.md
 DEMO_PRESENTATION_GUIDE.md
+progress.md
+
 
 # =============================================================================
 # Frontend & Node Dependencies / Build Outputs
@@ -211,3 +213,21 @@ ENV/
 .copilot/
 .aider*
 skills-lock.json
+# =============================================================================
+# Added by AI Assistant - Additional Best Practice Ignores
+# =============================================================================
+# Hardhat Ignition
+ignition/deployments/
+
+# Node/NPM/Yarn alternative lockfiles (enforce npm)
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Java/Spring Boot additional
+.nb-gradle/
+.nb-gradle-properties
+*.log
+*.swp
+*.bak
+start-app.bat

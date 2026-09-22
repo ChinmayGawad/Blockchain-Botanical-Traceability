@@ -18,9 +18,11 @@
     "test:unit": "vitest run",
     "test:unit:ui": "vitest --ui",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "dev:all": "concurrently -c \"cyan.bold,blue.bold\" -n \"FRONTEND,BACKEND\" \"npm run dev\" \"cd backend && mvnw.cmd spring-boot:run\""
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "ethers": "^6.17.0",
@@ -42,6 +44,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^10.0.5",
     "hardhat": "^2.29.1",
     "jsdom": "^30.0.1",
     "postcss": "^8.4.47",

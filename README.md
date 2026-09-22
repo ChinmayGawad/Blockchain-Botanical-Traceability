@@ -60,6 +60,8 @@
 - **Cryptographic Laboratory Proofs & IPFS Off-Chain Storage**: Full assay documentation, certificates of analysis (CoA), heavy metal assays, and microbial tests are cryptographically hashed and linked via Pinata IPFS CID references.
 - **Consumer Instant Verification**: Public portal enabling consumers to scan a batch QR code or input a Batch ID to instantly view complete farm-to-shelf provenance, geo-coordinates, lab results, and blockchain transaction receipts without requiring crypto or a wallet.
 - **Anti-Counterfeit & Anomaly Alerting**: Built-in suspicious batch flagging, multi-stage dispute reporting, and admin recall mechanisms.
+- **Aadhaar e-KYC Identity Verification**: Real-time integration of Aadhaar Number validation using Verhoeff algorithm and simulated OTP-based KYC verification during user onboarding.
+- **Gasless Meta-Transactions**: Frictionless Web3 onboarding utilizing OpenZeppelin `ERC2771Context` and EIP-712 Typed Data Signatures, allowing non-crypto users to write to the blockchain without paying gas fees.
 - **Enterprise Spring Boot 3 Backend**: High-performance RESTful API with stateless JWT security, Web3j blockchain integration, H2 in-memory zero-config dev database, and PostgreSQL production readiness.
 - **Premium Reactive UI/UX**: Built with React 18, Vite, TypeScript, and modern glassmorphic Tailwind CSS with animated milestone progress trackers and real-time blockchain telemetry.
 
@@ -423,12 +425,14 @@ npx tsc --noEmit
 ## 🗺️ Roadmap
 
 - [x] Hardhat EVM Smart Contract (`BotanicalTraceability.sol`)
-- [x] Live Public Testnet Deployment (Ethereum Sepolia: `0xFc06C5eeF51Cc050D2A663120E7d86745cF51745`)
+- [x] Live Public Testnet Deployment (Ethereum Sepolia)
 - [x] Multi-Role Authentication with Spring Security 6 & JWT
 - [x] Spring Boot REST API & Web3j Blockchain Bridge
 - [x] Role-Scoped Dashboards (Admin, Farmer, Processor, Lab, Distributor, Retailer)
 - [x] Public Consumer Verification Portal & QR Code Generator
 - [x] Decentralized Pinata IPFS Assay Storage Integration
+- [x] Aadhaar Integration & Simulated OTP e-KYC Verification
+- [x] Meta-Transactions (Gasless Transactions) via OpenZeppelin ERC2771Context
 - [ ] Automated IoT Temperature & Humidity Sensor Telemetry via MQTT
 - [ ] Zero-Knowledge Proofs (ZK-SNARKs) for proprietary extraction formula confidentiality
 - [ ] Native Mobile App (React Native / Flutter) for offline barcode scanning at farm gates

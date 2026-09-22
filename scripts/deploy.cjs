@@ -85,7 +85,16 @@ async function main() {
   }
 
   const BotanicalTraceability = await hre.ethers.getContractFactory("BotanicalTraceability");
-  const contract = await BotanicalTraceability.deploy(deployOptions);
+  
+  console.log("🚀 Deploying ERC2771Forwarder smart contract...");
+  const ERC2771Forwarder = await hre.ethers.getContractFactory("@openzeppelin/contracts/metatx/ERC2771Forwarder.sol:ERC2771Forwarder");
+  const forwarderContract = await ERC2771Forwarder.deploy("FloraChainForwarder", deployOptions);
+  await forwarderContract.waitForDeployment();
+  const forwarderAddress = await forwarderContract.getAddress();
+  console.log(`✅ ERC2771Forwarder deployed successfully at: ${forwarderAddress}`);
+
+  console.log("🚀 Deploying BotanicalTraceability smart contract...");
+  const contract = await BotanicalTraceability.deploy(forwarderAddress, deployOptions);
   await contract.waitForDeployment();
 
   const contractAddress = await contract.getAddress();
@@ -243,13 +252,31 @@ async function main() {
   }
 
   const frontendConfigFile = path.join(configDir, "contractConfig.json");
+  const forwarderArtifactPath = path.join(
+    __dirname,
+    "..",
+    "artifacts",
+    "@openzeppelin",
+    "contracts",
+    "metatx",
+    "ERC2771Forwarder.sol",
+    "ERC2771Forwarder.json"
+  );
+  let forwarderAbi = [];
+  if (fs.existsSync(forwarderArtifactPath)) {
+    const forwarderArtifact = JSON.parse(fs.readFileSync(forwarderArtifactPath, "utf8"));
+    forwarderAbi = forwarderArtifact.abi;
+  }
+
   const frontendConfig = {
     network: networkName,
     chainId: chainId,
     contractAddress: contractAddress,
+    forwarderAddress: forwarderAddress,
     explorerUrl: explorerUrl,
     deployedAt: new Date().toISOString(),
     abi: contractArtifact.abi,
+    forwarderAbi: forwarderAbi
   };
 
   fs.writeFileSync(frontendConfigFile, JSON.stringify(frontendConfig, null, 2));

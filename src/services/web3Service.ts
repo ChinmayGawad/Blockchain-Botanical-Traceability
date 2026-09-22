@@ -426,10 +426,90 @@ class Web3Service {
     }
   }
 
+  public async signAndRelayMetaTransaction(
+    functionName: string,
+    args: any[]
+  ): Promise<{ txHash: string; blockNumber: number }> {
+    if (!this.signer) throw new Error("Wallet not connected");
+
+    const contract = await this.getContract(false);
+    const forwarderAddress = (contractConfig as any).forwarderAddress;
+    if (!forwarderAddress) throw new Error("Forwarder address not configured");
+
+    const from = await this.signer.getAddress();
+    const data = contract.interface.encodeFunctionData(functionName, args);
+    const provider = await this.getProvider();
+    
+    // Construct ForwardRequest
+    const forwarderAbi = (contractConfig as any).forwarderAbi;
+    const forwarder = new ethers.Contract(forwarderAddress, forwarderAbi, provider);
+    const nonce = await forwarder.nonces(from);
+    
+    const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour validity
+
+    const request = {
+      from,
+      to: this.getContractAddress(),
+      value: 0n,
+      gas: 2000000n, // sufficient gas
+      nonce,
+      deadline: BigInt(deadline),
+      data
+    };
+
+    // EIP-712 setup
+    const domain = {
+      name: "FloraChainForwarder",
+      version: "1",
+      chainId: ACTIVE_CHAIN_ID,
+      verifyingContract: forwarderAddress,
+    };
+
+    const types = {
+      ForwardRequest: [
+        { name: "from", type: "address" },
+        { name: "to", type: "address" },
+        { name: "value", type: "uint256" },
+        { name: "gas", type: "uint256" },
+        { name: "nonce", type: "uint256" },
+        { name: "deadline", type: "uint48" },
+        { name: "data", type: "bytes" },
+      ],
+    };
+
+    // User signs the message (costs no gas)
+    const signature = await (this.signer as ethers.JsonRpcSigner).signTypedData(domain, types, request);
+
+    // Relayer steps in: using the Admin account (hardcoded for demo)
+    const adminKey = HARDHAT_DEMO_ACCOUNTS[0].privateKey;
+    const relayerWallet = new ethers.Wallet(adminKey, provider);
+    
+    // Relayer submits the transaction and pays the gas
+    const forwarderWithRelayer = forwarder.connect(relayerWallet) as ethers.Contract;
+    
+    // Build ForwardRequestData struct
+    const requestData = {
+      from: request.from,
+      to: request.to,
+      value: request.value,
+      gas: request.gas,
+      deadline: request.deadline,
+      data: request.data,
+      signature: signature
+    };
+
+    const tx = await forwarderWithRelayer.execute(requestData);
+    const receipt = await tx.wait();
+    
+    return {
+      txHash: receipt.hash,
+      blockNumber: receipt.blockNumber,
+    };
+  }
+
   public async registerHarvestOnChain(
     product: Omit<BotanicalProduct, 'id' | 'status' | 'verificationState' | 'qrCodeValue' | 'createdTimestamp' | 'timeline' | 'blockchainTransactions'>
   ): Promise<{ txHash: string; blockNumber: number }> {
-    const contract = await this.getContract(true);
     const harvestTimestamp = Math.floor(new Date(product.harvestDate).getTime() / 1000) || Math.floor(Date.now() / 1000);
 
     const input = {
@@ -446,19 +526,13 @@ class Web3Service {
       farmerName: product.farmerName,
     };
 
-    const tx = await contract.registerHarvest(input);
-    const receipt = await tx.wait();
-    return {
-      txHash: receipt.hash,
-      blockNumber: receipt.blockNumber,
-    };
+    return await this.signAndRelayMetaTransaction('registerHarvest', [input]);
   }
 
   public async recordProcessingOnChain(
     batchId: string,
     details: Omit<ProcessingDetails, 'txHash'>
   ): Promise<{ txHash: string; blockNumber: number }> {
-    const contract = await this.getContract(true);
     const yieldLossInt = Math.round((details.yieldLossPercentage || 0) * 100);
 
     const input = {
@@ -475,12 +549,7 @@ class Web3Service {
       notes: details.notes || '',
     };
 
-    const tx = await contract.recordProcessing(input);
-    const receipt = await tx.wait();
-    return {
-      txHash: receipt.hash,
-      blockNumber: receipt.blockNumber,
-    };
+    return await this.signAndRelayMetaTransaction('recordProcessing', [input]);
   }
 
   public async submitLabReportOnChain(

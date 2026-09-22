@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
+
 /**
  * @title BotanicalTraceability
  * @dev Comprehensive smart contract for immutable botanical supply chain provenance,
  * tracking crops from harvest, through processing, laboratory testing, transport, and retail.
  */
-contract BotanicalTraceability {
+contract BotanicalTraceability is ERC2771Context {
 
     enum ProductStatus {
         REGISTERED,
@@ -211,13 +214,13 @@ contract BotanicalTraceability {
     event RoleGranted(address indexed actor, UserRole role);
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Only contract owner can perform this action");
+        require(_msgSender() == owner, "Only contract owner can perform this action");
         _;
     }
 
     modifier onlyRole(UserRole role) {
         require(
-            msg.sender == owner || (isAuthorizedActor[msg.sender] && userRoles[msg.sender] == role),
+            _msgSender() == owner || (isAuthorizedActor[_msgSender()] && userRoles[_msgSender()] == role),
             "Unauthorized role for this operation"
         );
         _;
@@ -228,11 +231,11 @@ contract BotanicalTraceability {
         _;
     }
 
-    constructor() {
-        owner = msg.sender;
-        userRoles[msg.sender] = UserRole.ADMIN;
-        isAuthorizedActor[msg.sender] = true;
-        emit RoleGranted(msg.sender, UserRole.ADMIN);
+    constructor(address trustedForwarder) ERC2771Context(trustedForwarder) {
+        owner = _msgSender();
+        userRoles[_msgSender()] = UserRole.ADMIN;
+        isAuthorizedActor[_msgSender()] = true;
+        emit RoleGranted(_msgSender(), UserRole.ADMIN);
 
         // Pre-authorize standard consortium addresses for local development & demonstration
         _seedRole(0x70997970C51812dc3A010C7d01b50e0d17dc79C8, UserRole.FARMER);
@@ -276,7 +279,7 @@ contract BotanicalTraceability {
         p.cultivationMethod = input.cultivationMethod;
         p.farmerId = input.farmerId;
         p.farmerName = input.farmerName;
-        p.farmerAddress = msg.sender;
+        p.farmerAddress = _msgSender();
         p.status = ProductStatus.REGISTERED;
         p.createdAt = block.timestamp;
         p.updatedAt = block.timestamp;
@@ -284,7 +287,7 @@ contract BotanicalTraceability {
 
         allBatchIds.push(input.batchId);
 
-        emit ProductRegistered(input.batchId, input.botanicalName, msg.sender, block.timestamp);
+        emit ProductRegistered(input.batchId, input.botanicalName, _msgSender(), block.timestamp);
     }
 
     /**
@@ -306,14 +309,14 @@ contract BotanicalTraceability {
             processingDate: block.timestamp,
             equipmentUsed: input.equipmentUsed,
             ipfsDocumentCid: input.ipfsDocumentCid,
-            processorAddress: msg.sender,
+            processorAddress: _msgSender(),
             notes: input.notes
         });
 
         p.status = ProductStatus.PROCESSED;
         p.updatedAt = block.timestamp;
 
-        emit ProcessingRecorded(input.batchId, input.processorName, msg.sender, block.timestamp);
+        emit ProcessingRecorded(input.batchId, input.processorName, _msgSender(), block.timestamp);
     }
 
     /**
@@ -339,14 +342,14 @@ contract BotanicalTraceability {
             pesticideResiduePassed: input.pesticideResiduePassed,
             certificateIpfsCid: input.certificateIpfsCid,
             overallApproved: input.overallApproved,
-            labAddress: msg.sender,
+            labAddress: _msgSender(),
             notes: input.notes
         });
 
         p.status = input.overallApproved ? ProductStatus.APPROVED : ProductStatus.REJECTED;
         p.updatedAt = block.timestamp;
 
-        emit LabReportRecorded(input.batchId, input.overallApproved, msg.sender, block.timestamp);
+        emit LabReportRecorded(input.batchId, input.overallApproved, _msgSender(), block.timestamp);
     }
 
     /**
@@ -369,14 +372,14 @@ contract BotanicalTraceability {
             trackingNumber: input.trackingNumber,
             dispatchDate: block.timestamp,
             deliveryDate: 0,
-            distributorAddress: msg.sender,
+            distributorAddress: _msgSender(),
             isDelivered: false
         });
 
         p.status = ProductStatus.IN_TRANSIT;
         p.updatedAt = block.timestamp;
 
-        emit ShipmentDispatched(input.batchId, input.shipmentId, msg.sender, block.timestamp);
+        emit ShipmentDispatched(input.batchId, input.shipmentId, _msgSender(), block.timestamp);
     }
 
     /**
@@ -391,7 +394,7 @@ contract BotanicalTraceability {
         p.status = ProductStatus.DELIVERED;
         p.updatedAt = block.timestamp;
 
-        emit ShipmentDelivered(batchId, p.shipment.shipmentId, msg.sender, block.timestamp);
+        emit ShipmentDelivered(batchId, p.shipment.shipmentId, _msgSender(), block.timestamp);
     }
 
     /**
@@ -412,13 +415,13 @@ contract BotanicalTraceability {
             shelfLocation: input.shelfLocation,
             receivedDate: block.timestamp,
             retailPrice: input.retailPrice,
-            retailerAddress: msg.sender
+            retailerAddress: _msgSender()
         });
 
         p.status = ProductStatus.RETAIL_READY;
         p.updatedAt = block.timestamp;
 
-        emit RetailReceived(input.batchId, input.retailerName, msg.sender, block.timestamp);
+        emit RetailReceived(input.batchId, input.retailerName, _msgSender(), block.timestamp);
     }
 
     /**
@@ -435,7 +438,7 @@ contract BotanicalTraceability {
             reportId: reportId,
             batchId: batchId,
             reporterName: reporterName,
-            reporterAddress: msg.sender,
+            reporterAddress: _msgSender(),
             reason: reason,
             evidenceIpfsCid: evidenceIpfsCid,
             timestamp: block.timestamp,
@@ -449,7 +452,7 @@ contract BotanicalTraceability {
         products[batchId].status = ProductStatus.SUSPICIOUS;
         products[batchId].updatedAt = block.timestamp;
 
-        emit ProductSuspiciousReported(batchId, reportId, msg.sender, reason);
+        emit ProductSuspiciousReported(batchId, reportId, _msgSender(), reason);
     }
 
     /**
@@ -459,7 +462,7 @@ contract BotanicalTraceability {
         products[batchId].status = ProductStatus.RECALLED;
         products[batchId].updatedAt = block.timestamp;
 
-        emit ProductRecalled(batchId, reason, msg.sender);
+        emit ProductRecalled(batchId, reason, _msgSender());
     }
 
     // ==========================================
