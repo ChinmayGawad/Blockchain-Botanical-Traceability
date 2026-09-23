@@ -3,13 +3,19 @@ const { ethers } = require("hardhat");
 
 describe("BotanicalTraceability Smart Contract", function () {
   let botanicalContract;
+  let forwarderContract;
   let owner, farmer, processor, lab, distributor, retailer, consumer;
 
   beforeEach(async function () {
     [owner, farmer, processor, lab, distributor, retailer, consumer] = await ethers.getSigners();
 
+    const ERC2771Forwarder = await ethers.getContractFactory("@openzeppelin/contracts/metatx/ERC2771Forwarder.sol:ERC2771Forwarder");
+    forwarderContract = await ERC2771Forwarder.deploy("FloraChainForwarder");
+    await forwarderContract.waitForDeployment();
+    const forwarderAddress = await forwarderContract.getAddress();
+
     const BotanicalTraceability = await ethers.getContractFactory("BotanicalTraceability");
-    botanicalContract = await BotanicalTraceability.deploy();
+    botanicalContract = await BotanicalTraceability.deploy(forwarderAddress);
     await botanicalContract.waitForDeployment();
 
     // Assign roles
@@ -399,5 +405,40 @@ describe("BotanicalTraceability Smart Contract", function () {
     await botanicalContract.connect(owner).recallProduct(batchId, "Batch seal tampering confirmed by quality audit");
     product = await botanicalContract.getProduct(batchId);
     expect(product.status).to.equal(10); // RECALLED
+  });
+
+  it("Should allow owner to revoke a role", async function () {
+    expect(await botanicalContract.isAuthorizedActor(farmer.address)).to.be.true;
+    await expect(botanicalContract.connect(owner).revokeRole(farmer.address))
+      .to.emit(botanicalContract, "RoleRevoked")
+      .withArgs(farmer.address);
+
+    expect(await botanicalContract.isAuthorizedActor(farmer.address)).to.be.false;
+  });
+
+  it("Should allow owner to pause and unpause operations", async function () {
+    expect(await botanicalContract.paused()).to.be.false;
+    await botanicalContract.connect(owner).pause();
+    expect(await botanicalContract.paused()).to.be.true;
+
+    // Modifications should revert when paused
+    await expect(
+      botanicalContract.connect(farmer).registerHarvest({
+        batchId: "PAUSE-TEST",
+        botanicalName: "Herb",
+        commonName: "Herb",
+        category: "Leaves",
+        farmLocation: "Farm",
+        coordinates: "0,0",
+        harvestDate: 0,
+        quantityKg: 100,
+        cultivationMethod: "ORGANIC",
+        farmerId: "F-1",
+        farmerName: "Farmer"
+      })
+    ).to.be.revertedWithCustomError(botanicalContract, "EnforcedPause");
+
+    await botanicalContract.connect(owner).unpause();
+    expect(await botanicalContract.paused()).to.be.false;
   });
 });

@@ -3,13 +3,14 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title BotanicalTraceability
  * @dev Comprehensive smart contract for immutable botanical supply chain provenance,
  * tracking crops from harvest, through processing, laboratory testing, transport, and retail.
  */
-contract BotanicalTraceability is ERC2771Context {
+contract BotanicalTraceability is ERC2771Context, Pausable {
 
     enum ProductStatus {
         REGISTERED,
@@ -212,6 +213,7 @@ contract BotanicalTraceability is ERC2771Context {
     event ProductSuspiciousReported(string indexed batchId, string reportId, address indexed reporter, string reason);
     event ProductRecalled(string indexed batchId, string reason, address indexed authority);
     event RoleGranted(address indexed actor, UserRole role);
+    event RoleRevoked(address indexed actor);
 
     modifier onlyOwner() {
         require(_msgSender() == owner, "Only contract owner can perform this action");
@@ -236,19 +238,6 @@ contract BotanicalTraceability is ERC2771Context {
         userRoles[_msgSender()] = UserRole.ADMIN;
         isAuthorizedActor[_msgSender()] = true;
         emit RoleGranted(_msgSender(), UserRole.ADMIN);
-
-        // Pre-authorize standard consortium addresses for local development & demonstration
-        _seedRole(0x70997970C51812dc3A010C7d01b50e0d17dc79C8, UserRole.FARMER);
-        _seedRole(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC, UserRole.PROCESSOR);
-        _seedRole(0x90F79bf6EB2c4f870365E785982E1f101E93b906, UserRole.LABORATORY);
-        _seedRole(0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65, UserRole.DISTRIBUTOR);
-        _seedRole(0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc, UserRole.RETAILER);
-    }
-
-    function _seedRole(address actor, UserRole role) private {
-        userRoles[actor] = role;
-        isAuthorizedActor[actor] = true;
-        emit RoleGranted(actor, role);
     }
 
     /**
@@ -261,9 +250,31 @@ contract BotanicalTraceability is ERC2771Context {
     }
 
     /**
+     * @dev Revoke participant role in the supply chain
+     */
+    function revokeRole(address actor) external onlyOwner {
+        isAuthorizedActor[actor] = false;
+        emit RoleRevoked(actor);
+    }
+
+    /**
+     * @dev Emergency circuit breaker to pause contract operations
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpause contract operations
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /**
      * @dev 1. Farmer registers a newly harvested botanical batch
      */
-    function registerHarvest(HarvestInput calldata input) external onlyRole(UserRole.FARMER) {
+    function registerHarvest(HarvestInput calldata input) external onlyRole(UserRole.FARMER) whenNotPaused {
         require(!products[input.batchId].exists, "Batch with this ID already registered");
         require(bytes(input.batchId).length > 0, "Batch ID cannot be empty");
 
@@ -293,7 +304,7 @@ contract BotanicalTraceability is ERC2771Context {
     /**
      * @dev 2. Processor records processing / extraction details
      */
-    function recordProcessing(ProcessingInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.PROCESSOR) {
+    function recordProcessing(ProcessingInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.PROCESSOR) whenNotPaused {
         BotanicalProduct storage p = products[input.batchId];
         require(p.status == ProductStatus.REGISTERED || p.status == ProductStatus.PROCESSING, "Invalid state: Batch must be in REGISTERED state for processing");
         require(p.processing.processingDate == 0, "Processing details already recorded for this batch");
@@ -322,7 +333,7 @@ contract BotanicalTraceability is ERC2771Context {
     /**
      * @dev 3. Laboratory submits QC testing results & certification
      */
-    function submitLabReport(LabInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.LABORATORY) {
+    function submitLabReport(LabInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.LABORATORY) whenNotPaused {
         BotanicalProduct storage p = products[input.batchId];
         require(
             p.status == ProductStatus.PROCESSED || p.status == ProductStatus.IN_TESTING,
@@ -355,7 +366,7 @@ contract BotanicalTraceability is ERC2771Context {
     /**
      * @dev 4. Distributor dispatches shipment
      */
-    function dispatchShipment(ShipmentInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.DISTRIBUTOR) {
+    function dispatchShipment(ShipmentInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.DISTRIBUTOR) whenNotPaused {
         BotanicalProduct storage p = products[input.batchId];
         require(p.status == ProductStatus.APPROVED, "Product must be approved by laboratory before shipment");
         require(p.shipment.dispatchDate == 0, "Shipment already dispatched for this batch");
@@ -385,7 +396,7 @@ contract BotanicalTraceability is ERC2771Context {
     /**
      * @dev 4b. Distributor confirms shipment arrival / delivery
      */
-    function confirmDelivery(string memory batchId) external batchExists(batchId) onlyRole(UserRole.DISTRIBUTOR) {
+    function confirmDelivery(string memory batchId) external batchExists(batchId) onlyRole(UserRole.DISTRIBUTOR) whenNotPaused {
         BotanicalProduct storage p = products[batchId];
         require(p.status == ProductStatus.IN_TRANSIT, "Product is not currently in transit");
 
@@ -400,7 +411,7 @@ contract BotanicalTraceability is ERC2771Context {
     /**
      * @dev 5. Retailer confirms receipt and places product on retail shelves
      */
-    function confirmRetailReceipt(RetailInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.RETAILER) {
+    function confirmRetailReceipt(RetailInput calldata input) external batchExists(input.batchId) onlyRole(UserRole.RETAILER) whenNotPaused {
         BotanicalProduct storage p = products[input.batchId];
         require(
             p.status == ProductStatus.DELIVERED,
@@ -433,7 +444,7 @@ contract BotanicalTraceability is ERC2771Context {
         string calldata reporterName,
         string calldata reason,
         string calldata evidenceIpfsCid
-    ) external batchExists(batchId) {
+    ) external batchExists(batchId) whenNotPaused {
         SuspiciousReport memory report = SuspiciousReport({
             reportId: reportId,
             batchId: batchId,
@@ -458,7 +469,7 @@ contract BotanicalTraceability is ERC2771Context {
     /**
      * @dev Admin/Regulator recalls a batch
      */
-    function recallProduct(string memory batchId, string calldata reason) external onlyOwner batchExists(batchId) {
+    function recallProduct(string memory batchId, string calldata reason) external onlyOwner batchExists(batchId) whenNotPaused {
         products[batchId].status = ProductStatus.RECALLED;
         products[batchId].updatedAt = block.timestamp;
 
@@ -502,5 +513,21 @@ contract BotanicalTraceability is ERC2771Context {
      */
     function getAllReports() external view returns (SuspiciousReport[] memory) {
         return allSuspiciousReports;
+    }
+
+    // ==========================================
+    // ERC2771Context & Context Overrides
+    // ==========================================
+
+    function _msgSender() internal view override(Context, ERC2771Context) returns (address) {
+        return ERC2771Context._msgSender();
+    }
+
+    function _msgData() internal view override(Context, ERC2771Context) returns (bytes calldata) {
+        return ERC2771Context._msgData();
+    }
+
+    function _contextSuffixLength() internal view override(Context, ERC2771Context) returns (uint256) {
+        return ERC2771Context._contextSuffixLength();
     }
 }
