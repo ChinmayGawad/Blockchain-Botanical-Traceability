@@ -68,6 +68,22 @@ public class AuthService {
         String rolePrefix = role.name().substring(0, Math.min(3, role.name().length()));
         String generatedId = "USR-" + rolePrefix + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
 
+        String rawAadhaar = request.getAadhaarNumber();
+        String aadhaarHash = null;
+        String aadhaarMasked = null;
+
+        if (rawAadhaar != null && !rawAadhaar.trim().isEmpty()) {
+            String trimmedAadhaar = rawAadhaar.trim();
+            if (!validateVerhoeff(trimmedAadhaar)) {
+                throw new BadRequestException("Invalid Aadhaar number checksum");
+            }
+            aadhaarHash = hashAadhaar(trimmedAadhaar);
+            if (userRepository.existsByAadhaarHash(aadhaarHash)) {
+                throw new BadRequestException("An account is already linked to this Aadhaar number");
+            }
+            aadhaarMasked = "XXXX-XXXX-" + trimmedAadhaar.substring(trimmedAadhaar.length() - 4);
+        }
+
         UserEntity user = UserEntity.builder()
                 .id(generatedId)
                 .name(request.getName() != null ? request.getName().trim() : "FloraChain User")
@@ -80,7 +96,8 @@ public class AuthService {
                 .joinedDate(LocalDate.now())
                 .certifications(request.getCertifications() != null ? request.getCertifications() : List.of())
                 .avatarUrl(request.getAvatarUrl() != null ? request.getAvatarUrl() : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150")
-                .aadhaarNumber(request.getAadhaarNumber())
+                .aadhaarHash(aadhaarHash)
+                .aadhaarMasked(aadhaarMasked)
                 .build();
 
         UserEntity savedUser = userRepository.save(Objects.requireNonNull(user));
@@ -189,7 +206,64 @@ public class AuthService {
                 .certifications(user.getCertifications() != null ? user.getCertifications() : List.of())
                 .avatarUrl(user.getAvatarUrl())
                 .walletAddress(user.getWalletAddress())
-                .aadhaarNumber(user.getAadhaarNumber())
+                .aadhaarNumber(user.getAadhaarMasked())
                 .build();
+    }
+
+    // Multiplication table for Verhoeff algorithm
+    private static final int[][] VERHOEFF_D = {
+        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+        {1, 2, 3, 4, 0, 6, 7, 8, 9, 5},
+        {2, 3, 4, 0, 1, 7, 8, 9, 5, 6},
+        {3, 4, 0, 1, 2, 8, 9, 5, 6, 7},
+        {4, 0, 1, 2, 3, 9, 5, 6, 7, 8},
+        {5, 9, 8, 7, 6, 0, 4, 3, 2, 1},
+        {6, 5, 9, 8, 7, 1, 0, 4, 3, 2},
+        {7, 6, 5, 9, 8, 2, 1, 0, 4, 3},
+        {8, 7, 6, 5, 9, 3, 2, 1, 0, 4},
+        {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+    };
+
+    // Permutation table for Verhoeff algorithm
+    private static final int[][] VERHOEFF_P = {
+        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+        {1, 5, 7, 6, 2, 8, 3, 0, 9, 4},
+        {5, 8, 0, 3, 7, 9, 6, 1, 4, 2},
+        {8, 9, 1, 6, 0, 4, 3, 5, 2, 7},
+        {9, 4, 5, 3, 1, 2, 6, 8, 7, 0},
+        {4, 2, 8, 6, 5, 7, 3, 9, 0, 1},
+        {2, 7, 9, 3, 8, 0, 6, 4, 1, 5},
+        {7, 0, 4, 6, 9, 1, 3, 2, 5, 8}
+    };
+
+    public static boolean validateVerhoeff(String num) {
+        if (num == null || num.length() != 12 || !num.matches("\\d{12}")) {
+            return false;
+        }
+        int c = 0;
+        int[] myArray = new int[num.length()];
+        for (int i = 0; i < num.length(); i++) {
+            myArray[i] = Character.getNumericValue(num.charAt(i));
+        }
+        for (int i = 0; i < myArray.length; i++) {
+            c = VERHOEFF_D[c][VERHOEFF_P[(i % 8)][myArray[myArray.length - i - 1]]];
+        }
+        return c == 0;
+    }
+
+    private static String hashAadhaar(String aadhaar) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(("florachain_aadhaar_salt:" + aadhaar).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
     }
 }

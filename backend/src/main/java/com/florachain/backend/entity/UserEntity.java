@@ -13,7 +13,8 @@ import java.util.List;
 @Table(name = "users", indexes = {
     @Index(name = "idx_user_email", columnList = "email", unique = true),
     @Index(name = "idx_user_role", columnList = "role"),
-    @Index(name = "idx_user_status", columnList = "status")
+    @Index(name = "idx_user_status", columnList = "status"),
+    @Index(name = "idx_user_aadhaar_hash", columnList = "aadhaar_hash")
 })
 @Getter
 @Setter
@@ -64,6 +65,9 @@ public class UserEntity {
     @Column(name = "wallet_address", length = 64)
     private String walletAddress;
 
-    @Column(name = "aadhaar_number", length = 12)
-    private String aadhaarNumber;
+    @Column(name = "aadhaar_hash", length = 64)
+    private String aadhaarHash;
+
+    @Column(name = "aadhaar_masked", length = 20)
+    private String aadhaarMasked;
 }

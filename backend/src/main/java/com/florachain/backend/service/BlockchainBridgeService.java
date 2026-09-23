@@ -37,8 +37,24 @@ public class BlockchainBridgeService {
     @Value("${app.blockchain.network-name:Hardhat EVM Localhost (Chain ID 31337)}")
     private String networkName;
 
+    @Value("${app.blockchain.private-key:}")
+    private String relayerPrivateKey;
+
     private volatile Web3j web3jClient;
     private final AtomicLong simulatedBlockHeight = new AtomicLong(10742L);
+
+    @Nullable
+    public String getRelayerAddress() {
+        if (relayerPrivateKey != null && !relayerPrivateKey.isBlank()) {
+            try {
+                org.web3j.crypto.Credentials credentials = org.web3j.crypto.Credentials.create(relayerPrivateKey);
+                return credentials.getAddress();
+            } catch (Exception e) {
+                log.warn("Invalid relayer private key configured: {}", e.getMessage());
+            }
+        }
+        return null;
+    }
 
     @Nullable
     private Web3j getWeb3j() {

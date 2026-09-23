@@ -2,6 +2,7 @@ package com.florachain.backend.config;
 
 import com.florachain.backend.security.JwtAuthenticationEntryPoint;
 import com.florachain.backend.security.JwtAuthenticationFilter;
+import com.florachain.backend.security.RateLimitingFilter;
 import com.florachain.backend.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +35,12 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitingFilter rateLimitingFilter;
     private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
     @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173}")
     private List<String> allowedOrigins;
@@ -55,26 +60,42 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        boolean isDev = "dev".equalsIgnoreCase(activeProfile);
+
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())) // Allow H2 console
-            .authorizeHttpRequests(auth -> auth
-                // Public authentication & verification endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/verify/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/blockchain/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/reports").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                // All other business endpoints require authentication
-                .anyRequest().authenticated()
-            );
+            .headers(headers -> {
+                if (isDev) {
+                    headers.frameOptions(frame -> frame.sameOrigin());
+                } else {
+                    headers.frameOptions(frame -> frame.deny());
+                }
+            })
+            .authorizeHttpRequests(auth -> {
+                auth
+                    // Public authentication & verification endpoints
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/verify/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/blockchain/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/reports").permitAll()
+                    // Actuator health & readiness probes
+                    .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                    .requestMatchers("/error").permitAll();
+
+                if (isDev) {
+                    auth.requestMatchers("/h2-console/**").permitAll();
+                }
+
+                // All other endpoints require authentication
+                auth.anyRequest().authenticated();
+            });
 
         http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

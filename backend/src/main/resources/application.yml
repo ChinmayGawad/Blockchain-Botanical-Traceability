@@ -23,6 +23,7 @@ app:
     rpc-url: ${BLOCKCHAIN_RPC_URL:https://ethereum-sepolia-rpc.publicnode.com}
     contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0xFc06C5eeF51Cc050D2A663120E7d86745cF51745}
     network-name: ${BLOCKCHAIN_NETWORK_NAME:Ethereum Sepolia Testnet (Chain ID 11155111)}
+    private-key: ${BLOCKCHAIN_RELAYER_PRIVATE_KEY:}
   ipfs:
     gateway-url: https://gateway.pinata.cloud/ipfs/
     mock-mode: true
@@ -31,3 +32,12 @@ app:
       - http://localhost:5173
       - http://localhost:3000
       - http://127.0.0.1:5173
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
