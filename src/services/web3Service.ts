@@ -108,37 +108,31 @@ export const HARDHAT_DEMO_ACCOUNTS = [
     role: 'ADMIN',
     label: 'Consortium Admin (Deployer)',
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    privateKey: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
   },
   {
     role: 'FARMER',
     label: 'Organic Farmer Account',
     address: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
-    privateKey: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
   },
   {
     role: 'PROCESSOR',
     label: 'Bio-Processing Facility',
     address: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
-    privateKey: '0x5de4111afa1a4b94908f83103eb2f95402b4e4f67f08a04cc9b4227d8e210e0',
   },
   {
     role: 'LABORATORY',
     label: 'Quality Testing Laboratory',
     address: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-    privateKey: '0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6',
   },
   {
     role: 'DISTRIBUTOR',
     label: 'Logistics & Cold-Chain',
     address: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
-    privateKey: '0x47e179ec346cb2c7325414d168f39cf25730dd2b24e62a06c7d7d6b02bee1b0b',
   },
   {
     role: 'RETAILER',
     label: 'Retail Wellness Store',
     address: '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc',
-    privateKey: '0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba',
   },
 ];
 
@@ -327,14 +321,14 @@ class Web3Service {
 
     try {
       const rpcProvider = new ethers.JsonRpcProvider(ACTIVE_RPC_URL);
-      const wallet = new ethers.Wallet(acc.privateKey, rpcProvider);
+      const signer = await rpcProvider.getSigner(acc.address);
 
       this.provider = rpcProvider;
-      this.signer = wallet;
+      this.signer = signer;
       this.contract = new ethers.Contract(
         this.getContractAddress(),
         contractConfig.abi,
-        wallet
+        signer
       );
 
       let balanceEth = '10000.0';
@@ -480,12 +474,17 @@ class Web3Service {
     // User signs the message (costs no gas)
     const signature = await (this.signer as ethers.JsonRpcSigner).signTypedData(domain, types, request);
 
-    // Relayer steps in: using the Admin account (hardcoded for demo)
-    const adminKey = HARDHAT_DEMO_ACCOUNTS[0].privateKey;
-    const relayerWallet = new ethers.Wallet(adminKey, provider);
+    // Relayer submits the transaction: On local Hardhat node, use unlocked signer; on public chains, use connected signer
+    let relayerSigner: ethers.Signer = this.signer;
+    if (IS_LOCAL_NETWORK && 'getSigner' in provider) {
+      try {
+        relayerSigner = await (provider as any).getSigner(HARDHAT_DEMO_ACCOUNTS[0].address);
+      } catch {
+        relayerSigner = this.signer;
+      }
+    }
     
-    // Relayer submits the transaction and pays the gas
-    const forwarderWithRelayer = forwarder.connect(relayerWallet) as ethers.Contract;
+    const forwarderWithRelayer = forwarder.connect(relayerSigner) as ethers.Contract;
     
     // Build ForwardRequestData struct
     const requestData = {

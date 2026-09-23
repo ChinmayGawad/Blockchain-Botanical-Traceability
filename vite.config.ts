@@ -28,4 +28,16 @@ export default defineConfig({
       ],
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-web3': ['ethers'],
+          'vendor-ui': ['lucide-react', 'qrcode.react', 'canvas-confetti'],
+        },
+      },
+    },
+  },
 });
