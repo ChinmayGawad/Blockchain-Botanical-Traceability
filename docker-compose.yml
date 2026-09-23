@@ -5,9 +5,9 @@ services:
     image: postgres:16-alpine
     container_name: florachain-postgres
     environment:
-      POSTGRES_DB: florachain_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: ${POSTGRES_DB:-florachain_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
     ports:
       - "5432:5432"
     volumes:
@@ -25,14 +25,36 @@ services:
     container_name: florachain-backend
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/florachain_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgrespassword
-      APP_BLOCKCHAIN_RPC_URL: http://blockchain:8545
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-florachain_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      BLOCKCHAIN_RPC_URL: ${BLOCKCHAIN_RPC_URL:-https://ethereum-sepolia-rpc.publicnode.com}
+      BLOCKCHAIN_CONTRACT_ADDRESS: ${BLOCKCHAIN_CONTRACT_ADDRESS:-0xFc06C5eeF51Cc050D2A663120E7d86745cF51745}
+      BLOCKCHAIN_RELAYER_PRIVATE_KEY: ${BLOCKCHAIN_RELAYER_PRIVATE_KEY:-}
+      CORS_FRONTEND_URL: ${CORS_FRONTEND_URL:-http://localhost}
     ports:
       - "8080:8080"
     depends_on:
       postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health | grep UP || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: florachain-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
         condition: service_healthy
     restart: unless-stopped
 
