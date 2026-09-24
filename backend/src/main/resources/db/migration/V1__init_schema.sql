@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS users (
     aadhaar_masked VARCHAR(20)
 );
 
+-- Safely add columns if the table already existed from a previous deployment
+ALTER TABLE users ADD COLUMN IF NOT EXISTS aadhaar_hash VARCHAR(64);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS aadhaar_masked VARCHAR(20);
+
 CREATE INDEX IF NOT EXISTS idx_user_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_user_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_user_status ON users(status);
