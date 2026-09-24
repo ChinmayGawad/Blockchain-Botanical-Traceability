@@ -231,3 +231,5 @@ bun.lockb
 *.swp
 *.bak
 start-app.bat
+
+.env.testnet

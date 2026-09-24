@@ -1,10 +1,10 @@
 {
-  "network": "localhost",
-  "chainId": 31337,
-  "contractAddress": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-  "forwarderAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-  "explorerUrl": "",
-  "deployedAt": "2026-09-22T16:21:08.718Z",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "contractAddress": "0x2B04B82dD07F1938E74b0CDCA9Fa5693Df147a87",
+  "forwarderAddress": "0xcfDd7062D8fe0a70c63114925a202b3F52EF7E1D",
+  "explorerUrl": "https://sepolia.etherscan.io/address/0x2B04B82dD07F1938E74b0CDCA9Fa5693Df147a87",
+  "deployedAt": "2026-09-24T16:18:12.720Z",
   "abi": [
     {
       "inputs": [
@@ -16,6 +16,16 @@
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "EnforcedPause",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ExpectedPause",
+      "type": "error"
     },
     {
       "anonymous": false,
@@ -46,6 +56,19 @@
         }
       ],
       "name": "LabReportRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Paused",
       "type": "event"
     },
     {
@@ -221,6 +244,19 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "address",
+          "name": "actor",
+          "type": "address"
+        }
+      ],
+      "name": "RoleRevoked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "string",
           "name": "batchId",
           "type": "string"
@@ -276,6 +312,19 @@
         }
       ],
       "name": "ShipmentDispatched",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Unpaused",
       "type": "event"
     },
     {
@@ -977,6 +1026,26 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "string",
@@ -1170,6 +1239,19 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "actor",
+          "type": "address"
+        }
+      ],
+      "name": "revokeRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "components": [
             {
               "internalType": "string",
@@ -1253,6 +1335,13 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {

@@ -20,8 +20,8 @@ app:
     secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     expiration-ms: 86400000 # 24 hours
   blockchain:
-    rpc-url: ${BLOCKCHAIN_RPC_URL:https://ethereum-sepolia-rpc.publicnode.com}
-    contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0xFc06C5eeF51Cc050D2A663120E7d86745cF51745}
+    rpc-url: ${BLOCKCHAIN_RPC_URL:https://eth-sepolia.g.alchemy.com/v2/alch_c8cTls0nqnvrEzVlYREFE}
+    contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0x2B04B82dD07F1938E74b0CDCA9Fa5693Df147a87}
     network-name: ${BLOCKCHAIN_NETWORK_NAME:Ethereum Sepolia Testnet (Chain ID 11155111)}
     private-key: ${BLOCKCHAIN_RELAYER_PRIVATE_KEY:}
   ipfs:
