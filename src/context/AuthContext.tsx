@@ -19,6 +19,7 @@ interface AuthContextType {
 const STORAGE_KEY_USER = 'florachain_current_user';
 const STORAGE_KEY_USERS = 'florachain_users_list';
 const STORAGE_KEY_TOKEN = 'florachain_jwt_token';
+const STORAGE_KEY_PASSWORDS = 'florachain_user_passwords';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -33,6 +34,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
     return MOCK_USERS;
+  });
+
+  const [localPasswords, setLocalPasswords] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PASSWORDS);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse passwords from localStorage', e);
+      }
+    }
+    return {};
   });
 
   const [currentUser, setCurrentUser] = useState<User>(() => {
@@ -50,6 +63,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
   }, [users]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PASSWORDS, JSON.stringify(localPasswords));
+  }, [localPasswords]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(currentUser));
@@ -106,9 +123,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, role?: UserRole, password?: string): Promise<boolean> => {
+    const trimmedEmail = email?.trim().toLowerCase();
+    const inputPassword = password?.trim();
+
+    // 1. Explicitly require both email and password
+    if (!trimmedEmail || !inputPassword) {
+      return false;
+    }
+
+    // 2. Attempt authentication against the backend API if online
     try {
-      const pwd = password || 'password123';
-      const res = await apiClient.post('/auth/login', { email, password: pwd });
+      const res = await apiClient.post('/auth/login', { email: trimmedEmail, password: inputPassword });
       if (res.data && res.data.token) {
         localStorage.setItem(STORAGE_KEY_TOKEN, res.data.token);
         if (res.data.user) {
@@ -116,20 +141,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return true;
         }
       }
-    } catch (e) {
-      console.info('Backend auth fallback to local session state');
+    } catch (e: any) {
+      // If the backend is running and responded with an HTTP status code (such as 401 Unauthorized, 400 Bad Request, or 403 Forbidden),
+      // the credentials or permissions were explicitly rejected. Do NOT fall back to local mock login!
+      if (e?.response) {
+        console.warn('Backend rejected login attempt with HTTP status:', e.response.status);
+        return false;
+      }
+      console.info('Backend unreachable, attempting offline mock authentication');
     }
 
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() || (role && u.role === role));
-    if (user) {
-      setCurrentUser(user);
-      return true;
+    // 3. Offline / Demo Mode Fallback:
+    // Only reachable when the backend is offline (no response from server).
+    const expectedPassword = localPasswords[trimmedEmail] || 'password123';
+    if (inputPassword !== expectedPassword) {
+      console.warn('Offline authentication failed: invalid password entered');
+      return false;
     }
-    if (role) {
-      switchRole(role);
-      return true;
+
+    // Match user by email
+    let user = users.find(u => u.email.toLowerCase() === trimmedEmail);
+
+    // Support role-based test persona aliases in offline test environments (e.g. farmer@test.com)
+    if (!user && role) {
+      if (trimmedEmail.includes(role.toLowerCase()) || trimmedEmail.endsWith('@test.com') || trimmedEmail.endsWith('@florachain.org')) {
+        user = users.find(u => u.role === role);
+      }
     }
-    return false;
+
+    if (!user) {
+      console.warn('Offline authentication failed: user not found for', trimmedEmail);
+      return false;
+    }
+
+    // Ensure account is ACTIVE and not pending approval or rejected
+    if (user.status !== 'ACTIVE') {
+      console.warn('Offline authentication failed: user account status is', user.status);
+      return false;
+    }
+
+    setCurrentUser(user);
+    return true;
   };
 
   const logout = () => {
@@ -138,11 +190,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const registerUser = async (userData: Omit<User, 'id' | 'status' | 'joinedDate'>, password?: string) => {
+    const trimmedEmail = userData.email.trim().toLowerCase();
+    const finalPassword = password?.trim() || 'password123';
+
+    if (password?.trim()) {
+      setLocalPasswords(prev => ({
+        ...prev,
+        [trimmedEmail]: password.trim(),
+      }));
+    }
+
     try {
       const res = await apiClient.post('/auth/register', {
         name: userData.name,
-        email: userData.email,
-        password: password || 'password123',
+        email: trimmedEmail,
+        password: finalPassword,
         role: userData.role,
         organization: userData.organization,
         location: userData.location,
@@ -160,6 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const newUser: User = {
       ...userData,
+      email: trimmedEmail,
       id: `USR-${userData.role.substring(0, 3)}-${Math.floor(1000 + Math.random() * 9000)}`,
       status: userData.role === 'CONSUMER' ? 'ACTIVE' : 'PENDING_APPROVAL',
       joinedDate: new Date().toISOString().split('T')[0],
