@@ -84,18 +84,22 @@ export const VerifyProductPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
       {/* Top Search & Audit Header Bar */}
-      <section className="bg-gradient-to-r from-[#0F766E] via-teal-50/50 to-slate-50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-white text-xs font-bold uppercase tracking-wider">
-                <ShieldCheck size={16} />
+      <section className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-emerald-950 to-teal-950 text-white py-8 sm:py-9 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/60 shadow-md">
+        {/* Subtle decorative glow orbs */}
+        <div className="absolute -top-12 -left-12 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 right-1/4 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 text-[11px] font-bold uppercase tracking-wider shadow-2xs">
+                <ShieldCheck size={14} className="text-emerald-400" />
                 <span>Consumer Provenance Audit</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 Botanical Authenticity Verification
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600">
+              <p className="text-xs sm:text-sm text-emerald-100/85 max-w-2xl leading-relaxed">
                 Cryptographic soil-to-shelf traceability verified across 5 consortium nodes on the blockchain.
               </p>
             </div>
@@ -106,6 +110,7 @@ export const VerifyProductPage: React.FC = () => {
                   onClick={() => navigate('/verify')}
                   variant="outline"
                   size="sm"
+                  className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:text-white"
                 >
                   <Search size={14} className="mr-1.5" />
                   Verify Another Batch
@@ -122,16 +127,16 @@ export const VerifyProductPage: React.FC = () => {
               <div className="w-full md:w-auto md:min-w-[420px]">
                 <form onSubmit={handleSearchSubmit} className="flex gap-2">
                   <div className="relative flex-1">
-                    <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     <Input
                       type="text"
                       placeholder="Enter Batch ID (e.g. ASH-2024-089)..."
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white text-slate-900 placeholder:text-slate-400 border-white/20 focus:border-emerald-400 shadow-sm"
                     />
                   </div>
-                  <Button type="submit" variant="botanical">
+                  <Button type="submit" variant="botanical" className="shadow-sm">
                     Verify
                   </Button>
                   <Button
@@ -139,6 +144,7 @@ export const VerifyProductPage: React.FC = () => {
                     onClick={() => setIsScannerOpen(true)}
                     variant="outline"
                     size="icon"
+                    className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:text-white"
                   >
                     <QrCode size={16} />
                   </Button>
