@@ -13,8 +13,13 @@ import {
   CheckCircle2,
   Fingerprint,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
-// Verhoeff algorithm logic for Aadhaar Validation
+// Verhoeff algorithm logic for Aadhaar Validation (keep as-is)
 const d = [
   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
@@ -92,17 +97,14 @@ export const RegisterPage: React.FC = () => {
         return;
       }
       setAadhaarError('');
-      // Simulate sending OTP via Mock third-party e-KYC sandbox API
       setShowOtpScreen(true);
     } else {
-      // Proceed without Aadhaar (if optional for this region)
       completeRegistration();
     }
   };
 
   const handleOtpVerification = (e: React.FormEvent) => {
     e.preventDefault();
-    // Sandbox Mock OTP verification (123456 is valid)
     if (otp !== '123456') {
       setOtpError('Invalid OTP. For sandbox testing, use 123456.');
       return;
@@ -132,270 +134,279 @@ export const RegisterPage: React.FC = () => {
       setIsSuccess(true);
       setShowOtpScreen(false);
     } catch {
-      // Handled in context
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-emerald-50/30 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="max-w-2xl w-full bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-        <div className="text-center space-y-1.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-900/10">
-            <Sprout size={26} />
-          </div>
-          <h2 className="text-2xl font-black tracking-tight text-slate-900">
-            Register Stakeholder Node
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600">
-            Apply for cryptographic membership on the FloraChain Botanical Traceability Network
-          </p>
-        </div>
-
-        {isSuccess ? (
-          <div className="text-center py-8 space-y-5 bg-emerald-50/70 rounded-2xl border border-emerald-200 p-6">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto border border-emerald-300">
-              <CheckCircle2 size={36} />
+    <div className="min-h-screen bg-gradient-to-b from-[#F0FDF4]/60 via-[#F0FDF4]/40 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+      <Card className="max-w-2xl w-full bg-white border-slate-200/90 rounded-3xl shadow-xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-[#0F766E] px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+              <Sprout size={24} className="text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-slate-900">Application Submitted Successfully</h3>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
-                Your <strong>{role}</strong> node profile has been queued for verification. {aadhaar ? "Your Aadhaar identity has been e-verified." : ""}
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-3">
-              <button
-                onClick={() => {
-                  switchRole(role);
-                  navigate(`/${role.toLowerCase()}/dashboard`);
-                }}
-                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-sm transition-colors cursor-pointer"
-              >
-                Open Demo Dashboard ({role})
-              </button>
-              <Link
-                to="/login"
-                className="px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold rounded-xl text-xs transition-colors"
-              >
-                Return to Sign In
-              </Link>
+              <h2 className="text-xl font-black text-white tracking-tight">
+                Register Stakeholder Node
+              </h2>
+              <p className="text-[11px] text-emerald-200">Apply for cryptographic membership</p>
             </div>
           </div>
-        ) : showOtpScreen ? (
-          <form onSubmit={handleOtpVerification} className="space-y-4 max-w-sm mx-auto bg-slate-50 p-6 rounded-2xl border border-slate-200">
-             <div className="text-center space-y-2 mb-4">
-               <Fingerprint className="mx-auto text-emerald-600" size={32} />
-               <h3 className="text-lg font-bold">Aadhaar e-KYC Verification</h3>
-               <p className="text-xs text-slate-500">An OTP has been sent to the mobile number registered with Aadhaar ending in {aadhaar.slice(-4)}.</p>
-               <p className="text-[10px] text-amber-600 bg-amber-50 p-2 rounded">Sandbox Mode: Use OTP 123456</p>
-             </div>
-             
-             <div className="space-y-1">
-                <input
+        </div>
+
+        <CardContent className="p-6 sm:p-8 space-y-6">
+          <div className="text-center space-y-1.5">
+            <div className="flex justify-center mb-2">
+              <Badge variant="botanical">Verified Network</Badge>
+              <Badge variant="outline">Cryptographic Membership</Badge>
+            </div>
+            <CardTitle className="text-2xl font-black tracking-tight text-slate-900">
+              Join the FloraChain Network
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-slate-600">
+              Apply for cryptographic membership on the FloraChain Botanical Traceability Network
+            </CardDescription>
+          </div>
+
+          {isSuccess ? (
+            <div className="text-center py-8 space-y-5 bg-emerald-50/70 rounded-2xl border border-emerald-200 p-6">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto border border-emerald-300">
+                <CheckCircle2 size={36} />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-bold text-slate-900">Application Submitted Successfully</CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
+                  Your <strong>{role}</strong> node profile has been queued for verification. {aadhaar ? "Your Aadhaar identity has been e-verified." : ""}
+                </CardDescription>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-3">
+                <Button
+                  onClick={() => {
+                    switchRole(role);
+                    navigate(`/${role.toLowerCase()}/dashboard`);
+                  }}
+                  variant="botanical"
+                >
+                  Open Demo Dashboard ({role})
+                </Button>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold rounded-xl text-xs transition-colors min-h-[44px]"
+                >
+                  Return to Sign In
+                </Link>
+              </div>
+            </div>
+          ) : showOtpScreen ? (
+            <form onSubmit={handleOtpVerification} className="space-y-4 max-w-sm mx-auto bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <div className="text-center space-y-2 mb-4">
+                <Fingerprint className="mx-auto text-[#0F766E] size={32}" />
+                <CardTitle className="text-lg font-bold">Aadhaar e-KYC Verification</CardTitle>
+                <CardDescription className="text-xs text-slate-500">
+                  An OTP has been sent to the mobile number registered with Aadhaar ending in {aadhaar.slice(-4)}.
+                </CardDescription>
+                <Alert variant="warning" className="text-left">
+                  <AlertDescription className="text-[10px]">Sandbox Mode: Use OTP 123456</AlertDescription>
+                </Alert>
+              </div>
+              
+              <div className="space-y-1">
+                <Input
                   type="text"
                   required
                   placeholder="Enter 6-digit OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   maxLength={6}
-                  className="w-full text-center tracking-widest bg-white border border-slate-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-lg font-medium text-slate-900 focus:outline-none"
+                  className="w-full text-center tracking-widest bg-white border-slate-200 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-lg font-medium"
                 />
                 {otpError && <p className="text-xs text-red-500 font-bold text-center mt-1">{otpError}</p>}
               </div>
 
-              <button
+              <Button type="submit" disabled={isLoading} variant="botanical" className="w-full">
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <span>Verify OTP & Register</span>
+                )}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setShowOtpScreen(false)}
+                variant="ghost"
+                className="w-full text-slate-500"
+              >
+                Cancel
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={initiateRegistration} className="space-y-4">
+              {/* Role Radio Group */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-800">
+                  Select Stakeholder Role & Network Tier:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {roleOptions.map((opt) => {
+                    const Icon = opt.icon;
+                    const isSelected = role === opt.role;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.role}
+                        onClick={() => setRole(opt.role)}
+                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                          isSelected
+                            ? 'bg-emerald-50 border-[#0F766E] ring-2 ring-[#0F766E]/20 text-emerald-950 font-bold'
+                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <Icon size={16} className={isSelected ? 'text-[#0F766E]' : 'text-slate-500'} />
+                          {isSelected && <span className="w-2 h-2 rounded-full bg-[#0F766E]"></span>}
+                        </div>
+                        <span className="text-xs font-bold">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Name and Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Full Name / Lead Official</label>
+                  <Input
+                    type="text"
+                    required
+                    placeholder="e.g. Rajesh Patel"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Official Email</label>
+                  <Input
+                    type="email"
+                    required
+                    placeholder="e.g. rajesh@vedicfarms.org"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Organization and Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Organization / Cluster Entity</label>
+                  <Input
+                    type="text"
+                    required
+                    placeholder={currentRoleOpt.placeholder}
+                    value={organization}
+                    onChange={(e) => setOrganization(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Physical Region / Location</label>
+                  <Input
+                    type="text"
+                    required
+                    placeholder="e.g. Madhya Pradesh, India"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              {/* Aadhaar Input */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
+                  <Fingerprint size={14} className="text-slate-500" />
+                  Aadhaar Number (Optional / e-KYC Verification)
+                </label>
+                <Input
+                  type="text"
+                  maxLength={12}
+                  placeholder="12-digit Aadhaar Number"
+                  value={aadhaar}
+                  onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, ''))}
+                />
+                {aadhaarError && <p className="text-xs text-red-500 font-bold mt-1">{aadhaarError}</p>}
+              </div>
+
+              {/* Certifications and Role-Specific Detail */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">
+                  Certifications / Standards Held (Comma separated)
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g. India Organic (NPOP), FSSAI Jaivik Bharat"
+                  value={certifications}
+                  onChange={(e) => setCertifications(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">{currentRoleOpt.extraLabel}</label>
+                <Input
+                  type="text"
+                  placeholder="Enter node specific verification details..."
+                  value={extraDetail}
+                  onChange={(e) => setExtraDetail(e.target.value)}
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Account Password</label>
+                <Input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                variant="botanical"
+                className="w-full"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>Verify OTP & Register</span>
+                    <ShieldCheck size={16} />
+                    <span>{aadhaar ? 'Verify via OTP & Submit' : 'Submit Node Accreditation Application'}</span>
+                    <ArrowRight size={16} />
                   </>
                 )}
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setShowOtpScreen(false)}
-                className="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
-              >
-                Cancel
-              </button>
-          </form>
-        ) : (
-          <form onSubmit={initiateRegistration} className="space-y-4">
-            {/* Role Radio Group */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800">
-                Select Stakeholder Role & Network Tier:
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {roleOptions.map((opt) => {
-                  const Icon = opt.icon;
-                  const isSelected = role === opt.role;
-                  return (
-                    <button
-                      type="button"
-                      key={opt.role}
-                      onClick={() => setRole(opt.role)}
-                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                        isSelected
-                          ? 'bg-emerald-50 border-emerald-600 ring-2 ring-emerald-500/20 text-emerald-950 font-bold shadow-xs'
-                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <Icon size={16} className={isSelected ? 'text-emerald-700' : 'text-slate-500'} />
-                        {isSelected && <span className="w-2 h-2 rounded-full bg-emerald-600"></span>}
-                      </div>
-                      <span className="text-xs font-bold">{opt.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+              </Button>
 
-            {/* Name and Email */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Full Name / Lead Official</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rajesh Patel"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                />
+              <div className="text-center pt-2 space-y-2">
+                <div>
+                  <Link to="/login" className="text-xs text-slate-600 hover:text-[#0F766E] font-bold">
+                    Already registered? <span className="text-[#0F766E] underline">Sign In instead</span>
+                  </Link>
+                </div>
+                <div>
+                  <Link to="/home" className="text-xs text-slate-500 hover:text-[#0F766E] font-medium">
+                    ← Back to Overview
+                  </Link>
+                </div>
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Official Email</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="e.g. rajesh@vedicfarms.org"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Organization and Location */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Organization / Cluster Entity</label>
-                <input
-                  type="text"
-                  required
-                  placeholder={currentRoleOpt.placeholder}
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Physical Region / Location</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Madhya Pradesh, India"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                />
-              </div>
-            </div>
-            
-            {/* Aadhaar Input */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
-                <Fingerprint size={14} className="text-slate-500" />
-                Aadhaar Number (Optional / e-KYC Verification)
-              </label>
-              <input
-                type="text"
-                maxLength={12}
-                placeholder="12-digit Aadhaar Number"
-                value={aadhaar}
-                onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, ''))}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-              />
-              {aadhaarError && <p className="text-xs text-red-500 font-bold mt-1">{aadhaarError}</p>}
-            </div>
-
-            {/* Certifications and Role-Specific Detail */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">
-                Certifications / Standards Held (Comma separated)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. India Organic (NPOP), FSSAI Jaivik Bharat"
-                value={certifications}
-                onChange={(e) => setCertifications(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">{currentRoleOpt.extraLabel}</label>
-              <input
-                type="text"
-                placeholder="Enter node specific verification details..."
-                value={extraDetail}
-                onChange={(e) => setExtraDetail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-              />
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Account Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <ShieldCheck size={16} />
-                  <span>{aadhaar ? 'Verify via OTP & Submit' : 'Submit Node Accreditation Application'}</span>
-                  <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-
-            <div className="text-center pt-2 space-y-2">
-              <div>
-                <Link to="/login" className="text-xs text-slate-600 hover:text-emerald-800 font-bold">
-                  Already registered? <span className="text-emerald-700 underline">Sign In instead</span>
-                </Link>
-              </div>
-              <div>
-                <Link to="/home" className="text-xs text-slate-500 hover:text-emerald-800 font-medium">
-                  ← Back to Overview
-                </Link>
-              </div>
-            </div>
-          </form>
-        )}
-      </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
