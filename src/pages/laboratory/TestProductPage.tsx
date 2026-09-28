@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
+import { ShareLabReportModal } from '../../components/verification/ShareLabReportModal';
 import {
   FlaskConical,
   ShieldCheck,
@@ -13,11 +14,12 @@ import {
   ArrowRight,
   UploadCloud,
   FileCheck,
+  Share2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const TestProductPage: React.FC = () => {
-  const { products, submitLabResult } = useBlockchain();
+  const { products, submitLabResult, getProductById } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -37,6 +39,7 @@ export const TestProductPage: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [decisionResult, setDecisionResult] = useState<'APPROVED' | 'REJECTED' | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
 
@@ -176,8 +179,17 @@ export const TestProductPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
               <button
                 type="button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-2"
+                title="Share Password-Protected QA Certificate"
+              >
+                <Share2 size={14} />
+                <span>Share Password-Protected Report</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => navigate(`/verify/${selectedProductId}`)}
-                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2"
               >
                 <span>View Public Consumer Verification</span>
                 <ArrowRight size={14} />
@@ -186,9 +198,9 @@ export const TestProductPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/distributor/dashboard')}
-                  className="px-6 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition-colors"
+                  className="px-5 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition-colors"
                 >
-                  Switch to Distributor to Create Shipment →
+                  Switch to Distributor →
                 </button>
               )}
             </div>
@@ -378,6 +390,14 @@ export const TestProductPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {isShareModalOpen && getProductById(selectedProductId) && (
+        <ShareLabReportModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          product={getProductById(selectedProductId)!}
+        />
+      )}
     </DashboardLayout>
   );
 };

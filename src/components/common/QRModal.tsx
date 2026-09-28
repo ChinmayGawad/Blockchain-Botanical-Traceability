@@ -1,17 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Modal } from './Modal';
-import { Download, Printer, Copy, Check, ExternalLink, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
+import { Download, Printer, Copy, Check, ExternalLink, ShieldCheck, Share2 } from 'lucide-react';
 import { BotanicalProduct } from '../../types';
 
 interface QRModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: BotanicalProduct;
+  onShareReport?: () => void;
 }
 
-export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product }) => {
+export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product, onShareReport }) => {
   const [copied, setCopied] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -111,6 +111,18 @@ export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product }) =>
             </button>
           </div>
         </div>
+
+        {/* Share Monograph CTA if provided */}
+        {onShareReport && (
+          <button
+            type="button"
+            onClick={onShareReport}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-sm font-semibold transition-colors shadow-2xs"
+          >
+            <Share2 size={16} className="text-emerald-700" />
+            <span>Share Password-Protected CoA Monograph</span>
+          </button>
+        )}
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3">

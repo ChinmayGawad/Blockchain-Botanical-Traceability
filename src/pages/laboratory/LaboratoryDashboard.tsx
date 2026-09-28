@@ -1,22 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { MetricCard } from '../../components/common/MetricCard';
 import { StatusBadge } from '../../components/common/StatusBadge';
+import { ShareLabReportModal } from '../../components/verification/ShareLabReportModal';
+import { BotanicalProduct } from '../../types';
 import {
   FlaskConical,
   CheckCircle2,
   XCircle,
   Clock,
   ArrowRight,
+  Share2,
 } from 'lucide-react';
 
 export const LaboratoryDashboard: React.FC = () => {
   const { products } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const [selectedShareProduct, setSelectedShareProduct] = useState<BotanicalProduct | null>(null);
 
   // Pending tests requiring QA inspection
   const pendingTests = products.filter(p => p.status === 'IN_TESTING' || p.status === 'PROCESSING');
@@ -191,13 +195,23 @@ export const LaboratoryDashboard: React.FC = () => {
                         <StatusBadge status={product.verificationState} />
                       </td>
                       <td className="px-5 py-4 text-right">
-                        <button
-                          onClick={() => navigate(`/verify/${product.id}`)}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <span>View Proof</span>
-                          <ArrowRight size={13} />
-                        </button>
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => setSelectedShareProduct(product)}
+                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                            title="Share Password-Protected QA Certificate"
+                          >
+                            <Share2 size={13} />
+                            <span>Share</span>
+                          </button>
+                          <button
+                            onClick={() => navigate(`/verify/${product.id}`)}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <span>View Proof</span>
+                            <ArrowRight size={13} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -207,6 +221,14 @@ export const LaboratoryDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {selectedShareProduct && (
+        <ShareLabReportModal
+          isOpen={!!selectedShareProduct}
+          onClose={() => setSelectedShareProduct(null)}
+          product={selectedShareProduct}
+        />
+      )}
     </DashboardLayout>
   );
 };

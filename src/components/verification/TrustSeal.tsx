@@ -1,14 +1,15 @@
 import React from 'react';
 import { VerificationState } from '../../types';
-import { ShieldCheck, ShieldAlert, ShieldX, Clock, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, ShieldX, Clock, CheckCircle2, Share2 } from 'lucide-react';
 
 interface TrustSealProps {
   state: VerificationState;
   batchId: string;
   className?: string;
+  onShare?: () => void;
 }
 
-export const TrustSeal: React.FC<TrustSealProps> = ({ state, batchId, className = '' }) => {
+export const TrustSeal: React.FC<TrustSealProps> = ({ state, batchId, className = '', onShare }) => {
   if (state === 'VERIFIED') {
     return (
       <div
@@ -33,17 +34,30 @@ export const TrustSeal: React.FC<TrustSealProps> = ({ state, batchId, className 
             </div>
           </div>
 
-          <div className="shrink-0 bg-slate-50 border border-emerald-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-1">
-            <div className="text-[10px] text-emerald-800 uppercase tracking-wider font-extrabold">
-              Consensus Batch ID
+          <div className="shrink-0 bg-slate-50 border border-emerald-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-2">
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-emerald-800 uppercase tracking-wider font-extrabold">
+                Consensus Batch ID
+              </div>
+              <div className="font-mono text-lg font-black text-slate-900 tracking-wide">
+                {batchId}
+              </div>
+              <div className="text-xs text-emerald-700 font-bold flex items-center md:justify-end gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                Quorum: 5/5 Peers Valid
+              </div>
             </div>
-            <div className="font-mono text-lg font-black text-slate-900 tracking-wide">
-              {batchId}
-            </div>
-            <div className="text-xs text-emerald-700 font-bold flex items-center md:justify-end gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              Quorum: 5/5 Peers Valid
-            </div>
+            {onShare && (
+              <button
+                type="button"
+                onClick={onShare}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                title="Share Verification & Lab Report"
+              >
+                <Share2 size={13} />
+                <span>Share Certificate</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -74,16 +88,29 @@ export const TrustSeal: React.FC<TrustSealProps> = ({ state, batchId, className 
             </div>
           </div>
 
-          <div className="shrink-0 bg-rose-50 border border-rose-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-1">
-            <div className="text-[10px] text-rose-800 uppercase tracking-wider font-extrabold">
-              Flagged Batch ID
+          <div className="shrink-0 bg-rose-50 border border-rose-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-2">
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-rose-800 uppercase tracking-wider font-extrabold">
+                Flagged Batch ID
+              </div>
+              <div className="font-mono text-lg font-black text-rose-900">
+                {batchId}
+              </div>
+              <div className="text-xs text-rose-700 font-bold">
+                Ledger State: CONTRACT_LOCKED
+              </div>
             </div>
-            <div className="font-mono text-lg font-black text-rose-900">
-              {batchId}
-            </div>
-            <div className="text-xs text-rose-700 font-bold">
-              Ledger State: CONTRACT_LOCKED
-            </div>
+            {onShare && (
+              <button
+                type="button"
+                onClick={onShare}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                title="Share Verification & Lab Report"
+              >
+                <Share2 size={13} />
+                <span>Share QA Report</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -114,16 +141,29 @@ export const TrustSeal: React.FC<TrustSealProps> = ({ state, batchId, className 
             </div>
           </div>
 
-          <div className="shrink-0 bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-1">
-            <div className="text-[10px] text-amber-800 uppercase tracking-wider font-extrabold">
-              Investigation Batch
+          <div className="shrink-0 bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-2">
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-amber-800 uppercase tracking-wider font-extrabold">
+                Investigation Batch
+              </div>
+              <div className="font-mono text-lg font-black text-amber-900">
+                {batchId}
+              </div>
+              <div className="text-xs text-amber-700 font-bold">
+                Warning: Incomplete Proof
+              </div>
             </div>
-            <div className="font-mono text-lg font-black text-amber-900">
-              {batchId}
-            </div>
-            <div className="text-xs text-amber-700 font-bold">
-              Warning: Incomplete Proof
-            </div>
+            {onShare && (
+              <button
+                type="button"
+                onClick={onShare}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                title="Share Verification & Lab Report"
+              >
+                <Share2 size={13} />
+                <span>Share Report</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -154,16 +194,29 @@ export const TrustSeal: React.FC<TrustSealProps> = ({ state, batchId, className 
           </div>
         </div>
 
-        <div className="shrink-0 bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-1">
-          <div className="text-[10px] text-indigo-800 uppercase tracking-wider font-extrabold">
-            Active Batch ID
+        <div className="shrink-0 bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-left md:text-right w-full md:w-auto space-y-2">
+          <div className="space-y-0.5">
+            <div className="text-[10px] text-indigo-800 uppercase tracking-wider font-extrabold">
+              Active Batch ID
+            </div>
+            <div className="font-mono text-lg font-black text-slate-900">
+              {batchId}
+            </div>
+            <div className="text-xs text-indigo-700 font-bold">
+              Stage: IN_PIPELINE
+            </div>
           </div>
-          <div className="font-mono text-lg font-black text-slate-900">
-            {batchId}
-          </div>
-          <div className="text-xs text-indigo-700 font-bold">
-            Stage: IN_PIPELINE
-          </div>
+          {onShare && (
+            <button
+              type="button"
+              onClick={onShare}
+              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+              title="Share Verification & Lab Report"
+            >
+              <Share2 size={13} />
+              <span>Share Report</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

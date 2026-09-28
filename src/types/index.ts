@@ -48,6 +48,7 @@ export interface LabTestParameter {
 
 export interface LabReport {
   labId: string;
+  reportId?: string;
   labName: string;
   testDate: string;
   testedBy: string;

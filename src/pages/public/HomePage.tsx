@@ -26,10 +26,13 @@ import {
   Leaf,
   Link as LinkIcon,
   Users,
+  Share2,
 } from 'lucide-react';
 import { QRScannerModal } from '../../components/verification/QRScannerModal';
+import { ShareLabReportModal } from '../../components/verification/ShareLabReportModal';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { Footer } from '../../components/layout/Footer';
+import { BotanicalProduct } from '../../types';
 
 /* ── Botanical-Blockchain Pattern Background ── */
 const BotanicalPattern: React.FC<{ className?: string }> = ({ className = '' }) => (
@@ -64,6 +67,7 @@ export const HomePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [activeStageTab, setActiveStageTab] = useState<number>(0);
+  const [shareProduct, setShareProduct] = useState<BotanicalProduct | null>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -366,20 +370,37 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 {/* CTA */}
-                <button
-                  type="button"
-                  onClick={() => navigate('/verify/BOT-2024-8901')}
-                  className="w-full py-4 mt-2 bg-[#064E3B] hover:bg-[#0F766E] text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-md relative z-10 group cursor-pointer min-h-[48px]"
-                  aria-label="Inspect full journey for ASH-2024-089"
-                >
-                  <Search size={18} aria-hidden="true" />
-                  <span>Inspect Full Journey</span>
-                  <ArrowRight
-                    size={16}
-                    className="opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                    aria-hidden="true"
-                  />
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2.5 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/verify/BOT-2024-8901')}
+                    className="flex-1 py-3.5 bg-[#064E3B] hover:bg-[#0F766E] text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-md relative z-10 group cursor-pointer min-h-[44px]"
+                    aria-label="Inspect full journey for ASH-2024-089"
+                  >
+                    <Search size={16} aria-hidden="true" />
+                    <span>Inspect Journey</span>
+                    <ArrowRight
+                      size={15}
+                      className="opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const sampleProduct = products.find(p => p.batchId === 'ASH-2024-089' || p.id === 'BOT-2024-8901') || products[0];
+                      if (sampleProduct) {
+                        setShareProduct(sampleProduct);
+                      }
+                    }}
+                    className="py-3.5 px-4 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#0F766E] border border-[#A7F3D0] rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 relative z-10 cursor-pointer min-h-[44px]"
+                    aria-label="Share CoA Lab Report"
+                    title="Share Password-Protected CoA Lab Report"
+                  >
+                    <Share2 size={16} aria-hidden="true" />
+                    <span>Share Monograph</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -620,6 +641,15 @@ export const HomePage: React.FC = () => {
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
       />
+
+      {/* Consumer Lab Report Sharing Modal */}
+      {shareProduct && (
+        <ShareLabReportModal
+          isOpen={!!shareProduct}
+          onClose={() => setShareProduct(null)}
+          product={shareProduct}
+        />
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TrustSeal } from '../../src/components/verification/TrustSeal';
 
 describe('TrustSeal Component Unit Tests', () => {
@@ -10,6 +10,15 @@ describe('TrustSeal Component Unit Tests', () => {
     expect(screen.getByText('Authentic Botanical Origin Verified')).toBeInTheDocument();
     expect(screen.getByText('ASH-2024-089')).toBeInTheDocument();
     expect(screen.getByText('Quorum: 5/5 Peers Valid')).toBeInTheDocument();
+  });
+
+  it('should trigger onShare callback when share button is clicked', () => {
+    const handleShare = vi.fn();
+    render(<TrustSeal state="VERIFIED" batchId="ASH-2024-089" onShare={handleShare} />);
+    const shareBtn = screen.getByRole('button', { name: /Share Certificate/i });
+    expect(shareBtn).toBeInTheDocument();
+    fireEvent.click(shareBtn);
+    expect(handleShare).toHaveBeenCalledTimes(1);
   });
 
   it('should render QA Rejection Alert for REJECTED state', () => {

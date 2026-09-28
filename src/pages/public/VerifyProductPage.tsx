@@ -1,37 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useBlockchain } from '../../context/BlockchainContext';
 import {
   Search,
   QrCode,
   ShieldCheck,
   MapPin,
-  Calendar,
-  Layers,
   FlaskConical,
   FileCheck,
-  Truck,
-  Store,
   AlertTriangle,
   ExternalLink,
-  Copy,
-  Check,
   Sprout,
   Share2,
-  Printer,
-  ChevronRight,
-  Info,
   CheckCircle2,
-  Sparkles,
-  ShieldAlert,
 } from 'lucide-react';
 import { TrustSeal } from '../../components/verification/TrustSeal';
 import { SupplyChainTimeline } from '../../components/timeline/SupplyChainTimeline';
 import { StatusBadge } from '../../components/common/StatusBadge';
-import { BlockchainTxBadge } from '../../components/common/BlockchainTxBadge';
 import { QRModal } from '../../components/common/QRModal';
 import { QRScannerModal } from '../../components/verification/QRScannerModal';
 import { ReportSuspiciousModal } from '../../components/verification/ReportSuspiciousModal';
+import { ShareLabReportModal } from '../../components/verification/ShareLabReportModal';
 import { Footer } from '../../components/layout/Footer';
 import { getBotanicalProductImage } from '../../utils/imageUtils';
 import confetti from 'canvas-confetti';
@@ -39,7 +28,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export const VerifyProductPage: React.FC = () => {
   const { productId } = useParams<{ productId?: string }>();
@@ -50,7 +38,7 @@ export const VerifyProductPage: React.FC = () => {
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
+  const [isShareLabReportOpen, setIsShareLabReportOpen] = useState(false);
 
   const currentProduct = productId
     ? getProductById(productId) || products.find(p => p.batchId.toLowerCase() === productId.toLowerCase())
@@ -73,12 +61,6 @@ export const VerifyProductPage: React.FC = () => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     navigate(`/verify/${searchQuery.trim()}`);
-  };
-
-  const copyShareLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   return (
@@ -106,6 +88,16 @@ export const VerifyProductPage: React.FC = () => {
 
             {currentProduct ? (
               <div className="flex items-center gap-2.5 shrink-0">
+                <Button
+                  onClick={() => setIsShareLabReportOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border-emerald-500/40 hover:text-white"
+                  title="Share Password-Protected QA Certificate"
+                >
+                  <Share2 size={14} className="mr-1.5" />
+                  Share Report
+                </Button>
                 <Button
                   onClick={() => navigate('/verify')}
                   variant="outline"
@@ -163,6 +155,7 @@ export const VerifyProductPage: React.FC = () => {
             <TrustSeal
               state={currentProduct.verificationState}
               batchId={currentProduct.batchId}
+              onShare={() => setIsShareLabReportOpen(true)}
             />
 
             {/* 2. Main 2-Column Section */}
@@ -210,11 +203,13 @@ export const VerifyProductPage: React.FC = () => {
                           Print QR Tag
                         </Button>
                         <Button
-                          onClick={copyShareLink}
+                          onClick={() => setIsShareLabReportOpen(true)}
                           variant="outline"
+                          className="w-full sm:flex-1 min-h-[48px] border-emerald-600/30 hover:bg-emerald-50 text-emerald-800 font-semibold"
+                          title="Share Password-Protected QA Monograph"
                         >
-                          {copiedLink ? <Check size={15} className="mr-2" /> : <Share2 size={15} className="mr-2" />}
-                          {copiedLink ? 'Copied' : 'Share'}
+                          <Share2 size={15} className="mr-2 text-emerald-700" />
+                          Share Report & CoA
                         </Button>
                       </div>
                     </div>
@@ -327,11 +322,25 @@ export const VerifyProductPage: React.FC = () => {
                           <span className="text-xs text-slate-500">ISO/IEC 17025 Accredited</span>
                         </div>
                       </div>
-                      {currentProduct.labReport && (
-                        <Badge variant={currentProduct.labReport.overallResult === 'APPROVED' ? 'success' : 'destructive'}>
-                          {currentProduct.labReport.overallResult}
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {currentProduct.labReport && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsShareLabReportOpen(true)}
+                            className="h-8 gap-1.5 text-xs text-indigo-700 border-indigo-200 hover:bg-indigo-50 font-semibold"
+                            title="Share Password-Protected QA Certificate"
+                          >
+                            <Share2 size={13} />
+                            <span>Share Report</span>
+                          </Button>
+                        )}
+                        {currentProduct.labReport && (
+                          <Badge variant={currentProduct.labReport.overallResult === 'APPROVED' ? 'success' : 'destructive'}>
+                            {currentProduct.labReport.overallResult}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-4">
@@ -391,6 +400,28 @@ export const VerifyProductPage: React.FC = () => {
                             <span className="truncate">{currentProduct.labReport.certificateIpfsCid}</span>
                             <ExternalLink size={14} className="shrink-0 ml-2" />
                           </a>
+                        </div>
+
+                        {/* Consumer Share CoA Callout Banner */}
+                        <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-3">
+                          <div className="space-y-0.5">
+                            <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                              <ShieldCheck size={14} className="text-emerald-600" />
+                              Consumer Verification & Export
+                            </span>
+                            <p className="text-[11px] text-emerald-800">
+                              Share this authenticated CoA with doctors, buyers, or family as a password-protected PDF or instant link.
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="botanical"
+                            onClick={() => setIsShareLabReportOpen(true)}
+                            className="shrink-0 h-8 text-xs font-semibold gap-1.5"
+                          >
+                            <Share2 size={13} />
+                            <span>Share Lab CoA</span>
+                          </Button>
                         </div>
                       </div>
                     ) : (
@@ -536,6 +567,17 @@ export const VerifyProductPage: React.FC = () => {
         <QRModal
           isOpen={isQRModalOpen}
           onClose={() => setIsQRModalOpen(false)}
+          product={currentProduct}
+          onShareReport={() => {
+            setIsQRModalOpen(false);
+            setIsShareLabReportOpen(true);
+          }}
+        />
+      )}
+      {currentProduct && (
+        <ShareLabReportModal
+          isOpen={isShareLabReportOpen}
+          onClose={() => setIsShareLabReportOpen(false)}
           product={currentProduct}
         />
       )}
