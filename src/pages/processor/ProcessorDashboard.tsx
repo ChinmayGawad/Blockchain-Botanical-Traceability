@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ArrowRight,
   MapPin,
+  Truck,
 } from 'lucide-react';
 
 export const ProcessorDashboard: React.FC = () => {
@@ -201,13 +202,23 @@ export const ProcessorDashboard: React.FC = () => {
                         <StatusBadge status={product.status} />
                       </td>
                       <td className="px-5 py-4 text-right">
-                        <button
-                          onClick={() => navigate(`/verify/${product.id}`)}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <span>Trace</span>
-                          <ArrowRight size={13} />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => navigate(`/fleet-map?batch=${product.batchId}`)}
+                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors border border-emerald-200"
+                            title="Track Live IoT Route & Moving Truck"
+                          >
+                            <Truck size={12} className="text-emerald-700" />
+                            <span>Live Map</span>
+                          </button>
+                          <button
+                            onClick={() => navigate(`/verify/${product.id}`)}
+                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <span>Trace</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

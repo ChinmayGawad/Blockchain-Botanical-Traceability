@@ -13,9 +13,11 @@ import {
   Sprout,
   Share2,
   CheckCircle2,
+  Truck,
 } from 'lucide-react';
 import { TrustSeal } from '../../components/verification/TrustSeal';
 import { SupplyChainTimeline } from '../../components/timeline/SupplyChainTimeline';
+import { SupplyChainJourneyMap } from '../../components/map/SupplyChainJourneyMap';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { QRModal } from '../../components/common/QRModal';
 import { QRScannerModal } from '../../components/verification/QRScannerModal';
@@ -39,6 +41,7 @@ export const VerifyProductPage: React.FC = () => {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isShareLabReportOpen, setIsShareLabReportOpen] = useState(false);
+  const [journeyViewMode, setJourneyViewMode] = useState<'MAP' | 'TIMELINE'>('MAP');
 
   const currentProduct = productId
     ? getProductById(productId) || products.find(p => p.batchId.toLowerCase() === productId.toLowerCase())
@@ -64,12 +67,12 @@ export const VerifyProductPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between">
       {/* Top Search & Audit Header Bar */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-emerald-950 to-teal-950 text-white py-8 sm:py-9 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/60 shadow-md">
+      <section className="relative overflow-hidden bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-950 text-foreground py-8 sm:py-9 px-4 sm:px-6 lg:px-8 border-b border-emerald-200/60 shadow-md">
         {/* Subtle decorative glow orbs */}
         <div className="absolute -top-12 -left-12 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 right-1/4 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -78,10 +81,10 @@ export const VerifyProductPage: React.FC = () => {
                 <ShieldCheck size={14} className="text-emerald-400" />
                 <span>Consumer Provenance Audit</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
                 Botanical Authenticity Verification
               </h1>
-              <p className="text-xs sm:text-sm text-emerald-100/85 max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-muted-foreground/85 max-w-2xl leading-relaxed">
                 Cryptographic soil-to-shelf traceability verified across 5 consortium nodes on the blockchain.
               </p>
             </div>
@@ -119,13 +122,13 @@ export const VerifyProductPage: React.FC = () => {
               <div className="w-full md:w-auto md:min-w-[420px]">
                 <form onSubmit={handleSearchSubmit} className="flex gap-2">
                   <div className="relative flex-1">
-                    <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
                       type="text"
                       placeholder="Enter Batch ID (e.g. ASH-2024-089)..."
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-white text-slate-900 placeholder:text-slate-400 border-white/20 focus:border-emerald-400 shadow-sm"
+                      className="pl-10 bg-white text-muted-foreground placeholder:text-muted-foreground/60 border-emerald-200/40 focus:border-emerald-400 shadow-sm"
                     />
                   </div>
                   <Button type="submit" variant="botanical" className="shadow-sm">
@@ -182,7 +185,7 @@ export const VerifyProductPage: React.FC = () => {
                   <CardContent className="space-y-6">
                     {/* Product Image & Quick Actions */}
                     <div className="space-y-4">
-                      <div className="relative rounded-2xl overflow-hidden bg-slate-900 h-56 sm:h-64 lg:h-64 border border-slate-100 shadow-inner">
+                      <div className="relative rounded-2xl overflow-hidden bg-muted-foreground/5 h-56 sm:h-64 lg:h-64 border border-muted-foreground/20 shadow-inner">
                         <img
                           src={getBotanicalProductImage(currentProduct)}
                           alt={currentProduct.name}
@@ -215,9 +218,9 @@ export const VerifyProductPage: React.FC = () => {
                     </div>
 
                     {/* Title & Description */}
-                    <div className="space-y-2.5 pt-2 border-t border-slate-100">
+                    <div className="space-y-2.5 pt-2 border-t border-muted-foreground/20">
                       <div>
-                        <CardTitle className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        <CardTitle className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight leading-tight">
                           {currentProduct.name}
                         </CardTitle>
                         <div className="mt-1.5">
@@ -226,15 +229,15 @@ export const VerifyProductPage: React.FC = () => {
                           </Badge>
                         </div>
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                         {currentProduct.description}
                       </p>
                     </div>
 
                     {/* Active Phytochemical Compounds Pills */}
                     {currentProduct.activeCompounds && currentProduct.activeCompounds.length > 0 && (
-                      <div className="pt-2 border-t border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                      <div className="pt-2 border-t border-muted-foreground/20">
+                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider block mb-2">
                           Phytochemical Assay Markers:
                         </span>
                         <div className="flex flex-wrap gap-2">
@@ -249,36 +252,36 @@ export const VerifyProductPage: React.FC = () => {
                     )}
 
                     {/* Core Metrics Grid */}
-                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
-                      <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">
+                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-muted-foreground/20">
+                      <div className="bg-muted-foreground/5 p-3.5 rounded-2xl border border-muted-foreground/20">
+                        <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider block mb-1">
                           Product ID
                         </span>
-                        <span className="font-mono text-xs font-bold text-slate-800 break-all">
+                        <span className="font-mono text-xs font-bold text-foreground break-all">
                           {currentProduct.id}
                         </span>
                       </div>
-                      <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">
+                      <div className="bg-muted-foreground/5 p-3.5 rounded-2xl border border-muted-foreground/20">
+                        <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider block mb-1">
                           Batch Number
                         </span>
                         <span className="font-mono text-xs font-bold text-[#0F766E]">
                           #{currentProduct.batchId}
                         </span>
                       </div>
-                      <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">
+                      <div className="bg-muted-foreground/5 p-3.5 rounded-2xl border border-muted-foreground/20">
+                        <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider block mb-1">
                           Cultivation Method
                         </span>
-                        <span className="text-xs font-bold text-slate-800">
+                        <span className="text-xs font-bold text-muted-foreground/80">
                           {currentProduct.cultivationMethod}
                         </span>
                       </div>
-                      <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">
+                      <div className="bg-muted-foreground/5 p-3.5 rounded-2xl border border-muted-foreground/20">
+                        <span className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-wider block mb-1">
                           Harvest Date
                         </span>
-                        <span className="text-xs font-bold text-slate-800">
+                        <span className="text-xs font-bold text-muted-foreground/80">
                           {new Date(currentProduct.harvestDate).toLocaleDateString()}
                         </span>
                       </div>
@@ -289,29 +292,94 @@ export const VerifyProductPage: React.FC = () => {
 
               {/* Right Column: Supply Chain Journey, Lab QA Report & Farm Geo-Origin */}
               <div className="lg:col-span-6 space-y-6">
-                {/* Complete Supply Chain Journey Stepper */}
-                <Card className="overflow-hidden">
-                  <CardHeader className="pb-3 border-b border-slate-100">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-2xl bg-[#0F766E] text-white">
-                        <Sprout size={20} />
+                {/* Interactive Supply Chain Journey & Map */}
+                <Card className="overflow-hidden border-muted-foreground/20 shadow-sm">
+                  <CardHeader className="pb-3 border-b border-muted-foreground/20 bg-muted-foreground/5">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-emerald-700 text-white shadow-2xs">
+                          <Truck size={18} />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <CardTitle className="text-base sm:text-lg text-foreground leading-snug">
+                              Supply Chain Transit Journey
+                            </CardTitle>
+                            <Badge variant="outline" className="text-[10px] text-muted-foreground/80 border-muted-foreground/40 font-mono">
+                              60 FPS LIVE
+                            </Badge>
+                          </div>
+                          <CardDescription className="text-xs text-muted-foreground/60 leading-normal block">
+                            {journeyViewMode === 'MAP'
+                              ? 'Interactive route map with animated truck. Click truck to inspect IoT telematics.'
+                              : 'Complete on-chain cryptographic ledger event audit log.'}
+                          </CardDescription>
+                        </div>
                       </div>
-                      <div>
-                        <CardTitle className="text-base sm:text-lg">Complete Supply Chain Journey</CardTitle>
-                        <CardDescription className="text-xs">
-                          Click on each stage to inspect GPS origin, processing yield, and blockchain proofs
-                        </CardDescription>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        {/* View Switcher Toggle */}
+                        <div className="flex items-center p-0.5 rounded-xl bg-muted-foreground/10 border border-muted-foreground/20 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setJourneyViewMode('MAP')}
+                            className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                              journeyViewMode === 'MAP'
+                                ? 'bg-white text-foreground shadow-xs'
+                                : 'text-muted-foreground/60 hover:text-foreground'
+                            }`}
+                          >
+                            🗺️ Map
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setJourneyViewMode('TIMELINE')}
+                            className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                              journeyViewMode === 'TIMELINE'
+                                ? 'bg-white text-foreground shadow-xs'
+                                : 'text-muted-foreground/60 hover:text-foreground'
+                            }`}
+                          >
+                            📑 Ledger
+                          </button>
+                        </div>
+
+                        {/* Direct link to Command Deck */}
+                        <Button
+                          onClick={() => navigate(`/fleet-map?batch=${currentProduct.batchId}`)}
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs font-semibold bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 shrink-0"
+                          title="Open Full-Screen Fleet & Provenance Command Center"
+                        >
+                          <span>Command Deck</span>
+                          <ExternalLink size={12} className="ml-1" />
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-4">
-                    <SupplyChainTimeline timeline={currentProduct.timeline} />
+                  <CardContent className="p-0 sm:p-4">
+                    {journeyViewMode === 'MAP' ? (
+                      <div className="p-2 sm:p-0">
+                        <SupplyChainJourneyMap
+                          batchId={currentProduct.batchId}
+                          productName={currentProduct.name}
+                          botanicalName={currentProduct.botanicalName}
+                          theme="light"
+                          productData={currentProduct}
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-4 sm:p-2">
+                        <SupplyChainTimeline timeline={currentProduct.timeline} />
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
                 {/* Quality Lab Report */}
                 <Card className="overflow-hidden">
-                  <CardHeader className="pb-3 border-b border-slate-100">
+                  <CardHeader className="pb-3 border-b border-muted-foreground/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="p-2.5 rounded-2xl bg-indigo-100 text-indigo-700">
@@ -360,14 +428,14 @@ export const VerifyProductPage: React.FC = () => {
 
                         {/* Parameters Table */}
                         <div className="space-y-2">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">
                             Key Assay Parameters:
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             {currentProduct.labReport.parameters.map((param, idx) => (
                               <div
                                 key={idx}
-                                className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100"
+                                className="flex items-center justify-between p-3 rounded-2xl border border-muted-foreground/20"
                               >
                                 <div>
                                   <span className="font-bold text-slate-900 text-xs block">{param.name}</span>
@@ -387,15 +455,15 @@ export const VerifyProductPage: React.FC = () => {
                         </div>
 
                         {/* IPFS Certificate Hash */}
-                        <div className="pt-2 border-t border-slate-100">
-                          <span className="text-[10px] text-slate-400 uppercase font-semibold block mb-1.5">
+                        <div className="pt-2 border-t border-muted-foreground/20">
+                          <span className="text-[10px] text-muted-foreground/60 uppercase font-semibold block mb-1.5">
                             IPFS Monograph Certificate Hash:
                           </span>
                           <a
                             href={`https://ipfs.io/ipfs/${currentProduct.labReport.certificateIpfsCid}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-center justify-between p-3 rounded-xl bg-slate-950 text-emerald-400 font-mono text-xs hover:bg-slate-900 transition-colors"
+                            className="flex items-center justify-between p-3 rounded-xl bg-muted-foreground/95 text-emerald-400 font-mono text-xs hover:bg-muted-foreground/90 transition-colors"
                           >
                             <span className="truncate">{currentProduct.labReport.certificateIpfsCid}</span>
                             <ExternalLink size={14} className="shrink-0 ml-2" />
@@ -425,7 +493,7 @@ export const VerifyProductPage: React.FC = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="py-6 text-center text-slate-400 text-xs">
+                      <div className="py-6 text-center text-muted-foreground/60 text-xs">
                         Laboratory inspection currently in progress for this batch.
                       </div>
                     )}
@@ -434,7 +502,7 @@ export const VerifyProductPage: React.FC = () => {
 
                 {/* Farm Origin & Soil Map Card */}
                 <Card className="overflow-hidden">
-                  <CardHeader className="pb-3 border-b border-slate-100">
+                  <CardHeader className="pb-3 border-b border-muted-foreground/20">
                     <div className="flex items-center gap-2.5">
                       <div className="p-2.5 rounded-2xl bg-[#0F766E] text-white">
                         <MapPin size={20} />
@@ -448,15 +516,15 @@ export const VerifyProductPage: React.FC = () => {
                   <CardContent className="pt-4">
                     <div className="space-y-3 text-xs">
                       <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold block mb-0.5">Farmer / Cooperative:</span>
-                        <span className="font-bold text-slate-900 text-sm">{currentProduct.farmerName} ({currentProduct.farmerOrg})</span>
+                        <span className="text-muted-foreground/60 text-[10px] uppercase font-bold block mb-0.5">Farmer / Cooperative:</span>
+                        <span className="font-bold text-foreground text-sm">{currentProduct.farmerName} ({currentProduct.farmerOrg})</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-bold block mb-0.5">Farm Location:</span>
-                        <span className="font-bold text-slate-900 text-sm">{currentProduct.farmLocation}</span>
+                        <span className="text-muted-foreground/60 text-[10px] uppercase font-bold block mb-0.5">Farm Location:</span>
+                        <span className="font-bold text-foreground text-sm">{currentProduct.farmLocation}</span>
                       </div>
-                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between">
-                        <span className="font-mono text-slate-700 text-xs font-semibold">
+                      <div className="bg-muted-foreground/5 p-3 rounded-xl border border-muted-foreground/20 flex items-center justify-between">
+                        <span className="font-mono text-muted-foreground/80 text-xs font-semibold">
                           {currentProduct.gpsCoordinates.lat.toFixed(4)}° N, {currentProduct.gpsCoordinates.lng.toFixed(4)}° E
                         </span>
                         <a
@@ -471,8 +539,8 @@ export const VerifyProductPage: React.FC = () => {
                       </div>
 
                       {currentProduct.certificates.length > 0 && (
-                        <div className="pt-3 border-t border-slate-100 space-y-2.5">
-                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Verified Organic Certificates:</span>
+                        <div className="pt-3 border-t border-muted-foreground/20 space-y-2.5">
+                          <span className="text-[10px] text-muted-foreground/60 uppercase font-bold block">Verified Organic Certificates:</span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             {currentProduct.certificates.map(cert => (
                               <div
@@ -505,15 +573,15 @@ export const VerifyProductPage: React.FC = () => {
               <QrCode size={40} />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground">
                 Enter Batch Code or Scan QR
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+              <p className="text-xs sm:text-sm text-muted-foreground/50 max-w-md mx-auto">
                 Scan the QR code printed on your botanical package or type the Batch ID to load full immutable provenance.
               </p>
             </div>
 
-            <Card className="p-6 sm:p-8 rounded-3xl border-slate-200 shadow-sm">
+            <Card className="p-6 sm:p-8 rounded-3xl border-muted-foreground/20 shadow-sm">
               <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
                 <Input
                   type="text"
@@ -536,14 +604,14 @@ export const VerifyProductPage: React.FC = () => {
 
             {/* Quick Demo Batches Selection */}
             <div className="space-y-3 text-left">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">
                 Or inspect one of our sample batches:
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {products.map(p => (
                   <Card
                     key={p.id}
-                    className="p-4 rounded-2xl border-slate-200 hover:border-[#0F766E] hover:bg-emerald-50/40 transition-all cursor-pointer shadow-sm"
+                    className="p-4 rounded-2xl border-muted-foreground/20 hover:border-[#0F766E] hover:bg-emerald-50/40 transition-all cursor-pointer shadow-sm"
                     onClick={() => navigate(`/verify/${p.id}`)}
                   >
                     <CardContent className="p-0">
@@ -551,8 +619,8 @@ export const VerifyProductPage: React.FC = () => {
                         <Badge variant="botanical" className="font-mono">#{p.batchId}</Badge>
                         <StatusBadge status={p.verificationState} size="sm" />
                       </div>
-                      <div className="font-bold text-slate-900 text-sm group-hover:text-[#0F766E]">{p.name}</div>
-                      <div className="text-xs text-slate-500 italic mt-0.5">{p.botanicalName}</div>
+                      <div className="font-bold text-foreground text-sm group-hover:text-[#0F766E]">{p.name}</div>
+                      <div className="text-xs text-muted-foreground/50 italic mt-0.5">{p.botanicalName}</div>
                     </CardContent>
                   </Card>
                 ))}

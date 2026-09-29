@@ -37,6 +37,11 @@ import { CreateShipmentPage } from '../pages/distributor/CreateShipmentPage';
 import { RetailerDashboard } from '../pages/retailer/RetailerDashboard';
 import { GenerateQRPage } from '../pages/retailer/GenerateQRPage';
 
+// Fleet Command & Animated Journey Map Pages (Option 3 & Showcase)
+import { DemoFleetCommandPage } from '../pages/demo/DemoFleetCommandPage';
+import { DemoVerificationHeroPage } from '../pages/demo/DemoVerificationHeroPage';
+import { DemoShowcaseHubPage } from '../pages/demo/DemoShowcaseHubPage';
+
 // Root Route Handler: Opens Authentication first when launching the web app
 const RootEntryPage: React.FC = () => {
   const { isAuthenticated, role } = useAuth();
@@ -60,6 +65,13 @@ export const AppRoutes: React.FC = () => {
       <Route path="/home" element={<HomePage />} />
       <Route path="/verify" element={<VerifyProductPage />} />
       <Route path="/verify/:productId" element={<VerifyProductPage />} />
+
+      {/* Fleet Command & Interactive Journey Map (Option 3) */}
+      <Route path="/fleet-map" element={<DemoFleetCommandPage />} />
+      <Route path="/demo/fleet-map" element={<DemoFleetCommandPage />} />
+      <Route path="/demo/verify-map" element={<DemoVerificationHeroPage />} />
+      <Route path="/demo/verify-map/:productId" element={<DemoVerificationHeroPage />} />
+      <Route path="/demo" element={<DemoShowcaseHubPage />} />
 
       {/* Admin Portal (Strictly for ADMIN only) */}
       <Route

@@ -85,6 +85,7 @@ export const Navbar: React.FC = () => {
   const publicLinks = [
     { to: '/home', label: 'Overview' },
     { to: '/verify', label: 'Verify Batch' },
+    { to: '/fleet-map', label: 'Fleet Command', icon: Truck, isLive: true },
     { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks },
   ];
 
@@ -245,6 +246,12 @@ export const Navbar: React.FC = () => {
                     >
                       {Icon && <Icon size={14} className={isActive ? 'text-emerald-700' : 'text-slate-500'} />}
                       <span>{link.label}</span>
+                      {'isLive' in link && link.isLive && (
+                        <span className="relative flex h-1.5 w-1.5 ml-0.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                        </span>
+                      )}
                     </Link>
                   );
                 })}

@@ -79,6 +79,13 @@
     --border: 166 50% 16%;
     --input: 166 50% 16%;
     --ring: 160 84% 39%;
+
+    --background-dark: #022c22;
+    --foreground-dark: #ecfdf5;
+    --primary-dark: #10b981;
+    --accent-dark: #34d399;
+    --border-dark: #059669;
+    --muted-foreground-dark: #a7f3d0;
   }
 
   * {
