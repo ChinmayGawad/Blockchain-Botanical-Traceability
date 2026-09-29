@@ -141,7 +141,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all shadow-2xs">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all shadow-xs">
         {/* Simple, Readable Network Ticker + Demo Login Toggle */}
         <div className="h-9 bg-slate-900 text-slate-300 text-xs px-3 sm:px-6 flex items-center border-b border-slate-800 overflow-hidden">
           <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 sm:gap-3">
