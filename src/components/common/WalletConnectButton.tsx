@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { HARDHAT_DEMO_ACCOUNTS, getAddressExplorerUrl } from '../../services/web3Service';
 import {
@@ -91,17 +92,29 @@ export const WalletConnectButton: React.FC = () => {
   const contractExplorerUrl = getAddressExplorerUrl(networkStats.contractAddress);
 
   const modalJSX = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      {/* Dimmed backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-        onClick={() => setShowModal(false)}
-      />
+    <AnimatePresence>
+      {showModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          {/* Dimmed backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+            onClick={() => setShowModal(false)}
+          />
 
-      {/* Modal Card */}
-      <div className="relative bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border border-slate-200 z-10 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
+          {/* Modal Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="relative bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border border-slate-200 z-10 overflow-hidden my-auto max-h-[92vh] flex flex-col"
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-sm shadow-emerald-900/10">
               <Cpu size={22} />
@@ -312,8 +325,10 @@ export const WalletConnectButton: React.FC = () => {
             Done
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
+      )}
+    </AnimatePresence>
   );
 
   return (
@@ -345,7 +360,7 @@ export const WalletConnectButton: React.FC = () => {
         </button>
       )}
 
-      {showModal && createPortal(modalJSX, document.body)}
+      {createPortal(modalJSX, document.body)}
     </>
   );
 };

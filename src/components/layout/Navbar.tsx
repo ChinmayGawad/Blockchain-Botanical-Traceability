@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -311,13 +311,21 @@ export const Navbar: React.FC = () => {
                   <ChevronDown size={14} className={`text-slate-400 transition-transform duration-150 ${isUserDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
+                <AnimatePresence>
                 {isUserDropdownOpen && (
                   <>
                     <div
                       className="fixed inset-0 z-40"
                       onClick={() => setIsUserDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      style={{ transformOrigin: 'top right' }}
+                      className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 p-3.5 space-y-3"
+                    >
                       {/* Identity Card */}
                       <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
                         <div className="flex items-center justify-between">
@@ -371,9 +379,10 @@ export const Navbar: React.FC = () => {
                           <span className="whitespace-nowrap">Sign Out of {role} Node</span>
                         </button>
                       </div>
-                    </div>
+                    </motion.div>
                   </>
                 )}
+                </AnimatePresence>
               </div>
             ) : (
               <Link
@@ -388,16 +397,28 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && createPortal(
-          <div className="md:hidden fixed inset-0 z-[9999] flex">
-            {/* Backdrop */}
-            <div 
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-            {/* Drawer */}
-            <div className="relative w-4/5 max-w-sm bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-200">
-              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        {createPortal(
+          <AnimatePresence>
+          {isMobileMenuOpen && (
+            <div className="md:hidden fixed inset-0 z-[9999] flex">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm"
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+              {/* Drawer */}
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative w-4/5 max-w-sm bg-white h-full shadow-2xl flex flex-col z-10"
+              >
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center">
                     <Sprout size={16} />
@@ -555,6 +576,7 @@ export const Navbar: React.FC = () => {
                     </button>
                   </div>
                 </div>
+                </div>
 
                 {/* Account Action: Sign In or Sign Out */}
                 <div className="pt-2 border-t border-slate-100">
@@ -580,9 +602,10 @@ export const Navbar: React.FC = () => {
                     </Link>
                   )}
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>,
+          )}
+          </AnimatePresence>,
           document.body
         )}
       </header>
