@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import {
   Sprout,
@@ -169,39 +170,62 @@ export const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col justify-between">
       {/* ════════════════ HERO SECTION ════════════════ */}
-      <section className="relative overflow-hidden bg-[#F0FDF4] pt-12 sm:pt-16 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 border-b border-[#CCFCDE]">
+      <section className="relative overflow-hidden pt-12 sm:pt-20 pb-24 sm:pb-32 px-4 sm:px-6 lg:px-8">
         <BotanicalPattern />
 
         <div className="relative max-w-7xl mx-auto z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* ── Left Content ── */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, staggerChildren: 0.15 }}
+              className="lg:col-span-7 space-y-6 sm:space-y-8"
+            >
               {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0F766E]/10 text-[#0F766E] border border-[#0F766E]/20 text-[13px] font-bold">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse" />
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-emerald-900 border border-emerald-500/30 text-[13px] font-bold shadow-glow hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
                 <span>Decentralized Botanical Provenance Ledger</span>
-              </div>
+              </motion.div>
 
               {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black text-[#064E3B] tracking-tight leading-[1.1]">
+              <motion.h1 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl sm:text-6xl xl:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]"
+              >
                 Soil to Shelf.
                 <br />
-                <span className="text-[#0F766E]">Cryptographically Verified.</span>
-              </h1>
+                <span className="text-gradient">Cryptographically Verified.</span>
+              </motion.h1>
 
               {/* Sub-copy */}
-              <p className="text-base sm:text-lg text-[#065F46] max-w-2xl leading-relaxed">
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-base sm:text-lg text-[#065F46] max-w-2xl leading-relaxed"
+              >
                 FloraChain unites farmers, bio-processors, testing laboratories,
                 distributors, and apothecaries into an immutable blockchain
                 network to eliminate botanical adulteration and build genuine
                 customer trust.
-              </p>
+              </motion.p>
 
               {/* ── Search Bar ── */}
-              <div className="pt-2 w-full max-w-xl">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="pt-2 w-full max-w-xl"
+              >
                 <form
                   onSubmit={handleSearch}
-                  className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#CCFCDE] shadow-sm p-1.5 focus-within:ring-2 focus-within:ring-[#0F766E] focus-within:border-transparent transition-all flex flex-col sm:flex-row gap-2"
+                  className="glass-card rounded-3xl border border-white/50 p-2 focus-within:ring-2 focus-within:ring-emerald-500/50 transition-all flex flex-col sm:flex-row gap-2 shadow-glass hover:shadow-[0_8px_32px_rgba(15,118,110,0.25)]"
                 >
                   <label htmlFor="hero-search" className="sr-only">
                     Search by Batch ID
@@ -227,14 +251,14 @@ export const HomePage: React.FC = () => {
                       type="button"
                       onClick={() => setIsScannerOpen(true)}
                       aria-label="Scan QR Code"
-                      className="flex-1 sm:flex-none px-4 bg-[#F0FDF4] hover:bg-[#CCFCDE] text-[#0F766E] rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors border border-[#0F766E]/20 cursor-pointer min-h-[44px]"
+                      className="flex-1 sm:flex-none px-4 glass-panel hover:bg-white/90 text-emerald-900 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all border border-emerald-500/20 cursor-pointer min-h-[44px]"
                     >
                       <QrCode size={18} aria-hidden="true" />
                       <span className="sm:hidden">Scan</span>
                     </button>
                     <button
                       type="submit"
-                      className="flex-[2] sm:flex-none px-6 bg-[#0F766E] hover:bg-[#115E59] active:bg-[#0D5F56] text-white rounded-xl text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 group cursor-pointer min-h-[44px]"
+                      className="flex-[2] sm:flex-none px-8 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-2xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] flex items-center justify-center gap-2 group cursor-pointer min-h-[44px]"
                     >
                       <span>Verify</span>
                       <ArrowRight
@@ -245,7 +269,7 @@ export const HomePage: React.FC = () => {
                     </button>
                   </div>
                 </form>
-              </div>
+              </motion.div>
 
               {/* Quick Sample Links */}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-2 text-sm">
@@ -275,7 +299,7 @@ export const HomePage: React.FC = () => {
                   NEM-2024-012
                 </button>
               </div>
-            </div>
+            </motion.div>
 
             {/* ── Right Card: Live Verified Batch ── */}
             <div className="lg:col-span-5 relative group">

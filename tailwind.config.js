@@ -88,9 +88,12 @@ export default {
       },
       boxShadow: {
         'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
-        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
-        'card-hover': '0 12px 30px -4px rgba(15, 118, 110, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.04)',
+        'card': '0 8px 30px rgba(0, 0, 0, 0.04), 0 4px 10px rgba(0, 0, 0, 0.02)',
+        'card-hover': '0 20px 40px rgba(15, 118, 110, 0.1), 0 8px 16px rgba(0, 0, 0, 0.04)',
         'modal': '0 25px 50px -12px rgba(6, 78, 59, 0.25)',
+        'glass': '0 8px 32px 0 rgba(15, 118, 110, 0.15)',
+        'glass-sm': '0 4px 16px 0 rgba(15, 118, 110, 0.1)',
+        'glow': '0 0 20px rgba(16, 185, 129, 0.4)',
       },
       keyframes: {
         'accordion-down': {
@@ -101,11 +104,32 @@ export default {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'blob': {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in-up': 'fade-in-up 0.4s ease-out forwards',
+        'blob': 'blob 7s infinite',
+        'float': 'float 3s ease-in-out infinite',
       },
+      backgroundImage: {
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%)',
+        'dark-glass-gradient': 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.4) 100%)',
+      }
     },
   },
   plugins: [],

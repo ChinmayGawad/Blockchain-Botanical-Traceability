@@ -2,6 +2,7 @@ import React from 'react';
 import { Sidebar } from './Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { AlertCircle, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -64,7 +65,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </div>
 
         {/* Inner Page Content Canvas */}
-        <div className="space-y-6">{children}</div>
+        <motion.div 
+          key={window.location.pathname}
+          initial={{ opacity: 0, scale: 0.99 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="space-y-6"
+        >
+          {children}
+        </motion.div>
       </main>
     </div>
   );

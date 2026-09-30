@@ -4,59 +4,59 @@
 
 @layer base {
   :root {
-    --background: 138 76% 97%; /* #F0FDF4 Soft mint */
-    --foreground: 166 84% 16%; /* #064E3B Deep botanical */
+    --background: 140 60% 98%; /* Softer mint-white #f4fbf7 */
+    --foreground: 166 84% 12%; /* Deeper, richer botanical #04382a */
 
     --card: 0 0% 100%;
-    --card-foreground: 166 84% 16%;
+    --card-foreground: 166 84% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 166 84% 16%;
+    --popover-foreground: 166 84% 12%;
 
-    --primary: 173 78% 26%; /* #0F766E Teal primary */
+    --primary: 168 80% 23%; /* Sleek dark teal #0b675e */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 174 71% 22%;
+    --primary-hover: 168 70% 19%;
 
-    --secondary: 160 84% 39%; /* #10B981 Emerald accent */
+    --secondary: 156 80% 45%; /* Vibrant emerald accent #17cf87 */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 150 20% 94%;
-    --muted-foreground: 158 13% 42%;
+    --muted: 150 30% 95%;
+    --muted-foreground: 158 20% 45%;
 
-    --accent: 160 84% 39%;
+    --accent: 156 80% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 145 63% 89%; /* #CCFCDE */
-    --input: 145 63% 89%;
-    --ring: 173 78% 26%;
+    --border: 145 50% 90%;
+    --input: 145 50% 90%;
+    --ring: 168 80% 23%;
 
-    --radius: 1rem;
+    --radius: 1.25rem; /* Larger, softer border radii */
 
     /* Semantic UI tokens */
-    --color-primary: #0F766E;
-    --color-primary-hover: #115E59;
-    --color-primary-active: #0D5F56;
-    --color-accent: #10B981;
-    --color-accent-hover: #059669;
-    --color-background: #F0FDF4;
+    --color-primary: #0b675e;
+    --color-primary-hover: #084f48;
+    --color-primary-active: #06403a;
+    --color-accent: #17cf87;
+    --color-accent-hover: #12ab6e;
+    --color-background: #f4fbf7;
     --color-card: #ffffff;
-    --color-border: #CCFCDE;
-    --color-border-muted: #A7F3D0;
-    --color-text-primary: #064E3B;
-    --color-text-secondary: #065F46;
-    --color-text-muted: #5F7A6B;
-    --color-text-faint: #8A9B82;
-    --color-success: #16A34A;
-    --color-success-bg: #ECFDF5;
-    --color-warning: #D97706;
-    --color-warning-bg: #FFF7ED;
-    --color-error: #DC2626;
-    --color-error-bg: #FEF2F2;
-    --color-info: #0284C7;
-    --color-info-bg: #EFF6FF;
+    --color-border: #e2f5ea;
+    --color-border-muted: #c1ebce;
+    --color-text-primary: #04382a;
+    --color-text-secondary: #0a4f3f;
+    --color-text-muted: #648679;
+    --color-text-faint: #92a89f;
+    --color-success: #10b981;
+    --color-success-bg: #ecfdf5;
+    --color-warning: #f59e0b;
+    --color-warning-bg: #fffbeb;
+    --color-error: #ef4444;
+    --color-error-bg: #fef2f2;
+    --color-info: #0ea5e9;
+    --color-info-bg: #f0f9ff;
   }
 
   .dark {
@@ -204,4 +204,69 @@ button:disabled,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-lg border border-white/40 shadow-glass;
+}
+
+.dark .glass-panel {
+  @apply bg-slate-900/70 backdrop-blur-lg border border-slate-700/50 shadow-glass;
+}
+
+.glass-card {
+  @apply bg-glass-gradient backdrop-blur-md border border-white/50 shadow-glass-sm;
+}
+
+.dark .glass-card {
+  @apply bg-dark-glass-gradient backdrop-blur-md border border-slate-700/50 shadow-glass-sm;
+}
+
+.glass-nav {
+  @apply bg-white/80 backdrop-blur-xl border-b border-white/40 shadow-sm supports-[backdrop-filter]:bg-white/60;
+}
+
+.dark .glass-nav {
+  @apply bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/60 shadow-sm supports-[backdrop-filter]:bg-slate-900/60;
+}
+
+/* Stunning Gradient Text */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+}
+.text-gradient-alt {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-emerald-400;
+}
+
+/* Beautiful Floating Blob Background */
+.bg-blobs {
+  position: relative;
+  overflow: clip;
+}
+.bg-blobs::before,
+.bg-blobs::after {
+  content: "";
+  position: absolute;
+  filter: blur(80px);
+  z-index: -1;
+  opacity: 0.4;
+  animation: blob 10s infinite alternate ease-in-out;
+}
+.bg-blobs::before {
+  background: var(--color-accent);
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+}
+.bg-blobs::after {
+  background: var(--color-primary);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  bottom: -50px;
+  left: -50px;
+  animation-delay: 2s;
 }

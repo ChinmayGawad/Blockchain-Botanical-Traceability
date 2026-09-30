@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -142,7 +143,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all shadow-xs">
+      <header className="sticky top-0 z-50 glass-nav transition-all duration-300">
         {/* Simple, Readable Network Ticker + Demo Login Toggle */}
         <div className="h-9 bg-slate-900 text-slate-300 text-xs px-3 sm:px-6 flex items-center border-b border-slate-800 overflow-hidden">
           <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 sm:gap-3">
@@ -214,19 +215,21 @@ export const Navbar: React.FC = () => {
             >
               <Menu size={22} />
             </button>
-            <Link to={isAuthenticated && role !== 'CONSUMER' ? `/${role.toLowerCase()}/dashboard` : '/home'} className="flex items-center gap-2 sm:gap-3 group min-w-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-900/10 group-hover:scale-105 transition-transform shrink-0">
-                <Sprout size={20} />
-              </div>
-              <div className="min-w-0">
-                <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center whitespace-nowrap">
-                  Flora<span className="text-emerald-700">Chain</span>
-                </span>
-                <span className="hidden xs:block text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-emerald-800 -mt-0.5 whitespace-nowrap truncate max-w-[130px] sm:max-w-none">
-                  {isAuthenticated && role !== 'CONSUMER' ? `${role} Portal` : 'Botanical Traceability'}
-                </span>
-              </div>
-            </Link>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
+              <Link to={isAuthenticated && role !== 'CONSUMER' ? `/${role.toLowerCase()}/dashboard` : '/home'} className="flex items-center gap-2 sm:gap-3 group min-w-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-900/10 group-hover:scale-105 transition-transform shrink-0">
+                  <Sprout size={20} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-base sm:text-lg font-black tracking-tight flex items-center whitespace-nowrap">
+                    <span className="text-slate-900 dark:text-white">Flora</span><span className="text-gradient">Chain</span>
+                  </span>
+                  <span className="hidden xs:block text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-emerald-800 -mt-0.5 whitespace-nowrap truncate max-w-[130px] sm:max-w-none">
+                    {isAuthenticated && role !== 'CONSUMER' ? `${role} Portal` : 'Botanical Traceability'}
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
 
             {/* Public-only Navigation Links (when NOT inside a dashboard) */}
             {(!isAuthenticated || role === 'CONSUMER') && (
@@ -289,10 +292,10 @@ export const Navbar: React.FC = () => {
             {/* Quick QR Scanner */}
             <button
               onClick={() => setIsQRScannerOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition-all shadow-2xs group cursor-pointer shrink-0 whitespace-nowrap"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/50 rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] group cursor-pointer shrink-0 whitespace-nowrap"
               title="Launch QR Camera Scanner"
             >
-              <QrCode size={15} className="text-emerald-700 group-hover:scale-110 transition-transform shrink-0" />
+              <QrCode size={15} className="text-emerald-50 group-hover:scale-110 transition-transform shrink-0" />
               <span className="hidden md:inline whitespace-nowrap">Scan QR</span>
             </button>
 

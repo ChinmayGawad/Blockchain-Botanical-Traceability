@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import {
   Search,
@@ -153,20 +154,34 @@ export const VerifyProductPage: React.FC = () => {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full flex-1 overflow-x-hidden">
         {currentProduct ? (
-          <div className="space-y-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, staggerChildren: 0.15 }}
+            className="space-y-8"
+          >
             {/* 1. Cryptographic Trust Seal */}
-            <TrustSeal
-              state={currentProduct.verificationState}
-              batchId={currentProduct.batchId}
-              onShare={() => setIsShareLabReportOpen(true)}
-            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <TrustSeal
+                state={currentProduct.verificationState}
+                batchId={currentProduct.batchId}
+                onShare={() => setIsShareLabReportOpen(true)}
+              />
+            </motion.div>
 
             {/* 2. Main 2-Column Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: Product UI (Sticky) */}
-              <div className="lg:col-span-6 space-y-6 lg:sticky lg:top-8">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="lg:col-span-6 space-y-6 lg:sticky lg:top-8"
+              >
                 {/* Product Card Summary */}
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden glass-card shadow-glass hover:shadow-[0_8px_32px_rgba(15,118,110,0.15)] transition-shadow">
                   <CardHeader className="pb-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <Badge variant="botanical" className="uppercase tracking-wider">
@@ -288,12 +303,16 @@ export const VerifyProductPage: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* Right Column: Supply Chain Journey, Lab QA Report & Farm Geo-Origin */}
-              <div className="lg:col-span-6 space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="lg:col-span-6 space-y-6"
+              >
                 {/* Interactive Supply Chain Journey & Map */}
-                <Card className="overflow-hidden border-muted-foreground/20 shadow-sm">
+                <Card className="overflow-hidden glass-card shadow-glass">
                   <CardHeader className="pb-3 border-b border-muted-foreground/20 bg-muted-foreground/5">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5">
@@ -563,9 +582,9 @@ export const VerifyProductPage: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         ) : (
           /* Landing / Empty State */
           <div className="max-w-2xl mx-auto py-12 text-center space-y-8">

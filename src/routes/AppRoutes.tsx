@@ -52,26 +52,41 @@ const RootEntryPage: React.FC = () => {
   return <Navigate to="/login" replace />;
 };
 
-export const AppRoutes: React.FC = () => {
+import { motion } from 'framer-motion';
+
+// Page Transition Wrapper
+const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 15 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -15 }}
+    transition={{ duration: 0.3, ease: 'easeOut' }}
+    className="flex-1 flex flex-col w-full h-full"
+  >
+    {children}
+  </motion.div>
+);
+
+export const AppRoutes: React.FC<{ location?: any }> = ({ location }) => {
   return (
-    <Routes>
+    <Routes location={location} key={location?.pathname}>
       {/* Root Route: Defaults to Authentication First */}
-      <Route path="/" element={<RootEntryPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<PageTransition><RootEntryPage /></PageTransition>} />
+      <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+      <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
       <Route path="/signup" element={<Navigate to="/register" replace />} />
 
       {/* Public Pages */}
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/verify" element={<VerifyProductPage />} />
-      <Route path="/verify/:productId" element={<VerifyProductPage />} />
+      <Route path="/home" element={<PageTransition><HomePage /></PageTransition>} />
+      <Route path="/verify" element={<PageTransition><VerifyProductPage /></PageTransition>} />
+      <Route path="/verify/:productId" element={<PageTransition><VerifyProductPage /></PageTransition>} />
 
       {/* Fleet Command & Interactive Journey Map (Option 3) */}
-      <Route path="/fleet-map" element={<DemoFleetCommandPage />} />
-      <Route path="/demo/fleet-map" element={<DemoFleetCommandPage />} />
-      <Route path="/demo/verify-map" element={<DemoVerificationHeroPage />} />
-      <Route path="/demo/verify-map/:productId" element={<DemoVerificationHeroPage />} />
-      <Route path="/demo" element={<DemoShowcaseHubPage />} />
+      <Route path="/fleet-map" element={<PageTransition><DemoFleetCommandPage /></PageTransition>} />
+      <Route path="/demo/fleet-map" element={<PageTransition><DemoFleetCommandPage /></PageTransition>} />
+      <Route path="/demo/verify-map" element={<PageTransition><DemoVerificationHeroPage /></PageTransition>} />
+      <Route path="/demo/verify-map/:productId" element={<PageTransition><DemoVerificationHeroPage /></PageTransition>} />
+      <Route path="/demo" element={<PageTransition><DemoShowcaseHubPage /></PageTransition>} />
 
       {/* Admin Portal (Strictly for ADMIN only) */}
       <Route
