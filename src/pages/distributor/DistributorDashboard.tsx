@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -43,13 +44,15 @@ export const DistributorDashboard: React.FC = () => {
       title="Cold-Chain Logistics Portal"
       subtitle={`${currentUser.name} • ${currentUser.organization || 'TransGlobal Logistics Hub'} (ID: ${currentUser.id}) • ${currentUser.location || 'Frankfurt GDP Hub'}`}
       action={
-        <Link
-          to="/distributor/create-shipment"
-          className="flex items-center gap-2 px-4 py-2.5 bg-sky-700 hover:bg-sky-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
-        >
-          <PlusCircle size={16} />
-          <span>Create Shipment</span>
-        </Link>
+        <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
+          <Link
+            to="/distributor/create-shipment"
+            className="flex items-center gap-2 px-4 py-2.5 bg-sky-700 hover:bg-sky-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+          >
+            <PlusCircle size={16} />
+            <span>Create Shipment</span>
+          </Link>
+        </motion.div>
       }
     >
       <div className="space-y-6">
@@ -137,13 +140,15 @@ export const DistributorDashboard: React.FC = () => {
                       <StatusBadge status={product.status} />
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -1 }}
+                        whileTap={{ scale: 0.94 }}
                         onClick={() => navigate('/distributor/create-shipment', { state: { selectedProduct: product } })}
-                        className="px-3.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        className="px-3.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-xs hover:shadow-md"
                       >
                         <Truck size={13} />
                         <span>Dispatch Shipment</span>
-                      </button>
+                      </motion.button>
                     </td>
                   </tr>
                 ))}
@@ -201,20 +206,24 @@ export const DistributorDashboard: React.FC = () => {
                       </td>
                       <td className="px-5 py-4 text-right">
                         {product.status === 'IN_TRANSIT' ? (
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
                             onClick={() => handleMarkDelivered(product.id)}
-                            className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                            className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-xs hover:shadow-md"
                           >
                             <span>Mark Delivered</span>
-                          </button>
+                          </motion.button>
                         ) : (
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
                             onClick={() => navigate(`/verify/${product.id}`)}
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all hover:shadow-xs"
                           >
                             <span>Trace</span>
                             <ArrowRight size={13} />
-                          </button>
+                          </motion.button>
                         )}
                       </td>
                     </tr>

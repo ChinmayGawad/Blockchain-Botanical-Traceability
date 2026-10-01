@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -12,9 +13,14 @@ import {
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
+  ArrowLeft,
   UploadCloud,
   FileCheck,
   Share2,
+  Package,
+  Check,
+  AlertCircle,
+  Lock,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -26,6 +32,10 @@ export const TestProductPage: React.FC = () => {
 
   const eligibleProducts = products.filter(p => p.status === 'PROCESSED' || p.status === 'IN_TESTING');
   const initialBatchId = searchParams.get('batch') || eligibleProducts[0]?.id || '';
+
+  const [step, setStep] = useState(1);
+  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [selectedProductId, setSelectedProductId] = useState(initialBatchId);
   const [purity, setPurity] = useState<number>(99.5);
@@ -43,10 +53,105 @@ export const TestProductPage: React.FC = () => {
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
 
+  const STEPS = [
+    { id: 1, label: 'Batch Intake', shortLabel: 'Intake', icon: Package },
+    { id: 2, label: 'Assay Specs', shortLabel: 'Assay', icon: FlaskConical },
+    { id: 3, label: 'Safety Screen', shortLabel: 'Safety', icon: ShieldCheck },
+    { id: 4, label: 'Sign-Off & IPFS', shortLabel: 'COA', icon: FileCheck },
+    { id: 5, label: 'Ledger Decision', shortLabel: 'Decision', icon: Blocks },
+  ];
+
+  const isStepComplete = (stepNum: number): boolean => {
+    switch (stepNum) {
+      case 1:
+        return Boolean(selectedProductId);
+      case 2:
+        return Boolean(!isNaN(purity) && purity >= 0 && !isNaN(moisture) && moisture >= 0);
+      case 3:
+        return Boolean(heavyMetals && microbial && pesticides);
+      case 4:
+        return Boolean(testedBy.trim() && notes.trim() && ipfsCid.trim());
+      case 5:
+        return Boolean(decisionResult);
+      default:
+        return false;
+    }
+  };
+
+  const canNavigateToStep = (targetStep: number): { allowed: boolean; reason?: string } => {
+    if (targetStep <= step) return { allowed: true };
+
+    for (let s = 1; s < targetStep; s++) {
+      if (!isStepComplete(s)) {
+        const stepInfo = STEPS.find(item => item.id === s);
+        const targetInfo = STEPS.find(item => item.id === targetStep);
+        return {
+          allowed: false,
+          reason: `Please complete Step ${s} (${stepInfo?.label || 'Previous Step'}) before advancing to Step ${targetStep} (${targetInfo?.label || 'Target Step'}).`,
+        };
+      }
+    }
+    return { allowed: true };
+  };
+
+  const handleTabClick = (targetStep: number) => {
+    if (targetStep === step) return;
+    const check = canNavigateToStep(targetStep);
+    if (!check.allowed) {
+      setValidationError(check.reason || 'Please fill in the required fields on the current tab first.');
+      return;
+    }
+    setValidationError(null);
+    setVisitedSteps(prev => new Set([...prev, targetStep]));
+    setStep(targetStep);
+  };
+
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isStepComplete(step)) {
+      setValidationError('Please complete the required fields in the current step before proceeding.');
+      return;
+    }
+    setValidationError(null);
+    const nextStep = Math.min(5, step + 1);
+    setVisitedSteps(prev => new Set([...prev, nextStep]));
+    setStep(nextStep);
+  };
+
+  const handleBack = () => {
+    setValidationError(null);
+    setStep(prev => Math.max(1, prev - 1));
+  };
+
+  const validateBeforeDecision = (): { isValid: boolean; targetStep?: number; message?: string } => {
+    if (!selectedProductId) {
+      return { isValid: false, targetStep: 1, message: 'Please select a botanical sample batch to inspect.' };
+    }
+    if (isNaN(purity) || isNaN(moisture)) {
+      return { isValid: false, targetStep: 2, message: 'Please enter valid purity and moisture assays in Step 2.' };
+    }
+    if (!heavyMetals || !microbial || !pesticides) {
+      return { isValid: false, targetStep: 3, message: 'Please specify all safety test statuses in Step 3.' };
+    }
+    if (!testedBy.trim() || !notes.trim() || !ipfsCid.trim()) {
+      return { isValid: false, targetStep: 4, message: 'Please complete analyst sign-off and IPFS certificate details in Step 4.' };
+    }
+    return { isValid: true };
+  };
+
   const handleDecision = async (approve: boolean) => {
-    if (!selectedProductId) return;
+    const validation = validateBeforeDecision();
+    if (!validation.isValid) {
+      setValidationError(validation.message || 'Please complete required fields.');
+      if (validation.targetStep) {
+        setVisitedSteps(prev => new Set([...prev, validation.targetStep!]));
+        setStep(validation.targetStep!);
+      }
+      return;
+    }
 
     setIsSubmitting(true);
+    setValidationError(null);
     try {
       const parameters = [
         {
@@ -123,9 +228,126 @@ export const TestProductPage: React.FC = () => {
   return (
     <DashboardLayout
       title="Laboratory QA Inspection & Cryptographic Certification"
-      subtitle="Conduct HPLC potency assays, heavy metal ICP-MS screening, and invoke chaincode to Approve or Reject batches on Hyperledger Fabric."
+      subtitle="5-step verification wizard to conduct HPLC assays, heavy metal ICP-MS screening, and invoke chaincode to Approve or Reject batches on Hyperledger Fabric."
     >
       <div className="max-w-3xl mx-auto space-y-6">
+        {/* Interactive Progress Tab Stepper */}
+        {!decisionResult && (
+          <nav aria-label="Testing Steps" className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+              {STEPS.map((s) => {
+                const isActive = step === s.id;
+                const isComplete = isStepComplete(s.id);
+                const IconComponent = s.icon;
+                const navCheck = canNavigateToStep(s.id);
+                const isAccessible = navCheck.allowed;
+
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="tab"
+                    id={`lab-step-tab-${s.id}`}
+                    aria-selected={isActive}
+                    aria-current={isActive ? 'step' : undefined}
+                    aria-disabled={!isAccessible}
+                    onClick={() => handleTabClick(s.id)}
+                    title={!isAccessible ? navCheck.reason : undefined}
+                    className={`relative flex flex-col items-center justify-center py-2.5 px-1 sm:px-2 rounded-xl transition-all duration-200 group text-center select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-700/20 ring-2 ring-indigo-500/40 font-bold cursor-default'
+                        : isComplete
+                        ? 'bg-indigo-50 text-indigo-800 border border-indigo-200/90 hover:bg-indigo-100/80 hover:border-indigo-300 font-semibold cursor-pointer'
+                        : isAccessible
+                        ? 'bg-slate-50 text-slate-600 border border-slate-200/80 hover:bg-slate-100 hover:text-slate-800 hover:border-slate-300 font-medium cursor-pointer'
+                        : 'bg-slate-50/60 text-slate-400 border border-dashed border-slate-200 cursor-not-allowed opacity-60'
+                    }`}
+                  >
+                    {/* Top Row: Icon + Badge */}
+                    <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
+                      <IconComponent
+                        size={15}
+                        className={`transition-transform duration-200 ${
+                          isActive
+                            ? 'text-white'
+                            : isComplete
+                            ? 'text-indigo-700 group-hover:scale-110'
+                            : isAccessible
+                            ? 'text-slate-400 group-hover:text-slate-600 group-hover:scale-110'
+                            : 'text-slate-300'
+                        }`}
+                      />
+                      {/* Step Number / Check Badge / Lock */}
+                      <span
+                        className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-extrabold shrink-0 ${
+                          isActive
+                            ? 'bg-indigo-800/90 text-indigo-100'
+                            : isComplete
+                            ? 'bg-indigo-200 text-indigo-900'
+                            : isAccessible
+                            ? 'bg-slate-200 text-slate-600'
+                            : 'bg-slate-100 text-slate-400'
+                        }`}
+                      >
+                        {isComplete && !isActive ? (
+                          <Check size={10} className="stroke-[3]" />
+                        ) : !isAccessible ? (
+                          <Lock size={9} />
+                        ) : (
+                          s.id
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Step Title */}
+                    <span className="text-[11px] sm:text-xs leading-tight tracking-tight hidden sm:inline truncate max-w-full">
+                      {s.label}
+                    </span>
+                    <span className="text-[10px] leading-tight tracking-tight sm:hidden font-medium truncate max-w-full">
+                      {s.shortLabel}
+                    </span>
+
+                    {/* Active Indicator Pip */}
+                    {isActive && (
+                      <span className="absolute -bottom-1 w-6 sm:w-8 h-1 bg-indigo-400 rounded-full shadow-xs" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Direct Tab Navigation Hint */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1.5 border-t border-slate-100">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                <span>Click previous tabs to edit • Next tabs unlock when current tab is filled</span>
+              </span>
+              <span className="font-mono text-[10px] text-slate-400 font-semibold">
+                Step {step} of 5
+              </span>
+            </div>
+          </nav>
+        )}
+
+        {/* Validation Error Alert Banner */}
+        {validationError && (
+          <div className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-200">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={16} className="text-amber-600 shrink-0" />
+              <span className="font-medium">{validationError}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setValidationError(null)}
+              className="text-amber-700 hover:text-amber-950 font-bold p-1 rounded-lg hover:bg-amber-100"
+              aria-label="Dismiss alert"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Success / Rejected Screen */}
         {decisionResult ? (
           <div
             className={`bg-white p-8 rounded-3xl border ${
@@ -177,217 +399,476 @@ export const TestProductPage: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.04, y: -1 }}
+                whileTap={{ scale: 0.96 }}
                 type="button"
                 onClick={() => setIsShareModalOpen(true)}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-2"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 title="Share Password-Protected QA Certificate"
               >
                 <Share2 size={14} />
                 <span>Share Password-Protected Report</span>
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.04, y: -1 }}
+                whileTap={{ scale: 0.96 }}
                 type="button"
                 onClick={() => navigate(`/verify/${selectedProductId}`)}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-md flex items-center justify-center gap-2"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View Public Consumer Verification</span>
                 <ArrowRight size={14} />
-              </button>
+              </motion.button>
               {decisionResult === 'APPROVED' && (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.04, y: -1 }}
+                  whileTap={{ scale: 0.96 }}
                   type="button"
                   onClick={() => navigate('/distributor/dashboard')}
-                  className="px-5 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition-colors"
+                  className="px-5 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition-all cursor-pointer hover:shadow-xs"
                 >
                   Switch to Distributor →
-                </button>
+                </motion.button>
               )}
             </div>
           </div>
         ) : (
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-                <FlaskConical size={20} />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Laboratory Quality Assay Form</h3>
-                <p className="text-xs text-slate-500">Record certified chemical purity and safety limits</p>
-              </div>
-            </div>
+          <>
+            {/* Step 1: Batch Intake & Selection */}
+            {step === 1 && (
+              <motion.div
+                key="lab-step-1"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+                      <Package size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Step 1: Botanical Batch Inspection Target</h3>
+                      <p className="text-xs text-slate-500">Select processed botanical sample awaiting quality control certification</p>
+                    </div>
+                  </div>
 
-            {/* Select Product to Test */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Select Botanical Sample Batch to Inspect: *
-              </label>
-              {eligibleProducts.length === 0 ? (
-                <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
-                  ⚠️ No batches currently in <strong>PROCESSED</strong> or <strong>IN_TESTING</strong> status. Harvested crops must first be processed before quality assurance testing can be conducted.
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Select Botanical Sample Batch to Inspect: *
+                    </label>
+                    {eligibleProducts.length === 0 ? (
+                      <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                        ⚠️ No batches currently in <strong>PROCESSED</strong> or <strong>IN_TESTING</strong> status. Harvested crops must first be processed before quality assurance testing can be conducted.
+                      </div>
+                    ) : (
+                      <select
+                        value={selectedProductId}
+                        onChange={e => setSelectedProductId(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-mono"
+                      >
+                        {eligibleProducts.map(p => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} • Batch #{p.batchId} [{p.status}]
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+
+                  {selectedProduct && (
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
+                      <div className="font-bold text-slate-900 border-b border-slate-200 pb-1.5">Batch Provenance Data:</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600">
+                        <div>Product: <span className="font-semibold text-slate-800">{selectedProduct.name} ({selectedProduct.botanicalName})</span></div>
+                        <div>Status: <span className="font-mono font-bold text-indigo-600">{selectedProduct.status}</span></div>
+                        <div>Farmer: <span className="font-medium text-slate-700">{selectedProduct.farmerName}</span></div>
+                        <div>Quantity: <span className="font-medium text-slate-700">{selectedProduct.quantityKg} kg</span></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end pt-3">
+                    <motion.button
+                      whileHover={{ scale: selectedProductId ? 1.03 : 1, y: selectedProductId ? -1 : 0 }}
+                      whileTap={{ scale: selectedProductId ? 0.96 : 1 }}
+                      type="submit"
+                      disabled={!selectedProductId}
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <span>Continue to Assay Specs</span>
+                      <ArrowRight size={16} />
+                    </motion.button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+
+            {/* Step 2: HPLC Potency & Moisture Assay */}
+            {step === 2 && (
+              <motion.div
+                key="lab-step-2"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+                      <FlaskConical size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Step 2: Phytochemical Potency & Moisture Assay</h3>
+                      <p className="text-xs text-slate-500">Record certified chemical purity and moisture limits</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1.5">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        HPLC Active Phytochemical Purity (%): *
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        required
+                        value={purity}
+                        onChange={e => setPurity(Number(e.target.value))}
+                        className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                      />
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="text-slate-400">USP Threshold: ≥ 95.0%</span>
+                        <span className={`font-bold ${purity >= 95 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {purity >= 95 ? '✓ Compliant' : '⚠ Below Standard'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1.5">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        Moisture Content (Karl Fischer) (%): *
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        required
+                        value={moisture}
+                        onChange={e => setMoisture(Number(e.target.value))}
+                        className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                      />
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="text-slate-400">API Threshold: ≤ 8.0%</span>
+                        <span className={`font-bold ${moisture <= 8 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {moisture <= 8 ? '✓ Compliant' : '⚠ Excess Moisture'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between pt-3">
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="button"
+                      onClick={handleBack}
+                      className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Back</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="submit"
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+                    >
+                      <span>Continue to Safety Screen</span>
+                      <ArrowRight size={16} />
+                    </motion.button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+
+            {/* Step 3: Safety Contaminant Screening */}
+            {step === 3 && (
+              <motion.div
+                key="lab-step-3"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+                      <ShieldCheck size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Step 3: Contaminant & Toxicology Screening</h3>
+                      <p className="text-xs text-slate-500">Test for toxic heavy metals, microbial bioburden, and pesticide residues</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Heavy Metals ICP-MS (Lead, Arsenic, Cadmium, Mercury): *
+                      </label>
+                      <select
+                        value={heavyMetals}
+                        onChange={e => setHeavyMetals(e.target.value as any)}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
+                      >
+                        <option value="PASS">PASS (Non-Detectable / &lt; 0.05 ppm - 100% Safe)</option>
+                        <option value="FAIL">FAIL (Exceeds Maximum Permissible Limits)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Microbial & Salmonella Screen (CFU/g): *
+                      </label>
+                      <select
+                        value={microbial}
+                        onChange={e => setMicrobial(e.target.value as any)}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
+                      >
+                        <option value="PASS">PASS (Zero Pathogens Detected - E. Coli / Salmonella Negative)</option>
+                        <option value="FAIL">FAIL (Microbial Contamination Detected)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Pesticide Residue Screen (GC-MS / LC-MS Multi-Residue): *
+                      </label>
+                      <select
+                        value={pesticides}
+                        onChange={e => setPesticides(e.target.value as any)}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
+                      >
+                        <option value="PASS">PASS (100% Pesticide-Free Organic Standard)</option>
+                        <option value="FAIL">FAIL (Synthetic Residues Detected above MRL)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between pt-3">
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="button"
+                      onClick={handleBack}
+                      className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Back</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="submit"
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+                    >
+                      <span>Continue to COA & IPFS</span>
+                      <ArrowRight size={16} />
+                    </motion.button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+
+            {/* Step 4: Sign-Off, Notes & IPFS CID */}
+            {step === 4 && (
+              <motion.div
+                key="lab-step-4"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+                      <FileCheck size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Step 4: Analyst Sign-Off & IPFS Certificate</h3>
+                      <p className="text-xs text-slate-500">Record certified testing officer identity and pin raw lab data to IPFS</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Lead Testing Biochemist / Analyst Name: *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={testedBy}
+                        onChange={e => setTestedBy(e.target.value)}
+                        placeholder="e.g. Dr. Ananya Sharma, Lead Biochemist"
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Monograph Conformance Notes: *
+                      </label>
+                      <textarea
+                        rows={3}
+                        required
+                        value={notes}
+                        onChange={e => setNotes(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      ></textarea>
+                    </div>
+
+                    {/* IPFS Certificate Hash */}
+                    <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-200 text-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center mx-auto">
+                        <UploadCloud size={20} />
+                      </div>
+                      <div className="text-xs font-bold text-slate-900">
+                        NABL Accredited Certificate of Analysis (COA) Attached
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-mono">
+                        IPFS CID: {ipfsCid}
+                      </div>
+                      <span className="inline-block text-[10px] text-indigo-800 font-bold bg-indigo-200/80 px-2 py-0.5 rounded">
+                        PINNED TO IPFS CLUSTER ✓
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between pt-3">
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="button"
+                      onClick={handleBack}
+                      className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Back</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="submit"
+                      className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+                    >
+                      <span>Review & Ledger Decision</span>
+                      <ArrowRight size={16} />
+                    </motion.button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+
+            {/* Step 5: Review & Decision Sign-Off */}
+            {step === 5 && (
+              <motion.div
+                key="lab-step-5"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
+                      <Blocks size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Step 5: Cryptographic Decision Sign-Off</h3>
+                      <p className="text-xs text-slate-500">Sign ledger endorsement to permanently certify or reject batch</p>
+                    </div>
+                  </div>
+
+                  {/* Summary Dossier */}
+                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3 text-xs">
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
+                      <span className="text-slate-500">Inspected Product:</span>
+                      <span className="font-bold text-slate-900">{selectedProduct?.name} ({selectedProduct?.batchId})</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
+                      <span className="text-slate-500">HPLC Purity & Moisture:</span>
+                      <span className="font-bold text-indigo-700">{purity}% Purity • {moisture}% Moisture</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
+                      <span className="text-slate-500">Safety Screening:</span>
+                      <span className="font-semibold text-slate-800">
+                        Metals: {heavyMetals} | Microbial: {microbial} | Pesticides: {pesticides}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
+                      <span className="text-slate-500">Certified By:</span>
+                      <span className="font-semibold text-slate-800">{testedBy} ({currentUser.organization || 'Eurofins Lab'})</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">IPFS COA Hash:</span>
+                      <span className="font-mono text-indigo-700">{ipfsCid}</span>
+                    </div>
+                  </div>
+
+                  {/* Action Decision Buttons */}
+                  <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-between items-center">
+                    <motion.button
+                      whileHover={{ scale: 1.03, y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="button"
+                      onClick={handleBack}
+                      className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer w-full sm:w-auto justify-center"
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Back</span>
+                    </motion.button>
+
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <motion.button
+                        whileHover={{ scale: !isSubmitting ? 1.03 : 1, y: !isSubmitting ? -1 : 0 }}
+                        whileTap={{ scale: !isSubmitting ? 0.96 : 1 }}
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => handleDecision(false)}
+                        className="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed hover:shadow-xs"
+                      >
+                        <ShieldX size={15} />
+                        <span>REJECT BATCH (Lock Smart Contract)</span>
+                      </motion.button>
+
+                      <motion.button
+                        whileHover={{ scale: !isSubmitting ? 1.03 : 1, y: !isSubmitting ? -1 : 0 }}
+                        whileTap={{ scale: !isSubmitting ? 0.96 : 1 }}
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => handleDecision(true)}
+                        className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-white rounded-xl text-xs font-extrabold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            <span>Signing Endorsement...</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck size={16} />
+                            <span>APPROVE & ISSUE CERTIFICATE</span>
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <select
-                  value={selectedProductId}
-                  onChange={e => setSelectedProductId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-mono"
-                >
-                  {eligibleProducts.map(p => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} • Batch #{p.batchId} [{p.status}]
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            {/* Assay Parameters Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  HPLC Active Phytochemical Purity (%): *
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  required
-                  value={purity}
-                  onChange={e => setPurity(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-                <span className="text-[10px] text-slate-400">USP Standard Threshold: ≥ 95.0%</span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Moisture Content (%): *
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  required
-                  value={moisture}
-                  onChange={e => setMoisture(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-                <span className="text-[10px] text-slate-400">Pharmacopeia Standard: ≤ 8.0%</span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Heavy Metals ICP-MS (Pb, As, Cd, Hg): *
-                </label>
-                <select
-                  value={heavyMetals}
-                  onChange={e => setHeavyMetals(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
-                >
-                  <option value="PASS">PASS (Non-Detectable / &lt; 0.05 ppm)</option>
-                  <option value="FAIL">FAIL (Exceeds Maximum Limits)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Microbial & Salmonella Screen: *
-                </label>
-                <select
-                  value={microbial}
-                  onChange={e => setMicrobial(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
-                >
-                  <option value="PASS">PASS (Zero Pathogens Detected)</option>
-                  <option value="FAIL">FAIL (Microbial Contamination)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Pesticide Residue (GC-MS Multi-Residue): *
-                </label>
-                <select
-                  value={pesticides}
-                  onChange={e => setPesticides(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
-                >
-                  <option value="PASS">PASS (100% Pesticide-Free Organic)</option>
-                  <option value="FAIL">FAIL (Synthetic Residues Detected)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Lead Analyst Sign-Off: *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={testedBy}
-                  onChange={e => setTestedBy(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Monograph Conformance Notes:
-              </label>
-              <textarea
-                rows={2}
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              ></textarea>
-            </div>
-
-            {/* IPFS Certificate Hash */}
-            <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-              <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                <UploadCloud size={14} className="text-indigo-600" />
-                <span>IPFS Laboratory Certificate CID:</span>
-              </div>
-              <div className="font-mono text-xs text-indigo-700 bg-white p-2 rounded border border-slate-200">
-                {ipfsCid}
-              </div>
-            </div>
-
-            {/* Decision Action Buttons */}
-            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-end">
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => handleDecision(false)}
-                className="px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2"
-              >
-                <ShieldX size={16} />
-                <span>REJECT BATCH (Lock Smart Contract)</span>
-              </button>
-
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => handleDecision(true)}
-                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-white rounded-xl text-xs font-extrabold transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    <span>Signing Blockchain Endorsement...</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck size={16} />
-                    <span>APPROVE & ISSUE BLOCKCHAIN CERTIFICATE</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
+              </motion.div>
+            )}
+          </>
         )}
       </div>
 

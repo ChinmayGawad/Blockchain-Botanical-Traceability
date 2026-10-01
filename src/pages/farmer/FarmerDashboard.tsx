@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -44,13 +45,15 @@ export const FarmerDashboard: React.FC = () => {
       title="Farmer Botanical Portal"
       subtitle={`${currentUser.name} • ${currentUser.organization || 'Organic Farm Cooperative'} (ID: ${currentUser.id}) • ${currentUser.location || 'Certified Farm Parcel'}`}
       action={
-        <Link
-          to="/farmer/register"
-          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
-        >
-          <PlusCircle size={16} />
-          <span>Register New Harvest</span>
-        </Link>
+        <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
+          <Link
+            to="/farmer/register"
+            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+          >
+            <PlusCircle size={16} />
+            <span>Register New Harvest</span>
+          </Link>
+        </motion.div>
       }
     >
       <div className="space-y-6">
@@ -165,20 +168,24 @@ export const FarmerDashboard: React.FC = () => {
                         <StatusBadge status={product.status} />
                       </td>
                       <td className="px-5 py-4 text-right space-x-2">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.05, y: -1 }}
+                          whileTap={{ scale: 0.94 }}
                           onClick={() => setSelectedProductForQR(product)}
-                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-emerald-200"
+                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-200 shadow-2xs hover:shadow-xs"
                         >
                           <QrCode size={13} />
                           <span>QR Tag</span>
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05, y: -1 }}
+                          whileTap={{ scale: 0.94 }}
                           onClick={() => navigate(`/verify/${product.id}`)}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 transition-all cursor-pointer hover:shadow-xs"
                         >
                           <span>Trace</span>
                           <ArrowRight size={13} />
-                        </button>
+                        </motion.button>
                       </td>
                     </tr>
                   ))}

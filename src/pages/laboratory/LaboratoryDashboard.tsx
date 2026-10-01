@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -42,13 +43,15 @@ export const LaboratoryDashboard: React.FC = () => {
       title="Laboratory QA Testing Station"
       subtitle={`${currentUser.name} • ${currentUser.organization || 'Eurofins AgriBio Analytics Lab'} (ID: ${currentUser.id}) • Accredited ISO/IEC 17025 Facility`}
       action={
-        <Link
-          to="/laboratory/test"
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
-        >
-          <FlaskConical size={16} />
-          <span>Conduct QA Inspection</span>
-        </Link>
+        <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
+          <Link
+            to="/laboratory/test"
+            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+          >
+            <FlaskConical size={16} />
+            <span>Conduct QA Inspection</span>
+          </Link>
+        </motion.div>
       }
     >
       <div className="space-y-6">
@@ -136,13 +139,15 @@ export const LaboratoryDashboard: React.FC = () => {
                       <StatusBadge status={product.status} />
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -1 }}
+                        whileTap={{ scale: 0.94 }}
                         onClick={() => navigate('/laboratory/test', { state: { selectedProduct: product } })}
-                        className="px-3.5 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        className="px-3.5 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-xs hover:shadow-md"
                       >
                         <FlaskConical size={13} />
                         <span>Perform QA Assay</span>
-                      </button>
+                      </motion.button>
                     </td>
                   </tr>
                 ))}
@@ -196,21 +201,25 @@ export const LaboratoryDashboard: React.FC = () => {
                       </td>
                       <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
                             onClick={() => setSelectedShareProduct(product)}
-                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all shadow-2xs hover:shadow-xs"
                             title="Share Password-Protected QA Certificate"
                           >
                             <Share2 size={13} />
                             <span>Share</span>
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
                             onClick={() => navigate(`/verify/${product.id}`)}
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all hover:shadow-xs"
                           >
                             <span>View Proof</span>
                             <ArrowRight size={13} />
-                          </button>
+                          </motion.button>
                         </div>
                       </td>
                     </tr>

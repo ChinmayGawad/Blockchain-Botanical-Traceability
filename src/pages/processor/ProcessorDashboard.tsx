@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -41,13 +42,15 @@ export const ProcessorDashboard: React.FC = () => {
       title="Processor Bio-Refining Portal"
       subtitle={`${currentUser.name} • ${currentUser.organization || 'PhytoExtracts Bio-Refining Ltd'} (ID: ${currentUser.id}) • ${currentUser.location || 'GMP Extraction Unit'}`}
       action={
-        <Link
-          to="/processor/process"
-          className="flex items-center gap-2 px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
-        >
-          <Cog size={16} />
-          <span>Process Raw Batch</span>
-        </Link>
+        <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
+          <Link
+            to="/processor/process"
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+          >
+            <Cog size={16} />
+            <span>Process Raw Batch</span>
+          </Link>
+        </motion.div>
       }
     >
       <div className="space-y-6">
@@ -139,13 +142,15 @@ export const ProcessorDashboard: React.FC = () => {
                       <StatusBadge status={product.status} />
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05, y: -1 }}
+                        whileTap={{ scale: 0.94 }}
                         onClick={() => navigate('/processor/process', { state: { selectedProduct: product } })}
-                        className="px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        className="px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-xs hover:shadow-md"
                       >
                         <span>Process Batch</span>
                         <ArrowRight size={13} />
-                      </button>
+                      </motion.button>
                     </td>
                   </tr>
                 ))}
@@ -203,21 +208,25 @@ export const ProcessorDashboard: React.FC = () => {
                       </td>
                       <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
                             onClick={() => navigate(`/fleet-map?batch=${product.batchId}`)}
-                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors border border-emerald-200"
+                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all border border-emerald-200 shadow-2xs hover:shadow-xs"
                             title="Track Live IoT Route & Moving Truck"
                           >
                             <Truck size={12} className="text-emerald-700" />
                             <span>Live Map</span>
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05, y: -1 }}
+                            whileTap={{ scale: 0.94 }}
                             onClick={() => navigate(`/verify/${product.id}`)}
-                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all hover:shadow-xs"
                           >
                             <span>Trace</span>
                             <ArrowRight size={12} />
-                          </button>
+                          </motion.button>
                         </div>
                       </td>
                     </tr>

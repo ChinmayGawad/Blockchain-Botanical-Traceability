@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -28,6 +29,7 @@ export const RetailerDashboard: React.FC = () => {
   const [receivingProductId, setReceivingProductId] = useState<string | null>(null);
   const [shelfId, setShelfId] = useState('RET-BLR-092');
   const [price, setPrice] = useState<number>(850.00);
+  const [isSubmittingReceipt, setIsSubmittingReceipt] = useState(false);
 
   // Incoming shipments ready for check-in
   const incomingShipments = products.filter(p => p.status === 'IN_TRANSIT' || p.status === 'DELIVERED');
@@ -41,8 +43,12 @@ export const RetailerDashboard: React.FC = () => {
         currentUser.role === 'ADMIN')
   );
 
-  const handleConfirmReceipt = (productId: string) => {
-    confirmRetailReceipt(productId, {
+  const receivingProduct = products.find(p => p.id === receivingProductId);
+
+  const handleConfirmReceipt = async (productId: string) => {
+    setIsSubmittingReceipt(true);
+    await new Promise(resolve => setTimeout(resolve, 450));
+    await confirmRetailReceipt(productId, {
       retailerId: currentUser.id,
       retailerName: `${currentUser.name} (${currentUser.organization || 'Arogya Pure Herbals'})`,
       storeLocation: currentUser.location || 'Indiranagar, Bengaluru, Karnataka',
@@ -52,9 +58,10 @@ export const RetailerDashboard: React.FC = () => {
       notes: 'Tamper seals verified intact. Matched with smart contract hash.',
     });
 
+    setIsSubmittingReceipt(false);
     setReceivingProductId(null);
     try {
-      confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+      confetti({ particleCount: 40, spread: 65, origin: { y: 0.6 } });
     } catch (e) {}
   };
 
@@ -157,17 +164,35 @@ export const RetailerDashboard: React.FC = () => {
                     </td>
                     <td className="px-5 py-4 text-right">
                       {product.status === 'RETAIL_READY' ? (
-                        <span className="text-emerald-800 font-bold text-xs inline-flex items-center gap-1">
+                        <span className="text-emerald-800 font-bold text-xs inline-flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                           <CheckCircle2 size={14} className="text-emerald-600" /> On Shelf
                         </span>
                       ) : (
-                        <button
-                          onClick={() => setReceivingProductId(product.id)}
-                          className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                        <motion.button
+                          whileHover={{ scale: 1.05, y: -1 }}
+                          whileTap={{ scale: 0.94 }}
+                          onClick={() => {
+                            if (receivingProductId === product.id) {
+                              setReceivingProductId(null);
+                            } else {
+                              setReceivingProductId(product.id);
+                              setShelfId(`RET-${product.batchId.split('-')[0] || 'BLR'}-${Math.floor(100 + Math.random() * 900)}`);
+                            }
+                          }}
+                          className={`px-3.5 py-1.5 font-bold rounded-xl text-xs inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
+                            receivingProductId === product.id
+                              ? 'bg-emerald-800 text-white ring-2 ring-emerald-400 shadow-md'
+                              : 'bg-emerald-700 hover:bg-emerald-800 text-white hover:shadow-md'
+                          }`}
                         >
-                          <PackageCheck size={14} />
-                          <span>Accept into Inventory</span>
-                        </button>
+                          <motion.span
+                            animate={receivingProductId === product.id ? { rotate: [0, -15, 15, -5, 0] } : {}}
+                            transition={{ duration: 0.4 }}
+                          >
+                            <PackageCheck size={14} className={receivingProductId === product.id ? 'text-emerald-200' : ''} />
+                          </motion.span>
+                          <span>{receivingProductId === product.id ? 'Intake Open ▲' : 'Accept into Inventory'}</span>
+                        </motion.button>
                       )}
                     </td>
                   </tr>
@@ -177,60 +202,96 @@ export const RetailerDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Modal / Inline Receive Form */}
-        {receivingProductId && (
-          <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
-                <Tag size={16} className="text-emerald-700" />
-                <span>Confirm Retail Intake & Shelf Tag Assignment</span>
-              </h4>
-              <button
-                onClick={() => setReceivingProductId(null)}
-                className="text-xs text-slate-500 hover:text-slate-800 font-bold cursor-pointer"
-              >
-                ✕ Cancel
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Retail Shelf Batch Tag:
-                </label>
-                <input
-                  type="text"
-                  value={shelfId}
-                  onChange={e => setShelfId(e.target.value)}
-                  className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-mono font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Shelf Unit Price (₹ INR):
-                </label>
-                <input
-                  type="number"
-                  step="10"
-                  value={price}
-                  onChange={e => setPrice(parseFloat(e.target.value) || 0)}
-                  className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
-                />
-              </div>
-
-              <div className="flex items-end">
+        {/* Modal / Inline Receive Form with AnimatePresence & Spring Motion */}
+        <AnimatePresence>
+          {receivingProductId && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: -16, scale: 0.98 }}
+              animate={{ opacity: 1, height: 'auto', y: 0, scale: 1 }}
+              exit={{ opacity: 0, height: 0, y: -10, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 26 }}
+              className="p-5 bg-gradient-to-r from-emerald-50 via-teal-50/50 to-emerald-50 border-2 border-emerald-300 rounded-2xl space-y-4 shadow-lg shadow-emerald-950/5 overflow-hidden"
+            >
+              <div className="flex items-center justify-between border-b border-emerald-200/70 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-emerald-200 text-emerald-800 rounded-lg">
+                    <Tag size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-emerald-950">
+                      Confirm Retail Intake & Shelf Tag Assignment
+                    </h4>
+                    {receivingProduct && (
+                      <p className="text-xs text-emerald-700 font-medium">
+                        Assigning shelf location for <span className="font-bold text-emerald-900">{receivingProduct.name}</span> (Batch #{receivingProduct.batchId})
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <button
-                  onClick={() => handleConfirmReceipt(receivingProductId)}
-                  className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  type="button"
+                  onClick={() => setReceivingProductId(null)}
+                  className="text-xs text-slate-500 hover:text-slate-800 font-bold px-2 py-1 rounded-lg hover:bg-emerald-100/60 transition-colors cursor-pointer"
                 >
-                  <CheckCircle2 size={14} />
-                  <span>Commit & Stock Shelf</span>
+                  ✕ Cancel
                 </button>
               </div>
-            </div>
-          </div>
-        )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Retail Shelf Batch Tag:
+                  </label>
+                  <input
+                    type="text"
+                    value={shelfId}
+                    onChange={e => setShelfId(e.target.value)}
+                    className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Shelf Unit Price (₹ INR):
+                  </label>
+                  <input
+                    type="number"
+                    step="10"
+                    value={price}
+                    onChange={e => setPrice(parseFloat(e.target.value) || 0)}
+                    className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
+                    disabled={isSubmittingReceipt}
+                    onClick={() => handleConfirmReceipt(receivingProductId)}
+                    className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:bg-emerald-900 disabled:cursor-not-allowed"
+                  >
+                    {isSubmittingReceipt ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                        />
+                        <span>Committing to Ledger...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={15} />
+                        <span>Commit & Stock Shelf</span>
+                      </>
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* My Store Shelf Inventory */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
@@ -278,20 +339,24 @@ export const RetailerDashboard: React.FC = () => {
                         <StatusBadge status={product.verificationState} />
                       </td>
                       <td className="px-5 py-4 text-right space-x-2">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.05, y: -1 }}
+                          whileTap={{ scale: 0.94 }}
                           onClick={() => setSelectedProductForQR(product)}
-                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors border border-emerald-200"
+                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all border border-emerald-200 shadow-2xs hover:shadow-xs"
                         >
                           <Printer size={13} />
                           <span>Print QR</span>
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05, y: -1 }}
+                          whileTap={{ scale: 0.94 }}
                           onClick={() => navigate(`/verify/${product.id}`)}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs inline-flex items-center gap-1 cursor-pointer transition-all hover:shadow-xs"
                         >
                           <span>Trace</span>
                           <ArrowRight size={13} />
-                        </button>
+                        </motion.button>
                       </td>
                     </tr>
                   ))}
