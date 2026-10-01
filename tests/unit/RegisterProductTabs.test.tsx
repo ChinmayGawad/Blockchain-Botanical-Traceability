@@ -3,19 +3,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { RegisterProductPage } from '../../src/pages/farmer/RegisterProductPage';
+import { UserRole } from '../../src/types';
 
 // Mock contexts
+const { mockAuthState } = vi.hoisted(() => ({
+  mockAuthState: { role: 'FARMER' as UserRole },
+}));
+
 vi.mock('../../src/context/AuthContext', () => ({
   useAuth: () => ({
     currentUser: {
       id: 'USR-FRM-01',
       name: 'Rajesh Kumar',
       email: 'rajesh@vedicfarms.org',
-      role: 'FARMER',
+      role: mockAuthState.role,
       organization: 'Vedic Agro Organic Cooperative',
       status: 'VERIFIED',
     },
-    role: 'FARMER',
+    role: mockAuthState.role,
   }),
 }));
 
@@ -38,6 +43,7 @@ vi.mock('canvas-confetti', () => ({
 describe('RegisterProductPage Tab Navigation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.role = 'FARMER';
   });
 
   const renderComponent = () => {
@@ -183,6 +189,15 @@ describe('RegisterProductPage Tab Navigation', () => {
     // Should stay on Step 2 and show validation error
     expect(screen.getByText('Step 2: Farm Location & Soil Telemetry')).toBeInTheDocument();
     expect(screen.getByText(/please complete step 2/i)).toBeInTheDocument();
+  });
+
+  it('blocks unauthorized consumer role from accessing farmer registration', () => {
+    mockAuthState.role = 'CONSUMER';
+    renderComponent();
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/Access Restricted: Role Authorization Required/i)).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(/FARMER/i);
   });
 });
 

@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ProcessBatchPage } from '../../src/pages/processor/ProcessBatchPage';
 import { TestProductPage } from '../../src/pages/laboratory/TestProductPage';
 import { CreateShipmentPage } from '../../src/pages/distributor/CreateShipmentPage';
-import { BotanicalProduct } from '../../src/types';
+import { BotanicalProduct, UserRole } from '../../src/types';
 
 const mockProduct: BotanicalProduct = {
   id: 'PROD-001',
@@ -47,17 +47,21 @@ const mockProcessedProduct: BotanicalProduct = {
 };
 
 // Mock Auth
+const { mockAuthState } = vi.hoisted(() => ({
+  mockAuthState: { role: 'PROCESSOR' as UserRole },
+}));
+
 vi.mock('../../src/context/AuthContext', () => ({
   useAuth: () => ({
     currentUser: {
       id: 'USR-TEST-01',
       name: 'Test Stakeholder',
       email: 'test@florachain.org',
-      role: 'PROCESSOR',
+      role: mockAuthState.role,
       organization: 'PhytoExtracts',
       status: 'VERIFIED',
     },
-    role: 'PROCESSOR',
+    role: mockAuthState.role,
   }),
 }));
 
@@ -83,6 +87,7 @@ vi.mock('canvas-confetti', () => ({
 describe('Processor ProcessBatchPage Tab Navigation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.role = 'PROCESSOR';
   });
 
   const renderProcessorPage = () => {
@@ -175,6 +180,7 @@ describe('Processor ProcessBatchPage Tab Navigation', () => {
 describe('Laboratory TestProductPage Tab Navigation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.role = 'LABORATORY';
   });
 
   const renderLabPage = () => {
@@ -232,6 +238,7 @@ describe('Laboratory TestProductPage Tab Navigation', () => {
 describe('Distributor CreateShipmentPage Tab Navigation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.role = 'DISTRIBUTOR';
   });
 
   const renderDistributorPage = () => {
@@ -297,6 +304,63 @@ describe('Distributor CreateShipmentPage Tab Navigation', () => {
     // Should remain on Step 4 and show validation error
     expect(screen.getByText('Step 4: Dispatch Schedule & Tracking Number')).toBeInTheDocument();
     expect(screen.getByText(/please complete step 4/i)).toBeInTheDocument();
+  });
+});
+
+describe('RBAC Defense-in-Depth Security Gates', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('blocks unauthorized consumer role from accessing processor workflow', () => {
+    mockAuthState.role = 'CONSUMER';
+    render(
+      <BrowserRouter>
+        <ProcessBatchPage />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/Access Restricted: Role Authorization Required/i)).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(/PROCESSOR/i);
+  });
+
+  it('blocks unauthorized farmer role from accessing laboratory workflow', () => {
+    mockAuthState.role = 'FARMER';
+    render(
+      <BrowserRouter>
+        <TestProductPage />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/Access Restricted: Role Authorization Required/i)).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(/LABORATORY/i);
+  });
+
+  it('blocks unauthorized retailer role from accessing distributor workflow', () => {
+    mockAuthState.role = 'RETAILER';
+    render(
+      <BrowserRouter>
+        <CreateShipmentPage />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText(/Access Restricted: Role Authorization Required/i)).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(/DISTRIBUTOR/i);
+  });
+
+  it('permits ADMIN role superuser access across workflows', () => {
+    mockAuthState.role = 'ADMIN';
+    const { unmount } = render(
+      <BrowserRouter>
+        <ProcessBatchPage />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByRole('tab', { name: /batch intake/i })).toBeInTheDocument();
+    unmount();
   });
 });
 

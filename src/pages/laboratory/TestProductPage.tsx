@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   ShieldX,
   Blocks,
-  CheckCircle2,
   AlertTriangle,
   ArrowRight,
   ArrowLeft,
@@ -18,11 +17,14 @@ import {
   FileCheck,
   Share2,
   Package,
-  Check,
-  AlertCircle,
-  Lock,
+  CheckCircle2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { generateMockIpfsCid, isValidIpfsCid } from '../../utils/ipfsUtils';
+import { WizardStepper } from '../../components/common/WizardStepper';
+import { WizardAlert } from '../../components/common/WizardAlert';
+import { UnauthorizedCard } from '../../components/common/UnauthorizedCard';
+import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation';
 
 export const TestProductPage: React.FC = () => {
   const { products, submitLabResult, getProductById } = useBlockchain();
@@ -30,12 +32,23 @@ export const TestProductPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // Role-Based Access Control (Axis 4: Defense-in-depth security guard)
+  if (currentUser?.role !== 'LABORATORY' && currentUser?.role !== 'ADMIN') {
+    return (
+      <DashboardLayout
+        title="Botanical Monograph & Safety Testing"
+        subtitle="Perform ISO 17025 accredited laboratory assays, purity validation, and sign cryptographic Certificates of Analysis (COA)."
+      >
+        <UnauthorizedCard
+          currentRole={currentUser?.role || 'UNKNOWN'}
+          requiredRole="LABORATORY"
+        />
+      </DashboardLayout>
+    );
+  }
+
   const eligibleProducts = products.filter(p => p.status === 'PROCESSED' || p.status === 'IN_TESTING');
   const initialBatchId = searchParams.get('batch') || eligibleProducts[0]?.id || '';
-
-  const [step, setStep] = useState(1);
-  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1]));
-  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [selectedProductId, setSelectedProductId] = useState(initialBatchId);
   const [purity, setPurity] = useState<number>(99.5);
@@ -45,9 +58,10 @@ export const TestProductPage: React.FC = () => {
   const [pesticides, setPesticides] = useState<'PASS' | 'FAIL'>('PASS');
   const [testedBy, setTestedBy] = useState('Dr. Ananya Sharma, Lead Biochemist');
   const [notes, setNotes] = useState('Batch passed all Ayurvedic Pharmacopoeia of India (API) & FSSAI 2023 botanical monograph criteria. Zero synthetic pesticide residue detected (<0.001 mg/kg limit of quantification).');
-  const [ipfsCid, setIpfsCid] = useState('QmLabReport' + Math.random().toString(36).substring(2, 12));
+  const [ipfsCid, setIpfsCid] = useState(() => generateMockIpfsCid('LabReport'));
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [decisionResult, setDecisionResult] = useState<'APPROVED' | 'REJECTED' | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
@@ -70,7 +84,7 @@ export const TestProductPage: React.FC = () => {
       case 3:
         return Boolean(heavyMetals && microbial && pesticides);
       case 4:
-        return Boolean(testedBy.trim() && notes.trim() && ipfsCid.trim());
+        return Boolean(testedBy.trim() && notes.trim() && ipfsCid.trim() && isValidIpfsCid(ipfsCid));
       case 5:
         return Boolean(decisionResult);
       default:
@@ -78,50 +92,21 @@ export const TestProductPage: React.FC = () => {
     }
   };
 
-  const canNavigateToStep = (targetStep: number): { allowed: boolean; reason?: string } => {
-    if (targetStep <= step) return { allowed: true };
-
-    for (let s = 1; s < targetStep; s++) {
-      if (!isStepComplete(s)) {
-        const stepInfo = STEPS.find(item => item.id === s);
-        const targetInfo = STEPS.find(item => item.id === targetStep);
-        return {
-          allowed: false,
-          reason: `Please complete Step ${s} (${stepInfo?.label || 'Previous Step'}) before advancing to Step ${targetStep} (${targetInfo?.label || 'Target Step'}).`,
-        };
-      }
-    }
-    return { allowed: true };
-  };
-
-  const handleTabClick = (targetStep: number) => {
-    if (targetStep === step) return;
-    const check = canNavigateToStep(targetStep);
-    if (!check.allowed) {
-      setValidationError(check.reason || 'Please fill in the required fields on the current tab first.');
-      return;
-    }
-    setValidationError(null);
-    setVisitedSteps(prev => new Set([...prev, targetStep]));
-    setStep(targetStep);
-  };
-
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isStepComplete(step)) {
-      setValidationError('Please complete the required fields in the current step before proceeding.');
-      return;
-    }
-    setValidationError(null);
-    const nextStep = Math.min(5, step + 1);
-    setVisitedSteps(prev => new Set([...prev, nextStep]));
-    setStep(nextStep);
-  };
-
-  const handleBack = () => {
-    setValidationError(null);
-    setStep(prev => Math.max(1, prev - 1));
-  };
+  const {
+    step,
+    setStep,
+    validationError,
+    setValidationError,
+    clearValidationError,
+    canNavigateToStep,
+    handleTabClick,
+    handleNext,
+    handleBack,
+    markStepVisited,
+  } = useWizardNavigation({
+    steps: STEPS,
+    isStepComplete,
+  });
 
   const validateBeforeDecision = (): { isValid: boolean; targetStep?: number; message?: string } => {
     if (!selectedProductId) {
@@ -133,25 +118,35 @@ export const TestProductPage: React.FC = () => {
     if (!heavyMetals || !microbial || !pesticides) {
       return { isValid: false, targetStep: 3, message: 'Please specify all safety test statuses in Step 3.' };
     }
-    if (!testedBy.trim() || !notes.trim() || !ipfsCid.trim()) {
-      return { isValid: false, targetStep: 4, message: 'Please complete analyst sign-off and IPFS certificate details in Step 4.' };
+    if (!testedBy.trim() || !notes.trim() || !ipfsCid.trim() || !isValidIpfsCid(ipfsCid)) {
+      return { isValid: false, targetStep: 4, message: 'Please complete analyst sign-off and provide a valid IPFS certificate CID format in Step 4.' };
     }
     return { isValid: true };
   };
 
   const handleDecision = async (approve: boolean) => {
+    // Double-submit & idempotency guard (Axis 4)
+    if (isSubmitting || decisionResult) return;
+
     const validation = validateBeforeDecision();
     if (!validation.isValid) {
       setValidationError(validation.message || 'Please complete required fields.');
       if (validation.targetStep) {
-        setVisitedSteps(prev => new Set([...prev, validation.targetStep!]));
-        setStep(validation.targetStep!);
+        markStepVisited(validation.targetStep);
+        setStep(validation.targetStep);
       }
       return;
     }
 
+    // Input sanitization & boundary defense (Axis 4)
+    const sanitizedTestedBy = testedBy.trim().slice(0, 120);
+    const sanitizedNotes = notes.trim().slice(0, 1000);
+    const sanitizedIpfsCid = ipfsCid.trim();
+
     setIsSubmitting(true);
     setValidationError(null);
+    setSubmitError(null);
+
     try {
       const parameters = [
         {
@@ -197,30 +192,28 @@ export const TestProductPage: React.FC = () => {
           labId: currentUser.id,
           labName: currentUser.organization || 'Eurofins NABL Analytical Testing Lab',
           testDate: new Date().toISOString(),
-          testedBy,
+          testedBy: sanitizedTestedBy,
           purityPercentage: purity,
           moisturePercentage: moisture,
           heavyMetalsStatus: heavyMetals,
           microbialTestStatus: microbial,
           pesticideResidueStatus: pesticides,
           parameters,
-          certificateIpfsCid: ipfsCid,
+          certificateIpfsCid: sanitizedIpfsCid,
           overallResult: approve ? 'APPROVED' : 'REJECTED',
-          notes: approve ? notes : 'CRITICAL FAILURE: Pesticide / microbial contamination exceeds allowed Ayurvedic Pharmacopoeia of India (API) & FSSAI limits. Smart contract locked batch.',
+          notes: approve ? sanitizedNotes : 'CRITICAL FAILURE: Pesticide / microbial contamination exceeds allowed Ayurvedic Pharmacopoeia of India (API) & FSSAI limits. Smart contract locked batch.',
         },
         approve
       );
 
-      setIsSubmitting(false);
       setDecisionResult(approve ? 'APPROVED' : 'REJECTED');
-
-      if (approve) {
-        try {
-          confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
-        } catch (e) {}
-      }
-    } catch (err) {
+      try {
+        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+      } catch (e) {}
+    } catch (err: any) {
       console.error(err);
+      setSubmitError(err?.message || 'Laboratory certification transaction failed. Please verify ledger connection and try again.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -233,119 +226,23 @@ export const TestProductPage: React.FC = () => {
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Interactive Progress Tab Stepper */}
         {!decisionResult && (
-          <nav aria-label="Testing Steps" className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
-            <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
-              {STEPS.map((s) => {
-                const isActive = step === s.id;
-                const isComplete = isStepComplete(s.id);
-                const IconComponent = s.icon;
-                const navCheck = canNavigateToStep(s.id);
-                const isAccessible = navCheck.allowed;
-
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    role="tab"
-                    id={`lab-step-tab-${s.id}`}
-                    aria-selected={isActive}
-                    aria-current={isActive ? 'step' : undefined}
-                    aria-disabled={!isAccessible}
-                    onClick={() => handleTabClick(s.id)}
-                    title={!isAccessible ? navCheck.reason : undefined}
-                    className={`relative flex flex-col items-center justify-center py-2.5 px-1 sm:px-2 rounded-xl transition-all duration-200 group text-center select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
-                      isActive
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-700/20 ring-2 ring-indigo-500/40 font-bold cursor-default'
-                        : isComplete
-                        ? 'bg-indigo-50 text-indigo-800 border border-indigo-200/90 hover:bg-indigo-100/80 hover:border-indigo-300 font-semibold cursor-pointer'
-                        : isAccessible
-                        ? 'bg-slate-50 text-slate-600 border border-slate-200/80 hover:bg-slate-100 hover:text-slate-800 hover:border-slate-300 font-medium cursor-pointer'
-                        : 'bg-slate-50/60 text-slate-400 border border-dashed border-slate-200 cursor-not-allowed opacity-60'
-                    }`}
-                  >
-                    {/* Top Row: Icon + Badge */}
-                    <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
-                      <IconComponent
-                        size={15}
-                        className={`transition-transform duration-200 ${
-                          isActive
-                            ? 'text-white'
-                            : isComplete
-                            ? 'text-indigo-700 group-hover:scale-110'
-                            : isAccessible
-                            ? 'text-slate-400 group-hover:text-slate-600 group-hover:scale-110'
-                            : 'text-slate-300'
-                        }`}
-                      />
-                      {/* Step Number / Check Badge / Lock */}
-                      <span
-                        className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-extrabold shrink-0 ${
-                          isActive
-                            ? 'bg-indigo-800/90 text-indigo-100'
-                            : isComplete
-                            ? 'bg-indigo-200 text-indigo-900'
-                            : isAccessible
-                            ? 'bg-slate-200 text-slate-600'
-                            : 'bg-slate-100 text-slate-400'
-                        }`}
-                      >
-                        {isComplete && !isActive ? (
-                          <Check size={10} className="stroke-[3]" />
-                        ) : !isAccessible ? (
-                          <Lock size={9} />
-                        ) : (
-                          s.id
-                        )}
-                      </span>
-                    </div>
-
-                    {/* Step Title */}
-                    <span className="text-[11px] sm:text-xs leading-tight tracking-tight hidden sm:inline truncate max-w-full">
-                      {s.label}
-                    </span>
-                    <span className="text-[10px] leading-tight tracking-tight sm:hidden font-medium truncate max-w-full">
-                      {s.shortLabel}
-                    </span>
-
-                    {/* Active Indicator Pip */}
-                    {isActive && (
-                      <span className="absolute -bottom-1 w-6 sm:w-8 h-1 bg-indigo-400 rounded-full shadow-xs" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Direct Tab Navigation Hint */}
-            <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-1.5 border-t border-slate-100">
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                <span>Click previous tabs to edit • Next tabs unlock when current tab is filled</span>
-              </span>
-              <span className="font-mono text-[10px] text-slate-400 font-semibold">
-                Step {step} of 5
-              </span>
-            </div>
-          </nav>
+          <WizardStepper
+            steps={STEPS}
+            currentStep={step}
+            isStepComplete={isStepComplete}
+            canNavigateToStep={canNavigateToStep}
+            onTabClick={handleTabClick}
+            theme="indigo"
+            ariaLabel="Testing Steps"
+          />
         )}
 
         {/* Validation Error Alert Banner */}
-        {validationError && (
-          <div className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-200">
-            <div className="flex items-center gap-2">
-              <AlertCircle size={16} className="text-amber-600 shrink-0" />
-              <span className="font-medium">{validationError}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setValidationError(null)}
-              className="text-amber-700 hover:text-amber-950 font-bold p-1 rounded-lg hover:bg-amber-100"
-              aria-label="Dismiss alert"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+        <WizardAlert
+          message={validationError}
+          type="error"
+          onDismiss={clearValidationError}
+        />
 
         {/* Success / Rejected Screen */}
         {decisionResult ? (
@@ -816,6 +713,14 @@ export const TestProductPage: React.FC = () => {
                       <span className="font-mono text-indigo-700">{ipfsCid}</span>
                     </div>
                   </div>
+
+                  {submitError && (
+                    <WizardAlert
+                      message={submitError}
+                      type="error"
+                      onDismiss={() => setSubmitError(null)}
+                    />
+                  )}
 
                   {/* Action Decision Buttons */}
                   <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-between items-center">
