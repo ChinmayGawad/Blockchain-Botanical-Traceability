@@ -82,10 +82,10 @@ export const VerifyProductPage: React.FC = () => {
                 <ShieldCheck size={14} className="text-emerald-400" />
                 <span>Consumer Provenance Audit</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 Botanical Authenticity Verification
               </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground/85 max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-emerald-50/90 max-w-2xl leading-relaxed">
                 Cryptographic soil-to-shelf traceability verified across 5 consortium nodes on the blockchain.
               </p>
             </div>
