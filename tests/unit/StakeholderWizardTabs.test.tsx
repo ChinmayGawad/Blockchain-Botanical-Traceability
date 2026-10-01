@@ -146,6 +146,30 @@ describe('Processor ProcessBatchPage Tab Navigation', () => {
     expect(screen.getByText('Step 2: Bio-Refining & Facility Details')).toBeInTheDocument();
     expect(screen.getByText(/please complete step 2/i)).toBeInTheDocument();
   });
+
+  it('enforces mass balance: blocks advancing if processed output mass exceeds raw intake mass', () => {
+    renderProcessorPage();
+
+    // Go to Step 3
+    const massTab = screen.getByRole('tab', { name: /mass & yield/i });
+    fireEvent.click(massTab);
+    expect(screen.getByText('Step 3: Mass Balance & Yield Calculation')).toBeInTheDocument();
+
+    // Intake is 300kg by default. Set output to 500kg (violates physical mass balance)
+    const outputInput = screen.getByDisplayValue('270');
+    fireEvent.change(outputInput, { target: { value: '500' } });
+
+    // Verify visual error badge
+    expect(screen.getByText(/mass balance exceeded/i)).toBeInTheDocument();
+
+    // Try to click Step 4
+    const sopTab = screen.getByRole('tab', { name: /sop & ipfs/i });
+    fireEvent.click(sopTab);
+
+    // Should be blocked and remain on Step 3
+    expect(screen.getByText('Step 3: Mass Balance & Yield Calculation')).toBeInTheDocument();
+    expect(screen.getByText(/please complete step 3/i)).toBeInTheDocument();
+  });
 });
 
 describe('Laboratory TestProductPage Tab Navigation', () => {
@@ -181,6 +205,27 @@ describe('Laboratory TestProductPage Tab Navigation', () => {
     const intakeTab = screen.getByRole('tab', { name: /batch intake/i });
     fireEvent.click(intakeTab);
     expect(screen.getByText('Step 1: Botanical Batch Inspection Target')).toBeInTheDocument();
+  });
+
+  it('enforces assay bounds: blocks advancing if purity or moisture is outside 0..100', () => {
+    renderLabPage();
+
+    // Go to Step 2
+    const assayTab = screen.getByRole('tab', { name: /assay specs/i });
+    fireEvent.click(assayTab);
+    expect(screen.getByText('Step 2: Phytochemical Potency & Moisture Assay')).toBeInTheDocument();
+
+    // Set purity to 150 (> 100%)
+    const purityInput = screen.getByDisplayValue('99.5');
+    fireEvent.change(purityInput, { target: { value: '150' } });
+
+    // Try to click Step 3 (Safety screen)
+    const safetyTab = screen.getByRole('tab', { name: /safety screen/i });
+    fireEvent.click(safetyTab);
+
+    // Should remain on Step 2 and show error
+    expect(screen.getByText('Step 2: Phytochemical Potency & Moisture Assay')).toBeInTheDocument();
+    expect(screen.getByText(/please complete step 2/i)).toBeInTheDocument();
   });
 });
 
@@ -227,4 +272,31 @@ describe('Distributor CreateShipmentPage Tab Navigation', () => {
     expect(screen.getByText('Step 2: Logistics Route Origin & Destination')).toBeInTheDocument();
     expect(screen.getByText(/please complete step 2/i)).toBeInTheDocument();
   });
+
+  it('enforces temporal dispatch order: blocks advancing if estimated delivery precedes dispatch date', () => {
+    renderDistributorPage();
+
+    // Go to Step 4 (Schedule & Manifest)
+    const scheduleTab = screen.getByRole('tab', { name: /schedule & manifest/i });
+    fireEvent.click(scheduleTab);
+    expect(screen.getByText('Step 4: Dispatch Schedule & Tracking Number')).toBeInTheDocument();
+
+    // Default dispatch is today, expected is 3 days ahead.
+    // Set expected date to yesterday (earlier than dispatch)
+    const dateInputs = screen.getAllByDisplayValue(/\d{4}-\d{2}-\d{2}/);
+    // dateInputs[0] is dispatchDate, dateInputs[1] is expectedDate
+    fireEvent.change(dateInputs[1], { target: { value: '2020-01-01' } });
+
+    // Verify warning message is shown
+    expect(screen.getByText(/delivery date cannot precede scheduled dispatch date/i)).toBeInTheDocument();
+
+    // Try to click Step 5
+    const reviewTab = screen.getByRole('tab', { name: /review & dispatch/i });
+    fireEvent.click(reviewTab);
+
+    // Should remain on Step 4 and show validation error
+    expect(screen.getByText('Step 4: Dispatch Schedule & Tracking Number')).toBeInTheDocument();
+    expect(screen.getByText(/please complete step 4/i)).toBeInTheDocument();
+  });
 });
+

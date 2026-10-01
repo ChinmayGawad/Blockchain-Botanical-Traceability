@@ -66,7 +66,7 @@ export const TestProductPage: React.FC = () => {
       case 1:
         return Boolean(selectedProductId);
       case 2:
-        return Boolean(!isNaN(purity) && purity >= 0 && !isNaN(moisture) && moisture >= 0);
+        return Boolean(!isNaN(purity) && purity >= 0 && purity <= 100 && !isNaN(moisture) && moisture >= 0 && moisture <= 100);
       case 3:
         return Boolean(heavyMetals && microbial && pesticides);
       case 4:
@@ -127,8 +127,8 @@ export const TestProductPage: React.FC = () => {
     if (!selectedProductId) {
       return { isValid: false, targetStep: 1, message: 'Please select a botanical sample batch to inspect.' };
     }
-    if (isNaN(purity) || isNaN(moisture)) {
-      return { isValid: false, targetStep: 2, message: 'Please enter valid purity and moisture assays in Step 2.' };
+    if (isNaN(purity) || purity < 0 || purity > 100 || isNaN(moisture) || moisture < 0 || moisture > 100) {
+      return { isValid: false, targetStep: 2, message: 'Please enter valid assay percentages between 0% and 100% for purity and moisture in Step 2.' };
     }
     if (!heavyMetals || !microbial || !pesticides) {
       return { isValid: false, targetStep: 3, message: 'Please specify all safety test statuses in Step 3.' };

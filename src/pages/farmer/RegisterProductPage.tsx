@@ -78,7 +78,12 @@ export const RegisterProductPage: React.FC = () => {
       case 1:
         return Boolean(name.trim() && botanicalName.trim() && batchId.trim() && quantityKg > 0);
       case 2:
-        return Boolean(farmLocation.trim() && !isNaN(lat) && !isNaN(lng) && harvestDate);
+        return Boolean(
+          farmLocation.trim() &&
+          !isNaN(lat) && lat >= -90 && lat <= 90 &&
+          !isNaN(lng) && lng >= -180 && lng <= 180 &&
+          harvestDate
+        );
       case 3:
         // Local supply chain partner selection is optional/configurable
         return true;
@@ -121,6 +126,10 @@ export const RegisterProductPage: React.FC = () => {
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isStepComplete(step)) {
+      setValidationError('Please complete the required fields in the current step before proceeding.');
+      return;
+    }
     setValidationError(null);
     const nextStep = Math.min(5, step + 1);
     setVisitedSteps(prev => new Set([...prev, nextStep]));
@@ -140,11 +149,16 @@ export const RegisterProductPage: React.FC = () => {
         message: 'Please complete all required fields in Step 1 (Botanical Information) before submitting.',
       };
     }
-    if (!farmLocation.trim() || !lat || !lng || !harvestDate) {
+    if (
+      !farmLocation.trim() ||
+      isNaN(lat) || lat < -90 || lat > 90 ||
+      isNaN(lng) || lng < -180 || lng > 180 ||
+      !harvestDate
+    ) {
       return {
         isValid: false,
         targetStep: 2,
-        message: 'Please complete farm location, GPS coordinates, and harvest date in Step 2.',
+        message: 'Please complete farm location, valid GPS coordinates (Lat: -90 to 90, Lng: -180 to 180), and harvest date in Step 2.',
       };
     }
     if (!certType.trim() || !certNumber.trim() || !ipfsHash.trim()) {
@@ -491,6 +505,8 @@ export const RegisterProductPage: React.FC = () => {
                     <input
                       type="number"
                       step="0.0001"
+                      min="-90"
+                      max="90"
                       required
                       value={lat}
                       onChange={e => setLat(Number(e.target.value))}
@@ -503,6 +519,8 @@ export const RegisterProductPage: React.FC = () => {
                     <input
                       type="number"
                       step="0.0001"
+                      min="-180"
+                      max="180"
                       required
                       value={lng}
                       onChange={e => setLng(Number(e.target.value))}

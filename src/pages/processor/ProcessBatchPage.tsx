@@ -57,7 +57,10 @@ export const ProcessBatchPage: React.FC = () => {
     }
   }, [selectedProductId, selectedProduct]);
 
-  const yieldLoss = initialQty > 0 ? Math.max(0, Math.round(((initialQty - processedQty) / initialQty) * 100)) : 10;
+  const isYieldValid = initialQty > 0 && processedQty > 0 && processedQty <= initialQty;
+  const yieldLoss = isYieldValid
+    ? Math.round(((initialQty - processedQty) / initialQty) * 100)
+    : 0;
 
   const STEPS = [
     { id: 1, label: 'Batch Intake', shortLabel: 'Intake', icon: Package },
@@ -74,7 +77,7 @@ export const ProcessBatchPage: React.FC = () => {
       case 2:
         return Boolean(method.trim() && facilityLocation.trim());
       case 3:
-        return Boolean(initialQty > 0 && processedQty > 0);
+        return Boolean(initialQty > 0 && processedQty > 0 && processedQty <= initialQty);
       case 4:
         return Boolean(equipment.trim() && notes.trim() && ipfsCid.trim());
       case 5:
@@ -137,7 +140,10 @@ export const ProcessBatchPage: React.FC = () => {
       return { isValid: false, targetStep: 2, message: 'Please specify the processing method and facility location in Step 2.' };
     }
     if (!initialQty || initialQty <= 0 || !processedQty || processedQty <= 0) {
-      return { isValid: false, targetStep: 3, message: 'Please specify valid input and output masses in Step 3.' };
+      return { isValid: false, targetStep: 3, message: 'Please specify positive numerical input and output masses in Step 3.' };
+    }
+    if (processedQty > initialQty) {
+      return { isValid: false, targetStep: 3, message: 'Refined output mass cannot exceed raw intake mass.' };
     }
     if (!equipment.trim() || !notes.trim() || !ipfsCid.trim()) {
       return { isValid: false, targetStep: 4, message: 'Please enter equipment used and SOP notes in Step 4.' };
@@ -492,19 +498,35 @@ export const ProcessBatchPage: React.FC = () => {
                   <input
                     type="number"
                     min="1"
+                    max={initialQty > 0 ? initialQty : undefined}
                     required
                     value={processedQty}
                     onChange={e => setProcessedQty(Number(e.target.value))}
-                    className="w-full px-3 py-2 text-xs border border-purple-200 rounded-lg font-bold bg-white"
+                    className={`w-full px-3 py-2 text-xs border rounded-lg font-bold bg-white ${
+                      processedQty > initialQty ? 'border-rose-400 text-rose-700' : 'border-purple-200'
+                    }`}
                   />
+                  {processedQty > initialQty && (
+                    <p className="text-[11px] text-rose-600 font-semibold mt-1">
+                      ⚠ Output cannot exceed intake mass ({initialQty} kg).
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-bold text-purple-900 uppercase mb-1">
                     Calculated Yield Loss (%):
                   </label>
-                  <div className="px-3 py-2 text-xs font-bold text-purple-900 bg-purple-100 rounded-lg border border-purple-200">
-                    {yieldLoss}% Moisture / Hull Loss
+                  <div
+                    className={`px-3 py-2 text-xs font-bold rounded-lg border ${
+                      processedQty > initialQty
+                        ? 'text-rose-800 bg-rose-100 border-rose-200'
+                        : 'text-purple-900 bg-purple-100 border-purple-200'
+                    }`}
+                  >
+                    {processedQty > initialQty
+                      ? '⚠ Mass Balance Exceeded'
+                      : `${yieldLoss}% Moisture / Hull Loss`}
                   </div>
                 </div>
               </div>

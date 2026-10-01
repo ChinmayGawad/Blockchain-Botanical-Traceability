@@ -142,4 +142,47 @@ describe('RegisterProductPage Tab Navigation', () => {
     fireEvent.click(cropSpecsTab);
     expect(screen.getByText('Step 1: Botanical Information')).toBeInTheDocument();
   });
+
+  it('correctly accepts Equator (lat=0) and Prime Meridian (lng=0) as valid coordinates', () => {
+    renderComponent();
+
+    // Go to Step 2
+    const farmTab = screen.getByRole('tab', { name: /farm & gps/i });
+    fireEvent.click(farmTab);
+    expect(screen.getByText('Step 2: Farm Location & Soil Telemetry')).toBeInTheDocument();
+
+    // Change lat and lng to 0
+    const latInput = screen.getByDisplayValue('24.4721');
+    const lngInput = screen.getByDisplayValue('74.8812');
+    fireEvent.change(latInput, { target: { value: '0' } });
+    fireEvent.change(lngInput, { target: { value: '0' } });
+
+    // Click to Step 4 (Certs)
+    const certsTab = screen.getByRole('tab', { name: /certificates/i });
+    fireEvent.click(certsTab);
+
+    // Should successfully navigate to Step 4 without error
+    expect(screen.getByText('Step 4: Certificates & IPFS Storage')).toBeInTheDocument();
+  });
+
+  it('rejects out-of-bound GPS coordinates (lat > 90 or lng > 180)', () => {
+    renderComponent();
+
+    // Go to Step 2
+    const farmTab = screen.getByRole('tab', { name: /farm & gps/i });
+    fireEvent.click(farmTab);
+
+    // Set lat to 95 (> 90 max latitude)
+    const latInput = screen.getByDisplayValue('24.4721');
+    fireEvent.change(latInput, { target: { value: '95' } });
+
+    // Try to click Step 4
+    const certsTab = screen.getByRole('tab', { name: /certificates/i });
+    fireEvent.click(certsTab);
+
+    // Should stay on Step 2 and show validation error
+    expect(screen.getByText('Step 2: Farm Location & Soil Telemetry')).toBeInTheDocument();
+    expect(screen.getByText(/please complete step 2/i)).toBeInTheDocument();
+  });
 });
+

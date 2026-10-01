@@ -68,7 +68,12 @@ export const CreateShipmentPage: React.FC = () => {
       case 3:
         return Boolean(vehicleNumber.trim() && transportType && tempRange.trim());
       case 4:
-        return Boolean(trackingNumber.trim() && dispatchDate && expectedDate);
+        return Boolean(
+          trackingNumber.trim() &&
+          dispatchDate &&
+          expectedDate &&
+          new Date(expectedDate) >= new Date(dispatchDate)
+        );
       case 5:
         return Boolean(isSuccess);
       default:
@@ -133,6 +138,9 @@ export const CreateShipmentPage: React.FC = () => {
     }
     if (!trackingNumber.trim() || !dispatchDate || !expectedDate) {
       return { isValid: false, targetStep: 4, message: 'Please specify tracking number and schedule dates in Step 4.' };
+    }
+    if (new Date(expectedDate) < new Date(dispatchDate)) {
+      return { isValid: false, targetStep: 4, message: 'Estimated delivery date cannot precede the scheduled dispatch date.' };
     }
     return { isValid: true };
   };
@@ -631,11 +639,17 @@ export const CreateShipmentPage: React.FC = () => {
                         <label className="block text-xs font-semibold text-slate-700 mb-1">Estimated Delivery Date: *</label>
                         <input
                           type="date"
+                          min={dispatchDate || undefined}
                           required
                           value={expectedDate}
                           onChange={e => setExpectedDate(e.target.value)}
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none"
                         />
+                        {expectedDate && dispatchDate && new Date(expectedDate) < new Date(dispatchDate) && (
+                          <p className="text-[11px] text-rose-600 font-semibold mt-1">
+                            ⚠ Delivery date cannot precede scheduled dispatch date.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
