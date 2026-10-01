@@ -4,6 +4,7 @@ import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { CultivationMethod, Certificate } from '../../types';
+import { LocalPartnerSelector } from '../../components/map/LocalPartnerSelector';
 import {
   Sprout,
   Check,
@@ -50,6 +51,14 @@ export const RegisterProductPage: React.FC = () => {
   const [certType, setCertType] = useState('India Organic (NPOP) & FSSAI Jaivik Bharat');
   const [certNumber, setCertNumber] = useState(`NPOP-IND-2024-${Math.floor(1000 + Math.random() * 9000)}`);
   const [ipfsHash, setIpfsHash] = useState('QmShatavariCert' + Math.random().toString(36).substring(2, 12));
+
+  // Supply Chain Partners
+  const [selectedPartners, setSelectedPartners] = useState<any>({
+    processor: null,
+    lab: null,
+    distributor: null,
+    retailer: null,
+  });
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +123,7 @@ export const RegisterProductPage: React.FC = () => {
         {/* Progress Stepper Bar */}
         {!createdProduct && (
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-            <div className="grid grid-cols-4 gap-2 text-center text-xs font-semibold">
+            <div className="grid grid-cols-5 gap-2 text-center text-xs font-semibold">
               <div
                 className={`p-2 rounded-xl transition-colors ${
                   step >= 1 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'text-slate-400'
@@ -134,14 +143,21 @@ export const RegisterProductPage: React.FC = () => {
                   step >= 3 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'text-slate-400'
                 }`}
               >
-                3. Certificates
+                3. Local Partners
               </div>
               <div
                 className={`p-2 rounded-xl transition-colors ${
                   step >= 4 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'text-slate-400'
                 }`}
               >
-                4. Commit On-Chain
+                4. Certificates
+              </div>
+              <div
+                className={`p-2 rounded-xl transition-colors ${
+                  step >= 5 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'text-slate-400'
+                }`}
+              >
+                5. Commit On-Chain
               </div>
             </div>
           </div>
@@ -348,15 +364,44 @@ export const RegisterProductPage: React.FC = () => {
                 type="submit"
                 className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm"
               >
-                <span>Continue to Certificates</span>
+                <span>Continue to Supply Partners</span>
                 <ArrowRight size={16} />
               </button>
             </div>
           </form>
         )}
 
-        {/* Step 3: Certificates & IPFS */}
+        {/* Step 3: Local Area Partners */}
         {step === 3 && !createdProduct && (
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+            <LocalPartnerSelector
+              farmerLat={lat}
+              farmerLng={lng}
+              onSelectionComplete={(selections) => setSelectedPartners(selections)}
+            />
+            <div className="flex justify-between pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-1.5"
+              >
+                <ArrowLeft size={16} />
+                <span>Back</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm"
+              >
+                <span>Continue to Certificates</span>
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Certificates & IPFS */}
+        {step === 4 && !createdProduct && (
           <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
               <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
@@ -429,8 +474,8 @@ export const RegisterProductPage: React.FC = () => {
           </form>
         )}
 
-        {/* Step 4: Review and Commit to Blockchain */}
-        {step === 4 && !createdProduct && (
+        {/* Step 5: Review and Commit to Blockchain */}
+        {step === 5 && !createdProduct && (
           <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
               <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
