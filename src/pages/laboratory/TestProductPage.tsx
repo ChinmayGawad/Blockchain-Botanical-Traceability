@@ -138,6 +138,12 @@ export const TestProductPage: React.FC = () => {
       return;
     }
 
+    // Smart Contract Trust Policy & Safety Screening Invariant (Audit Finding 2)
+    if (approve && (heavyMetals === 'FAIL' || microbial === 'FAIL' || pesticides === 'FAIL')) {
+      setValidationError('Regulatory Safety Failure: Cannot approve batch. Contaminant safety screens (heavy metals, microbial pathogens, or pesticides) failed regulatory standards.');
+      return;
+    }
+
     // Input sanitization & boundary defense (Axis 4)
     const sanitizedTestedBy = testedBy.trim().slice(0, 120);
     const sanitizedNotes = notes.trim().slice(0, 1000);

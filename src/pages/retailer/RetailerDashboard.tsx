@@ -46,6 +46,16 @@ export const RetailerDashboard: React.FC = () => {
   const receivingProduct = products.find(p => p.id === receivingProductId);
 
   const handleConfirmReceipt = async (productId: string) => {
+    if (isSubmittingReceipt) return;
+    if (isNaN(price) || price <= 0) {
+      alert('Please specify a positive retail unit price (greater than ₹0).');
+      return;
+    }
+    if (!shelfId.trim()) {
+      alert('Please specify a valid retail shelf batch tag.');
+      return;
+    }
+
     setIsSubmittingReceipt(true);
     await new Promise(resolve => setTimeout(resolve, 450));
     await confirmRetailReceipt(productId, {
@@ -53,8 +63,8 @@ export const RetailerDashboard: React.FC = () => {
       retailerName: `${currentUser.name} (${currentUser.organization || 'Arogya Pure Herbals'})`,
       storeLocation: currentUser.location || 'Indiranagar, Bengaluru, Karnataka',
       receivedDate: new Date().toISOString(),
-      shelfBatchId: shelfId,
-      unitPrice: price,
+      shelfBatchId: shelfId.trim().slice(0, 50),
+      unitPrice: Number(price.toFixed(2)),
       notes: 'Tamper seals verified intact. Matched with smart contract hash.',
     });
 
@@ -257,6 +267,7 @@ export const RetailerDashboard: React.FC = () => {
                   <input
                     type="number"
                     step="10"
+                    min="1"
                     value={price}
                     onChange={e => setPrice(parseFloat(e.target.value) || 0)}
                     className="w-full bg-white px-3 py-2 text-xs rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"

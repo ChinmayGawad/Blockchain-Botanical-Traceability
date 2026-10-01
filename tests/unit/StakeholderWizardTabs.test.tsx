@@ -233,6 +233,31 @@ describe('Laboratory TestProductPage Tab Navigation', () => {
     expect(screen.getByText('Step 2: Phytochemical Potency & Moisture Assay')).toBeInTheDocument();
     expect(screen.getByText(/please complete step 2/i)).toBeInTheDocument();
   });
+
+  it('enforces safety screening consensus: blocks APPROVE decision if any screen indicates FAIL', () => {
+    renderLabPage();
+
+    // Go to Step 3
+    const safetyTab = screen.getByRole('tab', { name: /safety screen/i });
+    fireEvent.click(safetyTab);
+    expect(screen.getByText('Step 3: Contaminant & Toxicology Screening')).toBeInTheDocument();
+
+    // Change Heavy Metals to FAIL
+    const selects = screen.getAllByRole('combobox');
+    fireEvent.change(selects[0], { target: { value: 'FAIL' } });
+
+    // Jump to Step 5 (Decision)
+    const decisionTab = screen.getByRole('tab', { name: /ledger decision/i });
+    fireEvent.click(decisionTab);
+    expect(screen.getByText('Step 5: Cryptographic Decision Sign-Off')).toBeInTheDocument();
+
+    // Try to approve
+    const approveBtn = screen.getByRole('button', { name: /approve & issue certificate/i });
+    fireEvent.click(approveBtn);
+
+    // Expect safety failure error
+    expect(screen.getByText(/regulatory safety failure/i)).toBeInTheDocument();
+  });
 });
 
 describe('Distributor CreateShipmentPage Tab Navigation', () => {
