@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { LanguageSwitcher } from '../../src/components/common/LanguageSwitcher';
 import i18n, { SUPPORTED_LANGUAGES } from '../../src/i18n';
 

@@ -15,6 +15,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 }) => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [rotation, setRotation] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentLang = (i18n.language?.slice(0, 2) as AppLanguage) || 'en';
@@ -35,6 +36,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   }, [isOpen]);
 
   const handleSelectLanguage = (code: AppLanguage) => {
+    if (code !== currentLang) {
+      setRotation(prev => prev + 360);
+    }
     i18n.changeLanguage(code);
     setIsOpen(false);
   };
@@ -44,16 +48,23 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     return (
       <div className={`p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 ${className}`}>
         <div className="flex items-center gap-2 text-xs font-bold text-slate-700 px-1">
-          <Languages size={15} className="text-emerald-700" />
+          <motion.div
+            animate={{ rotate: rotation }}
+            transition={{ type: 'spring', stiffness: 280, damping: 20 }}
+          >
+            <Languages size={15} className="text-emerald-700" />
+          </motion.div>
           <span>Select Language / भाषा निवडा</span>
         </div>
         <div className="grid grid-cols-3 gap-1.5">
           {SUPPORTED_LANGUAGES.map((lang) => {
             const isSelected = lang.code === currentLang;
             return (
-              <button
+              <motion.button
                 key={lang.code}
                 onClick={() => handleSelectLanguage(lang.code)}
+                whileTap={{ scale: 0.94 }}
+                whileHover={{ scale: 1.02 }}
                 type="button"
                 className={`flex flex-col items-center justify-center p-2 rounded-xl text-xs font-bold transition-all border ${
                   isSelected
@@ -63,7 +74,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
               >
                 <span className="text-sm mb-0.5">{lang.flag}</span>
                 <span className="text-[11px] leading-tight font-semibold">{lang.nativeName}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -82,8 +93,24 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           title="Switch Platform Language"
           aria-label="Switch Language"
         >
-          <Languages size={11} className="text-emerald-400 shrink-0" />
-          <span className="truncate">{activeOption.nativeName}</span>
+          <motion.div
+            animate={{ rotate: rotation }}
+            transition={{ type: 'spring', stiffness: 280, damping: 20 }}
+          >
+            <Languages size={11} className="text-emerald-400 shrink-0" />
+          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={activeOption.code}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={{ duration: 0.15 }}
+              className="truncate"
+            >
+              {activeOption.nativeName}
+            </motion.span>
+          </AnimatePresence>
           <ChevronDown size={11} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
@@ -113,7 +140,15 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                       <span>{lang.flag}</span>
                       <span>{lang.nativeName}</span>
                     </span>
-                    {isSelected && <Check size={12} className="text-emerald-400" />}
+                    {isSelected && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
+                      >
+                        <Check size={12} className="text-emerald-400" />
+                      </motion.span>
+                    )}
                   </button>
                 );
               })}
@@ -127,18 +162,38 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   // Standard Navbar dropdown variant
   return (
     <div className={`relative shrink-0 ${className}`} ref={containerRef}>
-      <button
+      <motion.button
         type="button"
+        whileTap={{ scale: 0.96 }}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200/90 text-slate-800 border border-slate-200/90 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs group"
         title="Change Language / भाषा बदला"
         aria-label="Change Language"
       >
-        <Languages size={15} className="text-emerald-700 group-hover:scale-105 transition-transform shrink-0" />
-        <span className="hidden sm:inline font-semibold">{activeOption.nativeName}</span>
+        <motion.div
+          animate={{ rotate: rotation }}
+          transition={{ type: 'spring', stiffness: 280, damping: 20 }}
+          className="flex items-center justify-center shrink-0"
+        >
+          <Languages size={15} className="text-emerald-700 group-hover:scale-105 transition-transform" />
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={activeOption.code}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="hidden sm:inline font-semibold"
+          >
+            {activeOption.nativeName}
+          </motion.span>
+        </AnimatePresence>
+
         <span className="sm:hidden font-mono uppercase text-[11px]">{activeOption.code}</span>
         <ChevronDown size={13} className={`text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+      </motion.button>
 
       <AnimatePresence>
         {isOpen && (
@@ -171,7 +226,15 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                     <span>{lang.nativeName}</span>
                     <span className="text-[10px] text-slate-600 font-normal">({lang.label})</span>
                   </span>
-                  {isSelected && <Check size={14} className="text-emerald-700 shrink-0" />}
+                  {isSelected && (
+                    <motion.span
+                      initial={{ scale: 0, rotate: -30 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                    >
+                      <Check size={14} className="text-emerald-700 shrink-0" />
+                    </motion.span>
+                  )}
                 </button>
               );
             })}
