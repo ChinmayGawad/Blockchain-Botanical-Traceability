@@ -119,79 +119,87 @@ Verify on-chain: ${verificationUrl}`;
       onClose={onClose}
       title="Share Laboratory QA Report"
       subtitle={`Batch ${product.batchId} • Password-Protected Certificate of Analysis`}
-      maxWidth="lg"
+      maxWidth="2xl"
     >
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* Monograph Top Status Banner */}
-        <div className={`p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-          isApproved ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : 'bg-rose-50 border-rose-200 text-rose-950'
+        <div className={`p-3 sm:p-3.5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 ${
+          isApproved ? 'bg-emerald-50/90 border-emerald-200/90 text-emerald-950' : 'bg-rose-50/90 border-rose-200/90 text-rose-950'
         }`}>
           <div className="flex items-center space-x-3">
-            <div className={`p-2.5 rounded-lg ${isApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-              {isApproved ? <ShieldCheck className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
+            <div className={`p-2 rounded-xl shrink-0 ${isApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+              {isApproved ? <ShieldCheck className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <h4 className="font-semibold text-base">{product.name}</h4>
-                <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${
+              <div className="flex flex-wrap items-center gap-2">
+                <h4 className="font-bold text-sm sm:text-base text-gray-900 leading-tight">{product.name}</h4>
+                <span className={`px-2 py-0.5 text-[11px] font-bold rounded-full uppercase tracking-wider shrink-0 ${
                   isApproved ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'
                 }`}>
                   {lab?.overallResult || 'APPROVED'}
                 </span>
               </div>
               <p className="text-xs text-gray-600 mt-0.5">
-                {lab?.labName || 'FloraChain QA Testing Station'} • Tested on {lab?.testDate || 'N/A'}
+                {lab?.labName || 'FloraChain QA Testing Station'} • Tested on {lab?.testDate ? (lab.testDate.includes('T') ? lab.testDate.split('T')[0] : lab.testDate) : 'N/A'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 text-xs bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-200">
+          <div className="flex items-center space-x-3 shrink-0 text-xs bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-200/80 shadow-2xs self-stretch md:self-auto justify-around">
             <div>
-              <span className="text-gray-500 block">Purity</span>
+              <span className="text-gray-500 text-[10px] font-semibold uppercase block">Purity</span>
               <span className="font-bold text-gray-900">{lab?.purityPercentage ?? '98.5'}%</span>
             </div>
-            <div className="h-6 w-px bg-gray-200" />
+            <div className="h-5 w-px bg-gray-200" />
             <div>
-              <span className="text-gray-500 block">Moisture</span>
+              <span className="text-gray-500 text-[10px] font-semibold uppercase block">Moisture</span>
               <span className="font-bold text-gray-900">{lab?.moisturePercentage ?? '4.2'}%</span>
             </div>
-            <div className="h-6 w-px bg-gray-200" />
+            <div className="h-5 w-px bg-gray-200" />
             <div>
-              <span className="text-gray-500 block">Heavy Metals</span>
+              <span className="text-gray-500 text-[10px] font-semibold uppercase block whitespace-nowrap">Heavy Metals</span>
               <span className="font-bold text-emerald-600">{lab?.heavyMetalsStatus ?? 'PASS'}</span>
             </div>
           </div>
         </div>
 
         {/* Password Protection Section */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50/60 border border-amber-200/80 rounded-2xl p-5 shadow-sm space-y-4">
+        <div className="bg-gradient-to-br from-amber-50/90 via-amber-50/50 to-orange-50/40 border border-amber-200/90 rounded-2xl p-3 sm:p-3.5 shadow-2xs space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
-              <div className="p-2 bg-amber-100 text-amber-800 rounded-lg">
-                <Lock className="h-5 w-5" />
+              <div className="p-1.5 bg-amber-100 text-amber-800 rounded-lg shrink-0">
+                <Lock className="h-4 w-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-amber-950 flex items-center gap-1.5">
-                  PDF Password Protection
-                  <span className="text-[10px] uppercase tracking-wider bg-amber-200/80 text-amber-900 font-semibold px-2 py-0.5 rounded-full">
+                <h4 className="text-xs sm:text-sm font-bold text-amber-950 flex items-center gap-2">
+                  <span>PDF Password Protection</span>
+                  <span className="text-[10px] uppercase tracking-wider bg-amber-200/80 text-amber-900 font-bold px-2 py-0.5 rounded-full">
                     128-Bit Encryption
                   </span>
                 </h4>
-                <p className="text-xs text-amber-800/80 mt-0.5">
+                <p className="text-[11.5px] text-amber-800/80 mt-0.5">
                   The generated PDF Certificate is encrypted. Recipient must enter this password to open the file.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-            <div className="sm:col-span-7 relative">
-              <label className="block text-[11px] font-semibold text-amber-900 mb-1 flex items-center justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <label className="font-semibold text-amber-950 flex items-center gap-2">
                 <span>Custom PDF Passcode</span>
-                <span className="text-amber-700 font-normal">Recipient Access Code</span>
+                <span className="text-[10px] font-medium text-amber-800 bg-amber-100/90 border border-amber-200/80 px-2 py-0.5 rounded-md">
+                  Recipient Access Code
+                </span>
               </label>
-              <div className="relative flex items-center">
-                <div className="absolute left-3 text-amber-700 pointer-events-none">
+              <span className="text-[11px] text-amber-700/80 hidden sm:inline">
+                Default: Batch ID
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
+              <div className="relative flex-1">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-700 pointer-events-none">
                   <KeyRound className="h-4 w-4" />
                 </div>
                 <input
@@ -199,53 +207,52 @@ Verify on-chain: ${verificationUrl}`;
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter PDF password..."
-                  className="w-full pl-9 pr-20 py-2 text-sm bg-white border border-amber-300 rounded-lg text-gray-900 font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                  className="w-full h-10 pl-9 pr-20 text-sm bg-white border border-amber-300 rounded-xl text-gray-900 font-mono focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-2xs"
                 />
-                <div className="absolute right-2 flex items-center space-x-1">
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="p-1 text-amber-700 hover:text-amber-900 rounded hover:bg-amber-100 transition"
+                    className="p-1.5 text-amber-700 hover:text-amber-900 rounded-lg hover:bg-amber-100 transition cursor-pointer"
                     title={showPassword ? 'Hide passcode' : 'Show passcode'}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                   </button>
                   <button
                     type="button"
                     onClick={handleCopyPassword}
-                    className="p-1 text-amber-700 hover:text-amber-900 rounded hover:bg-amber-100 transition"
+                    className="p-1.5 text-amber-700 hover:text-amber-900 rounded-lg hover:bg-amber-100 transition cursor-pointer"
                     title="Copy passcode to clipboard"
                   >
-                    {isCopiedPassword ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                    {isCopiedPassword ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
               </div>
-              {isCopiedPassword && (
-                <span className="absolute -bottom-4 left-1 text-[10px] font-medium text-emerald-700 animate-fade-in">
-                  Passcode copied to clipboard!
-                </span>
-              )}
-            </div>
 
-            <div className="sm:col-span-5 flex flex-col justify-end pt-5 sm:pt-0">
               <button
                 type="button"
                 onClick={handleDownloadPdf}
                 disabled={isDownloading}
-                className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition disabled:opacity-50"
+                className="h-10 px-4.5 shrink-0 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition active:scale-[0.98] disabled:opacity-50 cursor-pointer"
               >
                 <Download className="h-4 w-4" />
                 <span>{isDownloading ? 'Encrypting PDF...' : 'Download Encrypted PDF'}</span>
               </button>
             </div>
+
+            {isCopiedPassword && (
+              <p className="text-[11px] font-medium text-emerald-700 animate-fade-in pl-1">
+                Passcode copied to clipboard!
+              </p>
+            )}
           </div>
         </div>
 
         {/* Share Channels & Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5">
           {/* Left Column: Quick Share & Summary Copy */}
-          <div className="space-y-3">
-            <h5 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+          <div className="md:col-span-7 space-y-1.5">
+            <h5 className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">
               Direct Sharing Options
             </h5>
 
@@ -253,27 +260,27 @@ Verify on-chain: ${verificationUrl}`;
             <button
               type="button"
               onClick={handleNativeShare}
-              className="w-full flex items-center justify-between p-3.5 bg-white border border-gray-200 hover:border-emerald-500 rounded-xl shadow-xs hover:shadow-sm transition text-left group"
+              className="w-full flex items-center justify-between p-2 sm:p-2.5 bg-white border border-gray-200 hover:border-emerald-500 rounded-xl shadow-2xs hover:shadow-xs transition text-left group cursor-pointer"
             >
-              <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-emerald-50 group-hover:bg-emerald-100 text-emerald-700 rounded-lg transition">
-                  <Share2 className="h-5 w-5" />
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="p-1.5 bg-emerald-50 group-hover:bg-emerald-100 text-emerald-700 rounded-lg transition shrink-0">
+                  <Share2 className="h-4 w-4" />
                 </div>
-                <div>
-                  <span className="text-sm font-semibold text-gray-900 block group-hover:text-emerald-700 transition">
+                <div className="min-w-0">
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900 block group-hover:text-emerald-700 transition truncate">
                     {hasNativeShare ? 'Mobile Share Sheet' : 'Share Lab Certificate'}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-[10.5px] text-gray-500 block truncate">
                     {hasNativeShare ? 'WhatsApp, AirDrop, Messages, Email' : 'Quick send report summary'}
                   </span>
                 </div>
               </div>
               {shareSuccess ? (
-                <span className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-                  <Check className="h-4 w-4" /> Shared!
+                <span className="text-xs font-medium text-emerald-600 flex items-center gap-1 shrink-0 ml-2">
+                  <Check className="h-3.5 w-3.5" /> Shared!
                 </span>
               ) : (
-                <Sparkles className="h-4 w-4 text-emerald-500 opacity-70 group-hover:opacity-100" />
+                <Sparkles className="h-4 w-4 text-emerald-500 opacity-60 group-hover:opacity-100 shrink-0 ml-2" />
               )}
             </button>
 
@@ -281,27 +288,27 @@ Verify on-chain: ${verificationUrl}`;
             <button
               type="button"
               onClick={handleCopyLink}
-              className="w-full flex items-center justify-between p-3.5 bg-white border border-gray-200 hover:border-blue-500 rounded-xl shadow-xs hover:shadow-sm transition text-left group"
+              className="w-full flex items-center justify-between p-2 sm:p-2.5 bg-white border border-gray-200 hover:border-blue-500 rounded-xl shadow-2xs hover:shadow-xs transition text-left group cursor-pointer"
             >
-              <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-blue-50 group-hover:bg-blue-100 text-blue-700 rounded-lg transition">
-                  <Copy className="h-5 w-5" />
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="p-1.5 bg-blue-50 group-hover:bg-blue-100 text-blue-700 rounded-lg transition shrink-0">
+                  <Copy className="h-4 w-4" />
                 </div>
-                <div>
-                  <span className="text-sm font-semibold text-gray-900 block group-hover:text-blue-700 transition">
+                <div className="min-w-0">
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900 block group-hover:text-blue-700 transition truncate">
                     Copy Verification URL
                   </span>
-                  <span className="text-xs text-gray-500 font-mono truncate max-w-[200px] block">
+                  <span className="text-[10.5px] text-gray-500 font-mono truncate max-w-[220px] block">
                     /verify/{product.id}
                   </span>
                 </div>
               </div>
               {isCopiedLink ? (
-                <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                  <Check className="h-4 w-4" /> Copied!
+                <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 shrink-0 ml-2">
+                  <Check className="h-3.5 w-3.5" /> Copied!
                 </span>
               ) : (
-                <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-500" />
+                <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-500 shrink-0 ml-2" />
               )}
             </button>
 
@@ -309,71 +316,71 @@ Verify on-chain: ${verificationUrl}`;
             <button
               type="button"
               onClick={handleCopySummary}
-              className="w-full flex items-center justify-between p-3.5 bg-white border border-gray-200 hover:border-purple-500 rounded-xl shadow-xs hover:shadow-sm transition text-left group"
+              className="w-full flex items-center justify-between p-2 sm:p-2.5 bg-white border border-gray-200 hover:border-purple-500 rounded-xl shadow-2xs hover:shadow-xs transition text-left group cursor-pointer"
             >
-              <div className="flex items-center space-x-3">
-                <div className="p-2.5 bg-purple-50 group-hover:bg-purple-100 text-purple-700 rounded-lg transition">
-                  <FileText className="h-5 w-5" />
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="p-1.5 bg-purple-50 group-hover:bg-purple-100 text-purple-700 rounded-lg transition shrink-0">
+                  <FileText className="h-4 w-4" />
                 </div>
-                <div>
-                  <span className="text-sm font-semibold text-gray-900 block group-hover:text-purple-700 transition">
+                <div className="min-w-0">
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900 block group-hover:text-purple-700 transition truncate">
                     Copy Monograph Text
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-[10.5px] text-gray-500 block truncate">
                     Includes test specs, hashes & passcode
                   </span>
                 </div>
               </div>
               {isCopiedSummary ? (
-                <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                  <Check className="h-4 w-4" /> Copied!
+                <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 shrink-0 ml-2">
+                  <Check className="h-3.5 w-3.5" /> Copied!
                 </span>
               ) : (
-                <Copy className="h-4 w-4 text-gray-400 group-hover:text-purple-500" />
+                <Copy className="h-4 w-4 text-gray-400 group-hover:text-purple-500 shrink-0 ml-2" />
               )}
             </button>
           </div>
 
           {/* Right Column: QR Code for Mobile Verification */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center space-y-3">
-            <h5 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+          <div className="md:col-span-5 bg-gradient-to-b from-gray-50 to-slate-100/70 border border-gray-200 rounded-2xl p-2.5 flex flex-col items-center justify-between text-center">
+            <h5 className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">
               Scan & Verify On Mobile
             </h5>
             
-            <div className="p-3 bg-white rounded-xl shadow-xs border border-gray-200 inline-block">
+            <div className="p-1.5 bg-white rounded-xl shadow-xs border border-gray-200 my-1">
               <QRCodeSVG
                 value={verificationUrl}
-                size={140}
+                size={86}
                 level="M"
                 includeMargin={false}
                 imageSettings={{
                   src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z'/></svg>",
                   x: undefined,
                   y: undefined,
-                  height: 24,
-                  width: 24,
+                  height: 16,
+                  width: 16,
                   excavate: true,
                 }}
               />
             </div>
 
-            <p className="text-[11px] text-gray-500 max-w-xs leading-relaxed">
-              Scan with any mobile camera to view real-time cryptographic audit trail and lab proofs.
+            <p className="text-[10px] text-gray-500 leading-tight max-w-[180px]">
+              Scan with phone camera to view live blockchain audit trail.
             </p>
           </div>
         </div>
 
         {/* Ledger Proofs Footer */}
-        <div className="bg-gray-50/80 rounded-xl p-3 border border-gray-200 text-xs text-gray-600 space-y-1 font-mono">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500">IPFS Certificate CID:</span>
-            <span className="text-gray-800 font-medium truncate max-w-[260px]">
+        <div className="bg-slate-50/90 rounded-xl p-2 sm:p-2.5 border border-slate-200 text-xs text-slate-600 space-y-1 font-mono">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 sm:gap-2">
+            <span className="text-slate-500 text-[11px]">IPFS Certificate CID:</span>
+            <span className="text-slate-800 font-medium truncate max-w-full sm:max-w-[340px] text-[11px]">
               {lab?.certificateIpfsCid || 'QmTestCertificateFloraChainQA982'}
             </span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500">Smart Contract Tx:</span>
-            <span className="text-gray-800 font-medium truncate max-w-[260px]">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 sm:gap-2">
+            <span className="text-slate-500 text-[11px]">Smart Contract Tx:</span>
+            <span className="text-slate-800 font-medium truncate max-w-full sm:max-w-[340px] text-[11px]">
               {lab?.txHash || '0x4a7c8e9b1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a'}
             </span>
           </div>

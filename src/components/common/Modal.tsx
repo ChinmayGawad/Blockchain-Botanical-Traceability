@@ -47,14 +47,14 @@ export const Modal: React.FC<ModalProps> = ({
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
             onClick={onClose}
           />
 
@@ -64,12 +64,12 @@ export const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className={`relative w-full ${widthClasses[maxWidth] || 'max-w-lg'} bg-white rounded-3xl shadow-2xl border border-slate-200 z-10 my-8 overflow-hidden`}
+            className={`relative w-full ${widthClasses[maxWidth] || 'max-w-lg'} bg-white rounded-3xl shadow-2xl border border-slate-200 z-10 my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden`}
           >
             {/* Header */}
-            <div className="flex items-start justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+            <div className="shrink-0 flex items-start justify-between px-6 py-3.5 border-b border-slate-100 bg-slate-50/70">
               <div>
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                   {title}
                 </h3>
                 {subtitle && (
@@ -88,7 +88,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
 
             {/* Body */}
-            <div className="p-6 max-h-[calc(85vh-130px)] overflow-y-auto">
+            <div className="p-4.5 sm:p-5 overflow-y-auto flex-1 overscroll-contain">
               {children}
             </div>
           </motion.div>
