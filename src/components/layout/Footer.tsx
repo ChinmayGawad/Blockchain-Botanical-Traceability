@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Sprout, ShieldCheck, Blocks, Database, Cpu, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-slate-950 text-slate-400 border-t border-slate-800 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,38 +21,38 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
-              Decentralized botanical supply chain provenance and verification platform powered by Hyperledger Fabric, IPFS, and Spring Boot.
+              {t('footer.description')}
             </p>
             <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Ledger Channel: botanical-provenance-channel
+              {t('footer.ledgerChannel')}
             </div>
           </div>
 
           {/* Quick Verification Links */}
           <div className="space-y-3">
             <h4 className="text-white font-bold uppercase tracking-wider text-xs">
-              Consumer Verification
+              {t('footer.consumerVerification')}
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/verify/BOT-2024-8901" className="hover:text-emerald-400 transition-colors">
-                  Sample: Organic Ashwagandha Root
+                  {t('footer.sampleAshwagandha')}
                 </Link>
               </li>
               <li>
                 <Link to="/verify/BOT-2024-4412" className="hover:text-emerald-400 transition-colors">
-                  Sample: Lakadong Turmeric 8.4%
+                  {t('footer.sampleTurmeric')}
                 </Link>
               </li>
               <li>
                 <Link to="/verify/BOT-2024-9981" className="hover:text-rose-400 transition-colors text-rose-400/80">
-                  Sample: QA Flagged Neem Batch
+                  {t('footer.sampleNeem')}
                 </Link>
               </li>
               <li>
                 <Link to="/verify" className="hover:text-emerald-400 transition-colors">
-                  Scan QR / Search Product ID
+                  {t('footer.scanQrLink')}
                 </Link>
               </li>
             </ul>
@@ -58,7 +61,7 @@ export const Footer: React.FC = () => {
           {/* Stakeholder Portals */}
           <div className="space-y-3">
             <h4 className="text-white font-bold uppercase tracking-wider text-xs">
-              Supply Chain Stakeholders
+              {t('footer.stakeholderPortals')}
             </h4>
             <ul className="space-y-2">
               <li>
@@ -92,7 +95,7 @@ export const Footer: React.FC = () => {
           {/* Architecture Details */}
           <div className="space-y-3">
             <h4 className="text-white font-bold uppercase tracking-wider text-xs">
-              Consortium Architecture
+              {t('footer.consortiumArchitecture')}
             </h4>
             <div className="space-y-2 text-[11px] text-slate-400">
               <div className="flex items-center gap-1.5">
@@ -117,14 +120,14 @@ export const Footer: React.FC = () => {
 
         <div className="mt-12 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-[11px]">
           <div>
-            © {new Date().getFullYear()} FloraChain Botanical Consortium. Built for complete medicinal herb provenance & customer trust.
+            © {new Date().getFullYear()} {t('footer.copyright')}
           </div>
           <div className="flex items-center gap-4">
             <Link to="/admin/explorer" className="hover:text-slate-300">
-              Hyperledger Explorer
+              {t('footer.explorerLink')}
             </Link>
             <Link to="/admin/approvals" className="hover:text-slate-300">
-              Admin Governance
+              {t('footer.governanceLink')}
             </Link>
           </div>
         </div>

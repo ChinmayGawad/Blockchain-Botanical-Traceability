@@ -31,8 +31,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 export const VerifyProductPage: React.FC = () => {
+  const { t } = useTranslation();
   const { productId } = useParams<{ productId?: string }>();
   const { getProductById, products } = useBlockchain();
   const navigate = useNavigate();
@@ -80,13 +82,13 @@ export const VerifyProductPage: React.FC = () => {
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 text-[11px] font-bold uppercase tracking-wider shadow-2xs">
                 <ShieldCheck size={14} className="text-emerald-400" />
-                <span>Consumer Provenance Audit</span>
+                <span>{t('verify.badgeProvenance')}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Botanical Authenticity Verification
+                {t('verify.title')}
               </h1>
               <p className="text-xs sm:text-sm text-emerald-50/90 max-w-2xl leading-relaxed">
-                Cryptographic soil-to-shelf traceability verified across 5 consortium nodes on the blockchain.
+                {t('verify.subtitle')}
               </p>
             </div>
 
@@ -100,7 +102,7 @@ export const VerifyProductPage: React.FC = () => {
                   title="Share Password-Protected QA Certificate"
                 >
                   <Share2 size={14} className="mr-1.5" />
-                  Share Report
+                  {t('verify.shareQaReport')}
                 </Button>
                 <Button
                   onClick={() => navigate('/verify')}
@@ -109,7 +111,7 @@ export const VerifyProductPage: React.FC = () => {
                   className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:text-white"
                 >
                   <Search size={14} className="mr-1.5" />
-                  Verify Another Batch
+                  {t('nav.verifyBatch')}
                 </Button>
                 <Button
                   onClick={() => setIsScannerOpen(true)}
@@ -126,7 +128,7 @@ export const VerifyProductPage: React.FC = () => {
                     <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
                       type="text"
-                      placeholder="Enter Batch ID (e.g. ASH-2024-089)..."
+                      placeholder={t('verify.searchBatchPlaceholder')}
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
                       className="pl-10 bg-white text-muted-foreground placeholder:text-muted-foreground/60 border-emerald-200/40 focus:border-emerald-400 shadow-sm"
@@ -348,7 +350,7 @@ export const VerifyProductPage: React.FC = () => {
                                 : 'text-muted-foreground/60 hover:text-foreground'
                             }`}
                           >
-                            🗺️ Map
+                            🗺️ {t('verify.tabsMap')}
                           </button>
                           <button
                             type="button"
@@ -359,7 +361,7 @@ export const VerifyProductPage: React.FC = () => {
                                 : 'text-muted-foreground/60 hover:text-foreground'
                             }`}
                           >
-                            📑 Ledger
+                            📑 {t('verify.tabsTimeline')}
                           </button>
                         </div>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Sprout,
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
+  const { t } = useTranslation();
   const { currentUser, role, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -28,46 +30,46 @@ export const Sidebar: React.FC = () => {
     switch (role) {
       case 'ADMIN':
         return [
-          { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Overview Dashboard' },
-          { to: '/admin/approvals', icon: Users, label: 'Stakeholder Approvals' },
-          { to: '/admin/products', icon: Package, label: 'Consortium Batches' },
-          { to: '/admin/explorer', icon: Blocks, label: 'Ledger Explorer' },
-          { to: '/admin/reports', icon: AlertTriangle, label: 'Fraud / Suspicious Reports' },
+          { to: '/admin/dashboard', icon: LayoutDashboard, label: t('sidebar.adminDashboard') },
+          { to: '/admin/approvals', icon: Users, label: t('sidebar.adminApprovals') },
+          { to: '/admin/products', icon: Package, label: t('sidebar.adminBatches') },
+          { to: '/admin/explorer', icon: Blocks, label: t('sidebar.adminExplorer') },
+          { to: '/admin/reports', icon: AlertTriangle, label: t('sidebar.adminReports') },
         ];
       case 'FARMER':
         return [
-          { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Farmer Dashboard' },
-          { to: '/farmer/register', icon: PlusCircle, label: 'Register Botanical Crop' },
-          { to: '/farmer/products', icon: Sprout, label: 'My Registered Crops' },
+          { to: '/farmer/dashboard', icon: LayoutDashboard, label: t('sidebar.farmerDashboard') },
+          { to: '/farmer/register', icon: PlusCircle, label: t('sidebar.farmerRegister') },
+          { to: '/farmer/products', icon: Sprout, label: t('sidebar.farmerProducts') },
         ];
       case 'PROCESSOR':
         return [
-          { to: '/processor/dashboard', icon: LayoutDashboard, label: 'Processing Queue' },
-          { to: '/processor/process', icon: Cog, label: 'Process Raw Batch' },
-          { to: '/processor/batches', icon: Package, label: 'Processed Inventory' },
+          { to: '/processor/dashboard', icon: LayoutDashboard, label: t('sidebar.processorDashboard') },
+          { to: '/processor/process', icon: Cog, label: t('sidebar.processorProcess') },
+          { to: '/processor/batches', icon: Package, label: t('sidebar.processorBatches') },
         ];
       case 'LABORATORY':
         return [
-          { to: '/laboratory/dashboard', icon: LayoutDashboard, label: 'Testing Dashboard' },
-          { to: '/laboratory/test', icon: FlaskConical, label: 'Inspect & QA Test' },
-          { to: '/laboratory/reports', icon: FileCheck, label: 'Issued Certificates' },
+          { to: '/laboratory/dashboard', icon: LayoutDashboard, label: t('sidebar.labDashboard') },
+          { to: '/laboratory/test', icon: FlaskConical, label: t('sidebar.labTest') },
+          { to: '/laboratory/reports', icon: FileCheck, label: t('sidebar.labReports') },
         ];
       case 'DISTRIBUTOR':
         return [
-          { to: '/distributor/dashboard', icon: LayoutDashboard, label: 'Logistics Dashboard' },
-          { to: '/distributor/create-shipment', icon: PlusCircle, label: 'Create Cold Shipment' },
-          { to: '/distributor/shipments', icon: Truck, label: 'Shipment Tracking' },
+          { to: '/distributor/dashboard', icon: LayoutDashboard, label: t('sidebar.distributorDashboard') },
+          { to: '/distributor/create-shipment', icon: PlusCircle, label: t('sidebar.distributorShipment') },
+          { to: '/distributor/shipments', icon: Truck, label: t('sidebar.distributorTracking') },
         ];
       case 'RETAILER':
         return [
-          { to: '/retailer/dashboard', icon: LayoutDashboard, label: 'Store Overview' },
-          { to: '/retailer/inventory', icon: Store, label: 'Retail Inventory' },
-          { to: '/retailer/generate-qr', icon: QrCode, label: 'Generate QR Labels' },
+          { to: '/retailer/dashboard', icon: LayoutDashboard, label: t('sidebar.retailerDashboard') },
+          { to: '/retailer/inventory', icon: Store, label: t('sidebar.retailerInventory') },
+          { to: '/retailer/generate-qr', icon: QrCode, label: t('sidebar.retailerGenerateQr') },
         ];
       default:
         return [
-          { to: '/home', icon: LayoutDashboard, label: 'Home Landing' },
-          { to: '/verify', icon: ShieldCheck, label: 'Verify Product' },
+          { to: '/home', icon: LayoutDashboard, label: t('sidebar.homeLanding') },
+          { to: '/verify', icon: ShieldCheck, label: t('sidebar.verifyProduct') },
         ];
     }
   };
@@ -168,7 +170,7 @@ export const Sidebar: React.FC = () => {
             className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-700 hover:text-emerald-900 hover:bg-white border border-transparent hover:border-slate-200 transition-all shadow-2xs"
           >
             <span className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-700" /> Public Verification
+              <ShieldCheck size={16} className="text-emerald-700" /> {t('nav.verifyBatch')}
             </span>
             <ExternalLink size={13} className="text-slate-400" />
           </NavLink>
@@ -181,7 +183,7 @@ export const Sidebar: React.FC = () => {
             className="w-full flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-rose-700 hover:text-rose-800 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
           >
             <LogOut size={16} />
-            <span>Sign Out ({role})</span>
+            <span>{t('nav.signOut')} ({role})</span>
           </button>
         </div>
       </aside>

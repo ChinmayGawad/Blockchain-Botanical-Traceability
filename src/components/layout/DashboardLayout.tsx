@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -17,6 +18,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   subtitle,
   action,
 }) => {
+  const { t } = useTranslation();
   const { currentUser, role } = useAuth();
 
   return (
@@ -31,9 +33,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-start gap-3 text-amber-900 text-xs shadow-xs">
             <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
             <div>
-              <div className="font-bold">Stakeholder Membership Under Review</div>
+              <div className="font-bold">{t('dashboard.membershipUnderReview')}</div>
               <div>
-                Your node credential is awaiting cryptographic approval by Consortium Admin Dr. Evelyn Vance. You have read-only access until verified.
+                {t('dashboard.membershipUnderReviewDesc')}
               </div>
             </div>
           </div>
@@ -47,11 +49,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 {title}
               </h1>
               <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
-                {role}
+                {t(`roles.${role}`)}
               </span>
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50/80 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
                 <ShieldCheck size={13} />
-                <span>Active on Ledger</span>
+                <span>{t('dashboard.activeOnLedger')}</span>
               </span>
             </div>
             {subtitle && (

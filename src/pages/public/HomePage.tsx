@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useBlockchain } from '../../context/BlockchainContext';
 import {
   Sprout,
@@ -63,6 +64,7 @@ const BotanicalPattern: React.FC<{ className?: string }> = ({ className = '' }) 
 );
 
 export const HomePage: React.FC = () => {
+  const { t } = useTranslation();
   const { products, networkStats } = useBlockchain();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,56 +114,56 @@ export const HomePage: React.FC = () => {
   const pipelineStages = [
     {
       step: '01',
-      role: 'Organic Farmer',
-      title: 'Harvest & GPS Origin',
+      role: t('roles.FARMER'),
+      title: t('home.stage1Title'),
       icon: Sprout,
       color: 'text-teal-800 bg-teal-50 border-teal-300',
       badge: 'Genesis Block',
-      desc: 'GPS farm telemetry, harvest date, soil assay, and India Organic (NPOP) certificate CID pinned to IPFS.',
+      desc: t('home.stage1Desc'),
       techProof: 'Smart Contract: CreateProduct() • Signed with Farmer Node Key',
       metrics: ['Precision GPS Geotag', 'NPOP Organic CID', 'Harvest Timestamp'],
     },
     {
       step: '02',
-      role: 'Bio Processor',
-      title: 'Milling & Refining SOP',
+      role: t('roles.PROCESSOR'),
+      title: t('home.stage2Title'),
       icon: Cog,
       color: 'text-purple-800 bg-purple-50 border-purple-300',
       badge: 'Transformation',
-      desc: 'Cryogenic milling, vacuum dehydration, mass yield delta, and GMP facility certificates stamped.',
+      desc: t('home.stage2Desc'),
       techProof: 'Smart Contract: AddProcessingDetails() • Mass Balance Verified',
       metrics: ['Milling Temperature (<45°C)', 'Yield Loss Delta', 'GMP Audit Hash'],
     },
     {
       step: '03',
-      role: 'Quality Lab',
-      title: 'HPLC Chemical Fingerprint',
+      role: t('roles.LABORATORY'),
+      title: t('home.stage3Title'),
       icon: FlaskConical,
       color: 'text-indigo-800 bg-indigo-50 border-indigo-300',
       badge: 'Assay Verdict',
-      desc: 'High-performance liquid chromatography potency assay, heavy metal screening, and ISO-17025 lab report.',
+      desc: t('home.stage3Desc'),
       techProof: 'Smart Contract: AddLabReport() • Cryptographic Pass/Fail Gate',
       metrics: ['Active Compound Potency', 'Heavy Metal ICP-MS', 'ISO/IEC 17025 CID'],
     },
     {
       step: '04',
-      role: 'Distributor',
-      title: 'Cold-Chain IoT Logistics',
+      role: t('roles.DISTRIBUTOR'),
+      title: t('home.stage4Title'),
       icon: Truck,
       color: 'text-sky-800 bg-sky-50 border-sky-300',
       badge: 'Telemetry',
-      desc: 'Continuous temperature logging, humidity sensors, carrier transfer timestamps, and seal tamper checks.',
+      desc: t('home.stage4Desc'),
       techProof: 'Smart Contract: AddShipmentDetails() • IoT Anomaly Check',
       metrics: ['Live Temperature (2-8°C)', 'GPS Route Milestones', 'Tamper Seal ID'],
     },
     {
       step: '05',
-      role: 'Retailer',
-      title: 'Store Shelf & QR Tag',
+      role: t('roles.RETAILER'),
+      title: t('home.stage5Title'),
       icon: Store,
       color: 'text-emerald-800 bg-emerald-50 border-emerald-300',
       badge: 'Consumer Trust',
-      desc: 'Store check-in confirmation, retail batch tagging, and consumer QR code label activation.',
+      desc: t('home.stage5Desc'),
       techProof: 'Smart Contract: ConfirmRetailReceipt() • Complete Soil-to-Shelf Proof',
       metrics: ['Retail Shelf Tag', 'QR Authenticity URL', 'Final Consumer Scan'],
     },
@@ -189,7 +191,7 @@ export const HomePage: React.FC = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-emerald-900 border border-emerald-500/30 text-[13px] font-bold shadow-glow hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all"
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
-                <span>Decentralized Botanical Provenance Ledger</span>
+                <span>{t('home.eyebrow')}</span>
               </motion.div>
 
               {/* Headline */}
@@ -198,9 +200,9 @@ export const HomePage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-4xl sm:text-6xl xl:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]"
               >
-                Soil to Shelf.
+                {t('home.heroTitleLine1')}
                 <br />
-                <span className="text-gradient">Cryptographically Verified.</span>
+                <span className="text-gradient">{t('home.heroTitleLine2')}</span>
               </motion.h1>
 
               {/* Sub-copy */}
@@ -210,10 +212,7 @@ export const HomePage: React.FC = () => {
                 transition={{ delay: 0.2 }}
                 className="text-base sm:text-lg text-[#065F46] max-w-2xl leading-relaxed"
               >
-                FloraChain unites farmers, bio-processors, testing laboratories,
-                distributors, and apothecaries into an immutable blockchain
-                network to eliminate botanical adulteration and build genuine
-                customer trust.
+                {t('home.heroDescription')}
               </motion.p>
 
               {/* ── Search Bar ── */}
@@ -241,7 +240,7 @@ export const HomePage: React.FC = () => {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Enter Batch ID (e.g. ASH-2024-089)…"
+                      placeholder={t('home.searchPlaceholder')}
                       className="w-full bg-transparent pl-12 pr-4 py-3 text-sm sm:text-base font-mono font-medium text-[#064E3B] placeholder:text-[#8A9B82] focus:outline-none h-full"
                     />
                   </div>
@@ -254,13 +253,13 @@ export const HomePage: React.FC = () => {
                       className="flex-1 sm:flex-none px-4 glass-panel hover:bg-white/90 text-emerald-900 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all border border-emerald-500/20 cursor-pointer min-h-[44px]"
                     >
                       <QrCode size={18} aria-hidden="true" />
-                      <span className="sm:hidden">Scan</span>
+                      <span className="sm:hidden">{t('home.scanQrBtn')}</span>
                     </button>
                     <button
                       type="submit"
                       className="flex-[2] sm:flex-none px-8 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-2xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] flex items-center justify-center gap-2 group cursor-pointer min-h-[44px]"
                     >
-                      <span>Verify</span>
+                      <span>{t('home.verifyBatchBtn')}</span>
                       <ArrowRight
                         size={18}
                         className="group-hover:translate-x-1 transition-transform"
@@ -490,11 +489,10 @@ export const HomePage: React.FC = () => {
             Cryptographic Pipeline
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-[#064E3B] tracking-tight">
-            How Botanical Provenance Works
+            {t('home.pipelineTitle')}
           </h2>
           <p className="text-base sm:text-lg text-[#5F7A6B] max-w-xl mx-auto">
-            Every step is signed by authorized stakeholder keys and committed to
-            the immutable blockchain ledger.
+            {t('home.pipelineSubtitle')}
           </p>
         </div>
 

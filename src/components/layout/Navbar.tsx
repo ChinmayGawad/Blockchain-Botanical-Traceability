@@ -32,8 +32,11 @@ import {
 } from 'lucide-react';
 import { QRScannerModal } from '../verification/QRScannerModal';
 import { WalletConnectButton } from '../common/WalletConnectButton';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export const Navbar: React.FC = () => {
+  const { t } = useTranslation();
   const { currentUser, role, isAuthenticated, switchRole, logout } = useAuth();
   const { networkStats, resetToDefaultData } = useBlockchain();
   const navigate = useNavigate();
@@ -58,13 +61,13 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const roleConfigs: Record<UserRole, { label: string; icon: React.ElementType; color: string; bg: string; actionPath?: string; actionLabel?: string }> = {
-    CONSUMER: { label: 'Public Consumer', icon: User, color: 'text-emerald-800', bg: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
-    FARMER: { label: 'Organic Farmer', icon: Sprout, color: 'text-emerald-800', bg: 'bg-emerald-100 text-emerald-900 border-emerald-300', actionPath: '/farmer/register', actionLabel: 'Register Harvest' },
-    PROCESSOR: { label: 'Bio Processor', icon: Cog, color: 'text-purple-800', bg: 'bg-purple-100 text-purple-900 border-purple-300', actionPath: '/processor/process', actionLabel: 'Process Raw Batch' },
-    LABORATORY: { label: 'QA Testing Lab', icon: FlaskConical, color: 'text-indigo-800', bg: 'bg-indigo-100 text-indigo-900 border-indigo-300', actionPath: '/laboratory/test', actionLabel: 'Conduct QA Inspection' },
-    DISTRIBUTOR: { label: 'Cold-Chain Distributor', icon: Truck, color: 'text-sky-800', bg: 'bg-sky-100 text-sky-900 border-sky-300', actionPath: '/distributor/create-shipment', actionLabel: 'Create Shipment' },
-    RETAILER: { label: 'Apothecary Retailer', icon: Store, color: 'text-emerald-900', bg: 'bg-teal-100 text-teal-900 border-teal-300', actionPath: '/retailer/generate-qr', actionLabel: 'QR Label Studio' },
-    ADMIN: { label: 'Consortium Admin', icon: ShieldCheck, color: 'text-slate-900', bg: 'bg-slate-100 text-slate-900 border-slate-300', actionPath: '/admin/approvals', actionLabel: 'User Approvals' },
+    CONSUMER: { label: t('roles.CONSUMER'), icon: User, color: 'text-emerald-800', bg: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+    FARMER: { label: t('roles.FARMER'), icon: Sprout, color: 'text-emerald-800', bg: 'bg-emerald-100 text-emerald-900 border-emerald-300', actionPath: '/farmer/register', actionLabel: t('roles.actionRegisterHarvest') },
+    PROCESSOR: { label: t('roles.PROCESSOR'), icon: Cog, color: 'text-purple-800', bg: 'bg-purple-100 text-purple-900 border-purple-300', actionPath: '/processor/process', actionLabel: t('roles.actionProcessRawBatch') },
+    LABORATORY: { label: t('roles.LABORATORY'), icon: FlaskConical, color: 'text-indigo-800', bg: 'bg-indigo-100 text-indigo-900 border-indigo-300', actionPath: '/laboratory/test', actionLabel: t('roles.actionConductInspection') },
+    DISTRIBUTOR: { label: t('roles.DISTRIBUTOR'), icon: Truck, color: 'text-sky-800', bg: 'bg-sky-100 text-sky-900 border-sky-300', actionPath: '/distributor/create-shipment', actionLabel: t('roles.actionCreateShipment') },
+    RETAILER: { label: t('roles.RETAILER'), icon: Store, color: 'text-emerald-900', bg: 'bg-teal-100 text-teal-900 border-teal-300', actionPath: '/retailer/generate-qr', actionLabel: t('roles.actionQrStudio') },
+    ADMIN: { label: t('roles.ADMIN'), icon: ShieldCheck, color: 'text-slate-900', bg: 'bg-slate-100 text-slate-900 border-slate-300', actionPath: '/admin/approvals', actionLabel: t('roles.actionUserApprovals') },
   };
 
   const currentRoleCfg = roleConfigs[role] || roleConfigs.CONSUMER;
@@ -84,51 +87,51 @@ export const Navbar: React.FC = () => {
   };
 
   const publicLinks = [
-    { to: '/home', label: 'Overview' },
-    { to: '/verify', label: 'Verify Batch' },
-    { to: '/fleet-map', label: 'Fleet Command', icon: Truck, isLive: true },
-    { to: '/admin/explorer', label: 'Ledger Explorer', icon: Blocks },
+    { to: '/home', label: t('nav.overview') },
+    { to: '/verify', label: t('nav.verifyBatch') },
+    { to: '/fleet-map', label: t('nav.fleetCommand'), icon: Truck, isLive: true },
+    { to: '/admin/explorer', label: t('nav.ledgerExplorer'), icon: Blocks },
   ];
 
   const getRoleNavLinks = (userRole: UserRole) => {
     switch (userRole) {
       case 'ADMIN':
         return [
-          { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Overview Dashboard' },
-          { to: '/admin/approvals', icon: Users, label: 'Stakeholder Approvals' },
-          { to: '/admin/products', icon: Package, label: 'Consortium Batches' },
-          { to: '/admin/explorer', icon: Blocks, label: 'Ledger Explorer' },
-          { to: '/admin/reports', icon: AlertTriangle, label: 'Fraud / Suspicious Reports' },
+          { to: '/admin/dashboard', icon: LayoutDashboard, label: t('sidebar.adminDashboard') },
+          { to: '/admin/approvals', icon: Users, label: t('sidebar.adminApprovals') },
+          { to: '/admin/products', icon: Package, label: t('sidebar.adminBatches') },
+          { to: '/admin/explorer', icon: Blocks, label: t('sidebar.adminExplorer') },
+          { to: '/admin/reports', icon: AlertTriangle, label: t('sidebar.adminReports') },
         ];
       case 'FARMER':
         return [
-          { to: '/farmer/dashboard', icon: LayoutDashboard, label: 'Farmer Dashboard' },
-          { to: '/farmer/register', icon: PlusCircle, label: 'Register Botanical Crop' },
-          { to: '/farmer/products', icon: Sprout, label: 'My Registered Crops' },
+          { to: '/farmer/dashboard', icon: LayoutDashboard, label: t('sidebar.farmerDashboard') },
+          { to: '/farmer/register', icon: PlusCircle, label: t('sidebar.farmerRegister') },
+          { to: '/farmer/products', icon: Sprout, label: t('sidebar.farmerProducts') },
         ];
       case 'PROCESSOR':
         return [
-          { to: '/processor/dashboard', icon: LayoutDashboard, label: 'Processing Queue' },
-          { to: '/processor/process', icon: Cog, label: 'Process Raw Batch' },
-          { to: '/processor/batches', icon: Package, label: 'Processed Inventory' },
+          { to: '/processor/dashboard', icon: LayoutDashboard, label: t('sidebar.processorDashboard') },
+          { to: '/processor/process', icon: Cog, label: t('sidebar.processorProcess') },
+          { to: '/processor/batches', icon: Package, label: t('sidebar.processorBatches') },
         ];
       case 'LABORATORY':
         return [
-          { to: '/laboratory/dashboard', icon: LayoutDashboard, label: 'Testing Dashboard' },
-          { to: '/laboratory/test', icon: FlaskConical, label: 'Inspect & QA Test' },
-          { to: '/laboratory/reports', icon: FileCheck, label: 'Issued Certificates' },
+          { to: '/laboratory/dashboard', icon: LayoutDashboard, label: t('sidebar.labDashboard') },
+          { to: '/laboratory/test', icon: FlaskConical, label: t('sidebar.labTest') },
+          { to: '/laboratory/reports', icon: FileCheck, label: t('sidebar.labReports') },
         ];
       case 'DISTRIBUTOR':
         return [
-          { to: '/distributor/dashboard', icon: LayoutDashboard, label: 'Logistics Dashboard' },
-          { to: '/distributor/create-shipment', icon: PlusCircle, label: 'Create Cold Shipment' },
-          { to: '/distributor/shipments', icon: Truck, label: 'Shipment Tracking' },
+          { to: '/distributor/dashboard', icon: LayoutDashboard, label: t('sidebar.distributorDashboard') },
+          { to: '/distributor/create-shipment', icon: PlusCircle, label: t('sidebar.distributorShipment') },
+          { to: '/distributor/shipments', icon: Truck, label: t('sidebar.distributorTracking') },
         ];
       case 'RETAILER':
         return [
-          { to: '/retailer/dashboard', icon: LayoutDashboard, label: 'Store Overview' },
-          { to: '/retailer/inventory', icon: Store, label: 'Retail Inventory' },
-          { to: '/retailer/generate-qr', icon: QrCode, label: 'Generate QR Labels' },
+          { to: '/retailer/dashboard', icon: LayoutDashboard, label: t('sidebar.retailerDashboard') },
+          { to: '/retailer/inventory', icon: Store, label: t('sidebar.retailerInventory') },
+          { to: '/retailer/generate-qr', icon: QrCode, label: t('sidebar.retailerGenerateQr') },
         ];
       default:
         return [];
@@ -150,19 +153,21 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2 sm:gap-3 font-medium min-w-0">
               <span className="flex items-center gap-1.5 text-emerald-400 font-semibold whitespace-nowrap text-[11px] sm:text-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                <span>Blockchain Active</span>
+                <span>{t('nav.blockchainActive')}</span>
               </span>
               <span className="text-slate-600 hidden sm:inline">•</span>
               <span className="hidden sm:inline text-slate-300 whitespace-nowrap">
-                Block <strong className="text-white font-mono font-bold">#{networkStats.blockHeight}</strong>
+                {t('nav.block')} <strong className="text-white font-mono font-bold">#{networkStats.blockHeight}</strong>
               </span>
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+              <LanguageSwitcher variant="ticker" />
+
               {/* Quick 1-Click Demo Login Role Switcher */}
               <div className="flex items-center gap-1 sm:gap-1.5 bg-slate-800 border border-slate-700/80 rounded-lg px-1.5 sm:px-2 py-0.5 max-w-[125px] xs:max-w-[160px] sm:max-w-none">
                 <Sparkles size={11} className="text-amber-400 shrink-0" />
-                <span className="text-[11px] font-bold text-slate-300 hidden md:inline whitespace-nowrap">Demo Login:</span>
+                <span className="text-[11px] font-bold text-slate-300 hidden md:inline whitespace-nowrap">{t('nav.demoLogin')}</span>
                 <select
                   value={role}
                   onChange={(e) => {
@@ -188,7 +193,7 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => {
-                  if (window.confirm('Reset all demo state to initial seed data?')) {
+                  if (window.confirm(t('nav.resetConfirm'))) {
                     resetToDefaultData();
                     window.location.reload();
                   }
@@ -197,7 +202,7 @@ export const Navbar: React.FC = () => {
                 title="Reset state to initial seed data"
               >
                 <RefreshCw size={12} />
-                <span className="hidden sm:inline">Reset State</span>
+                <span className="hidden sm:inline">{t('nav.resetState')}</span>
               </button>
             </div>
           </div>
@@ -225,7 +230,7 @@ export const Navbar: React.FC = () => {
                     <span className="text-slate-900 dark:text-white">Flora</span><span className="text-gradient">Chain</span>
                   </span>
                   <span className="hidden xs:block text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-emerald-800 -mt-0.5 whitespace-nowrap truncate max-w-[130px] sm:max-w-none">
-                    {isAuthenticated && role !== 'CONSUMER' ? `${role} Portal` : 'Botanical Traceability'}
+                    {isAuthenticated && role !== 'CONSUMER' ? `${currentRoleCfg.label} ${t('nav.portalSuffix')}` : t('nav.brandTagline')}
                   </span>
                 </div>
               </Link>
@@ -272,7 +277,7 @@ export const Navbar: React.FC = () => {
               <input
                 id="global-search-input"
                 type="text"
-                placeholder="Search Batch ID (e.g. ASH-2024-089)..."
+                placeholder={t('nav.searchPlaceholder')}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white text-xs font-medium pl-9 pr-12 py-2 rounded-xl border border-slate-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all font-mono placeholder:text-slate-400"
@@ -285,6 +290,8 @@ export const Navbar: React.FC = () => {
 
           {/* Right Action Tools */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <LanguageSwitcher variant="navbar" />
+
             <div className="shrink-0">
               <WalletConnectButton />
             </div>
@@ -296,7 +303,7 @@ export const Navbar: React.FC = () => {
               title="Launch QR Camera Scanner"
             >
               <QrCode size={15} className="text-emerald-50 group-hover:scale-110 transition-transform shrink-0" />
-              <span className="hidden md:inline whitespace-nowrap">Scan QR</span>
+              <span className="hidden md:inline whitespace-nowrap">{t('nav.quickScan')}</span>
             </button>
 
             {/* User Account Dropdown */}
@@ -307,7 +314,7 @@ export const Navbar: React.FC = () => {
                   className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm border border-slate-800 cursor-pointer shrink-0 whitespace-nowrap"
                 >
                   <RoleIcon size={14} className="text-emerald-400 shrink-0" />
-                  <span className="capitalize whitespace-nowrap text-[11px] sm:text-xs">{role.toLowerCase()}</span>
+                  <span className="capitalize whitespace-nowrap text-[11px] sm:text-xs">{currentRoleCfg.label}</span>
                   <ChevronDown size={14} className={`text-slate-400 transition-transform duration-150 ${isUserDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -346,7 +353,7 @@ export const Navbar: React.FC = () => {
                           className="w-full flex items-center gap-2 p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 transition-colors"
                         >
                           <LayoutDashboard size={15} className="text-emerald-700 shrink-0" />
-                          <span className="whitespace-nowrap">My {role} Dashboard</span>
+                          <span className="whitespace-nowrap">{t('nav.myDashboard', { role: currentRoleCfg.label })}</span>
                         </Link>
 
                         {currentRoleCfg.actionPath && (
@@ -366,7 +373,7 @@ export const Navbar: React.FC = () => {
                           className="w-full flex items-center gap-2 p-2.5 rounded-xl text-slate-800 hover:bg-slate-100 transition-colors"
                         >
                           <ShieldCheck size={15} className="text-emerald-700 shrink-0" />
-                          <span className="whitespace-nowrap">Audit Provenance Record</span>
+                          <span className="whitespace-nowrap">{t('nav.auditProvenance')}</span>
                         </Link>
                       </div>
 
@@ -376,7 +383,7 @@ export const Navbar: React.FC = () => {
                           className="w-full flex items-center gap-2 p-2 rounded-xl text-rose-700 hover:bg-rose-50 font-bold transition-colors cursor-pointer text-xs"
                         >
                           <LogOut size={15} className="shrink-0" />
-                          <span className="whitespace-nowrap">Sign Out of {role} Node</span>
+                          <span className="whitespace-nowrap">{t('nav.signOutNode', { role: currentRoleCfg.label })}</span>
                         </button>
                       </div>
                     </motion.div>
@@ -390,7 +397,7 @@ export const Navbar: React.FC = () => {
                 className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-sm cursor-pointer shrink-0 whitespace-nowrap"
               >
                 <LogIn size={15} className="shrink-0" />
-                <span className="whitespace-nowrap">Sign In</span>
+                <span className="whitespace-nowrap">{t('nav.signIn')}</span>
               </Link>
             )}
           </div>
@@ -452,12 +459,15 @@ export const Navbar: React.FC = () => {
                   </div>
                 )}
 
+                {/* Mobile Language Switcher */}
+                <LanguageSwitcher variant="mobile" />
+
                 {/* Search in Drawer */}
                 <form onSubmit={(e) => { handleSearchSubmit(e); setIsMobileMenuOpen(false); }} className="relative">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
                     type="text"
-                    placeholder="Search Batch ID (e.g. ASH-2024-089)..."
+                    placeholder={t('nav.searchPlaceholder')}
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
@@ -474,7 +484,7 @@ export const Navbar: React.FC = () => {
                     className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-xl text-xs font-bold text-emerald-900 transition-colors shadow-2xs cursor-pointer"
                   >
                     <QrCode size={15} className="text-emerald-700" />
-                    <span>Launch Camera QR Scanner</span>
+                    <span>{t('nav.quickScan')}</span>
                   </button>
                 </div>
 
