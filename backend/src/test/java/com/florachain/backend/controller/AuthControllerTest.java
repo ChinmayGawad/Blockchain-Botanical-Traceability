@@ -2,8 +2,6 @@ package com.florachain.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.florachain.backend.dto.AuthDTOs.LoginRequest;
-import com.florachain.backend.dto.AuthDTOs.RegisterRequest;
-import com.florachain.backend.enums.UserRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

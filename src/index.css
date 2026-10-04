@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   :root {
-    --background: 140 60% 98%; /* Softer mint-white #f4fbf7 */
-    --foreground: 166 84% 12%; /* Deeper, richer botanical #04382a */
+    --background: 140 60% 98%;
+    /* Softer mint-white #f4fbf7 */
+    --foreground: 166 84% 12%;
+    /* Deeper, richer botanical #04382a */
 
     --card: 0 0% 100%;
     --card-foreground: 166 84% 12%;
@@ -13,11 +16,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 166 84% 12%;
 
-    --primary: 168 80% 23%; /* Sleek dark teal #0b675e */
+    --primary: 168 80% 23%;
+    /* Sleek dark teal #0b675e */
     --primary-foreground: 0 0% 100%;
     --primary-hover: 168 70% 19%;
 
-    --secondary: 156 80% 45%; /* Vibrant emerald accent #17cf87 */
+    --secondary: 156 80% 45%;
+    /* Vibrant emerald accent #17cf87 */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 150 30% 95%;
@@ -33,7 +38,8 @@
     --input: 145 50% 90%;
     --ring: 168 80% 23%;
 
-    --radius: 1.25rem; /* Larger, softer border radii */
+    --radius: 1.25rem;
+    /* Larger, softer border radii */
 
     /* Semantic UI tokens */
     --color-primary: #0b675e;
@@ -101,10 +107,10 @@
   }
 
   /* Improved focus states for accessibility */
-  button:focus-visible, 
-  a:focus-visible, 
-  input:focus-visible, 
-  select:focus-visible, 
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
   textarea:focus-visible,
   [role="button"]:focus-visible,
   [tabindex]:focus-visible {
@@ -183,9 +189,12 @@ button:disabled,
   body * {
     visibility: hidden;
   }
-  #printable-qr, #printable-qr * {
+
+  #printable-qr,
+  #printable-qr * {
     visibility: visible;
   }
+
   #printable-qr {
     position: absolute;
     left: 0;
@@ -196,6 +205,7 @@ button:disabled,
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -235,6 +245,7 @@ button:disabled,
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
 }
+
 .text-gradient-alt {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-emerald-400;
 }
@@ -244,6 +255,7 @@ button:disabled,
   position: relative;
   overflow: clip;
 }
+
 .bg-blobs::before,
 .bg-blobs::after {
   content: "";
@@ -253,6 +265,7 @@ button:disabled,
   opacity: 0.4;
   animation: blob 10s infinite alternate ease-in-out;
 }
+
 .bg-blobs::before {
   background: var(--color-accent);
   width: 400px;
@@ -261,6 +274,7 @@ button:disabled,
   top: -100px;
   right: -100px;
 }
+
 .bg-blobs::after {
   background: var(--color-primary);
   width: 300px;
@@ -314,4 +328,3 @@ body.skiptranslate {
 [translate="no"] {
   font-family: inherit;
 }
-
