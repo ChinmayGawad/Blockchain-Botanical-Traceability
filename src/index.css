@@ -270,3 +270,48 @@ button:disabled,
   left: -50px;
   animation-delay: 2s;
 }
+
+/* Google Translate Engine Integration & Suppression Rules */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  border: none !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+#google_translate_element,
+.goog-te-gadget,
+.goog-te-gadget-simple {
+  display: none !important;
+}
+
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.goog-text-highlight {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+body.skiptranslate {
+  display: block !important;
+}
+
+/* Technical Cryptographic Identifiers - Never Translate */
+.notranslate,
+[translate="no"] {
+  font-family: inherit;
+}
+

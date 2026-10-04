@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Languages, Check, ChevronDown } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, AppLanguage } from '../../i18n';
+import { switchDynamicLanguage } from '../../services/dynamicTranslateService';
 
 interface LanguageSwitcherProps {
   variant?: 'navbar' | 'ticker' | 'mobile';
@@ -40,13 +41,14 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       setRotation(prev => prev + 360);
     }
     i18n.changeLanguage(code);
+    switchDynamicLanguage(code);
     setIsOpen(false);
   };
 
   // Mobile drawer full-width variant
   if (variant === 'mobile') {
     return (
-      <div className={`p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 ${className}`}>
+      <div className={`p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 notranslate ${className}`} translate="no">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-700 px-1">
           <motion.div
             animate={{ rotate: rotation }}
@@ -85,7 +87,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   // Ticker (top-bar) variant
   if (variant === 'ticker') {
     return (
-      <div className={`relative shrink-0 ${className}`} ref={containerRef}>
+      <div className={`relative shrink-0 notranslate ${className}`} ref={containerRef} translate="no">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
@@ -161,7 +163,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
   // Standard Navbar dropdown variant
   return (
-    <div className={`relative shrink-0 ${className}`} ref={containerRef}>
+    <div className={`relative shrink-0 notranslate ${className}`} ref={containerRef} translate="no">
       <motion.button
         type="button"
         whileTap={{ scale: 0.96 }}

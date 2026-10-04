@@ -46,7 +46,7 @@ export const BlockchainTxBadge: React.FC<BlockchainTxBadgeProps> = ({
         title="View Blockchain Transaction Proof"
       >
         <Blocks size={13} className="text-emerald-700 group-hover:rotate-12 transition-transform" />
-        <span>{displayText}</span>
+        <span className="notranslate" translate="no">{displayText}</span>
         <ExternalLink size={11} className="text-emerald-600 opacity-60 group-hover:opacity-100" />
       </button>
 

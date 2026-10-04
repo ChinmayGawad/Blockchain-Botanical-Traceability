@@ -374,13 +374,13 @@ Verify on-chain: ${verificationUrl}`;
         <div className="bg-slate-50/90 rounded-xl p-2 sm:p-2.5 border border-slate-200 text-xs text-slate-600 space-y-1 font-mono">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 sm:gap-2">
             <span className="text-slate-500 text-[11px]">IPFS Certificate CID:</span>
-            <span className="text-slate-800 font-medium truncate max-w-full sm:max-w-[340px] text-[11px]">
+            <span className="text-slate-800 font-medium truncate max-w-full sm:max-w-[340px] text-[11px] notranslate" translate="no">
               {lab?.certificateIpfsCid || 'QmTestCertificateFloraChainQA982'}
             </span>
           </div>
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 sm:gap-2">
             <span className="text-slate-500 text-[11px]">Smart Contract Tx:</span>
-            <span className="text-slate-800 font-medium truncate max-w-full sm:max-w-[340px] text-[11px]">
+            <span className="text-slate-800 font-medium truncate max-w-full sm:max-w-[340px] text-[11px] notranslate" translate="no">
               {lab?.txHash || '0x4a7c8e9b1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a'}
             </span>
           </div>
