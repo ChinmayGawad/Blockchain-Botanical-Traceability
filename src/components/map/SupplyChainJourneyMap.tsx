@@ -694,33 +694,34 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
     >
       {/* Top Banner & Control Deck Header */}
       <div
-        className={`flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b transition-colors ${
+        className={`flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-5 sm:py-3 border-b transition-colors ${
           isLight
             ? 'bg-emerald-50/70 border-emerald-100 text-emerald-950 backdrop-blur-sm'
             : 'bg-slate-900/90 border-slate-800 text-white backdrop-blur-md'
         }`}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <div
-            className={`flex items-center justify-center w-9 h-9 rounded-xl border ${
+            className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl border shrink-0 ${
               isLight
                 ? 'bg-white text-emerald-700 border-emerald-200 shadow-xs'
                 : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
             }`}
           >
-            <Truck size={18} />
+            <Truck size={17} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-sm font-bold tracking-tight">
                 Live Provenance Journey
               </h2>
               <span
-                className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold font-mono border ${
+                className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold font-mono border max-w-[280px] sm:max-w-none truncate ${
                   isLight
                     ? 'bg-emerald-100/80 text-emerald-900 border-emerald-300'
                     : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                 }`}
+                title={`${currentFromStage.name} → ${currentToStage.name}`}
               >
                 {currentFromStage.name} → {currentToStage.name}
               </span>
@@ -786,7 +787,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
 
       {/* Main Journey Vector Canvas */}
       <div
-        className={`relative w-full h-[460px] sm:h-[490px] overflow-hidden select-none transition-colors ${
+        className={`relative w-full h-[250px] sm:h-[280px] overflow-hidden select-none transition-colors ${
           isLight
             ? 'bg-gradient-to-b from-[#F0FDF4] via-[#FAFCF8] to-[#F0FDF4]'
             : 'bg-gradient-to-b from-slate-950 via-[#071d17] to-slate-950'
@@ -820,13 +821,13 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
 
         {/* Ambient Glow behind active transit */}
         <div
-          className={`absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none ${
+          className={`absolute top-1/4 left-1/3 w-[350px] h-[350px] rounded-full blur-3xl pointer-events-none ${
             isLight ? 'bg-emerald-300/15' : 'bg-emerald-500/10'
           }`}
         />
 
         <svg
-          viewBox="0 0 1000 460"
+          viewBox="0 80 1000 300"
           preserveAspectRatio="xMidYMid meet"
           className="w-full h-full"
         >
@@ -1116,12 +1117,12 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
           className="absolute z-20 pointer-events-none transform -translate-x-1/2 -translate-y-full transition-all duration-75"
           style={{
             left: `${(truckState.x / 1000) * 100}%`,
-            top: `${(truckState.y / 460) * 100}%`,
-            marginTop: '-24px',
+            top: `${((truckState.y - 80) / 300) * 100}%`,
+            marginTop: '-20px',
           }}
         >
           <div
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full border shadow-xl text-[11px] whitespace-nowrap backdrop-blur-md ${
+            className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border shadow-xl text-[11px] whitespace-nowrap backdrop-blur-md ${
               isLight
                 ? 'bg-white/95 border-emerald-300 text-emerald-950 font-medium'
                 : 'bg-slate-900/95 border-emerald-500/60 text-white'
@@ -1148,7 +1149,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
 
       {/* Interactive Control Deck Bottom Bar */}
       <div
-        className={`px-5 py-4 border-t flex flex-col md:flex-row items-center justify-between gap-4 transition-colors ${
+        className={`px-4 py-2.5 sm:px-5 sm:py-3 border-t flex flex-col md:flex-row items-center justify-between gap-3 transition-colors ${
           isLight
             ? 'bg-emerald-50/50 border-emerald-100 text-emerald-950'
             : 'bg-slate-900 border-slate-800 text-white'
