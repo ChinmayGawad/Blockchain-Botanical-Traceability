@@ -684,6 +684,8 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
 
   return (
     <div
+      role="region"
+      aria-label="Supply Chain Journey Map"
       className={`relative w-full rounded-2xl border transition-colors shadow-sm overflow-hidden flex flex-col ${
         isLight
           ? 'bg-white border-emerald-200/80 text-emerald-950'
@@ -728,7 +730,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
                 isLight ? 'text-emerald-800/80' : 'text-slate-400'
               }`}
             >
-              Tracking {productName} ({batchId}) through 5 verified checkpoints
+              Tracking <span>{productName}</span> {botanicalName && <span>({botanicalName})</span>} (<span>{batchId}</span>) through 5 verified checkpoints
             </p>
           </div>
         </div>
@@ -1160,6 +1162,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
             onClick={() => setIsPlaying((p) => !p)}
             variant={isLight ? 'outline' : 'outline'}
             size="sm"
+            aria-label={isPlaying ? "Pause / Play transit" : "Play transit / Pause"}
             className={`h-9 px-4 font-semibold active:scale-95 transition-all shadow-xs ${
               isLight
                 ? 'bg-white hover:bg-emerald-50 text-emerald-900 border-emerald-200'
@@ -1200,6 +1203,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
                 : 'text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
             title="Replay from Farm Origin"
+            aria-label="Replay from Farm Origin"
           >
             <RotateCcw size={14} />
           </Button>
@@ -1217,6 +1221,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
                   : 'text-slate-300 hover:bg-slate-800'
               }`}
               title="Jump to previous checkpoint"
+              aria-label="Jump to previous checkpoint"
             >
               <ChevronLeft size={14} className="mr-0.5" />
               <span>Prev</span>
@@ -1232,6 +1237,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
                   : 'text-slate-300 hover:bg-slate-800'
               }`}
               title="Jump to next checkpoint"
+              aria-label="Jump to next checkpoint"
             >
               <span>Next</span>
               <ChevronRight size={14} className="ml-0.5" />
@@ -1250,6 +1256,7 @@ export const SupplyChainJourneyMap: React.FC<SupplyChainJourneyMapProps> = ({
                 : 'bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700'
             }`}
             title="Toggle playback speed"
+            aria-label="Toggle playback speed"
           >
             <FastForward size={13} className="mr-1" />
             <span>{playbackSpeed}x</span>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SupplyChainJourneyMap } from '../../src/components/map/SupplyChainJourneyMap';
 
 describe('SupplyChainJourneyMap Component Unit Tests', () => {
@@ -106,11 +106,10 @@ describe('SupplyChainJourneyMap Component Unit Tests', () => {
     // Check for temperature pill button
     expect(screen.getByTitle(/click to inspect real-time iot cargo telematics/i)).toBeInTheDocument();
     expect(screen.getByText(/cargo:/i)).toBeInTheDocument();
-    expect(screen.getByText(/°c/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/°c/i)[0]).toBeInTheDocument();
   });
 
   it('should open telematics modal when truck is clicked', () => {
-    const handleClose = vi.fn();
     render(
       <SupplyChainJourneyMap
         batchId={mockBatchId}
@@ -122,7 +121,7 @@ describe('SupplyChainJourneyMap Component Unit Tests', () => {
     // Find and click the truck (should open telematics modal)
     const truckElement = screen.getByLabelText(/click truck to inspect live iot telematics/i);
     expect(truckElement).toBeInTheDocument();
-    truckElement.click();
+    fireEvent.click(truckElement);
 
     // Check that telematics modal is open
     expect(screen.getByText(/iot cold-chain telematics/i)).toBeInTheDocument();
@@ -140,7 +139,7 @@ describe('SupplyChainJourneyMap Component Unit Tests', () => {
     // Find and click a facility (first stage)
     const facilityElement = screen.getByLabelText(/inspect farm harvest origin facility/i);
     expect(facilityElement).toBeInTheDocument();
-    facilityElement.click();
+    fireEvent.click(facilityElement);
 
     // Check that milestone modal is open
     expect(screen.getByText(/checkpoint 1 audit/i)).toBeInTheDocument();
@@ -148,7 +147,6 @@ describe('SupplyChainJourneyMap Component Unit Tests', () => {
   });
 
   it('should close modals when escape key is pressed', () => {
-    const handleClose = vi.fn();
     render(
       <SupplyChainJourneyMap
         batchId={mockBatchId}
@@ -159,11 +157,11 @@ describe('SupplyChainJourneyMap Component Unit Tests', () => {
 
     // Open telematics modal first
     const truckElement = screen.getByLabelText(/click truck to inspect live iot telematics/i);
-    truckElement.click();
+    fireEvent.click(truckElement);
     expect(screen.getByText(/iot cold-chain telematics/i)).toBeInTheDocument();
 
     // Press Escape key
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
     // Should close the telematics modal
     expect(screen.queryByText(/iot cold-chain telematics/i)).not.toBeInTheDocument();
   });

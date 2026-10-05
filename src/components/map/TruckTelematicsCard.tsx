@@ -85,7 +85,7 @@ export const TruckTelematicsCard: React.FC<TruckTelematicsCardProps> = ({
 
   // Determine colors based on theme - using CSS variables
   const getBg = (theme: 'light' | 'dark') => 
-    theme === 'light' ? 'var(--background)' : 'var(--background-dark)';
+    theme === 'light' ? 'var(--background)' : '#022C22';
   const getForeground = (theme: 'light' | 'dark') => 
     theme === 'light' ? 'var(--foreground)' : 'var(--foreground-dark)';
   const getPrimary = (theme: 'light' | 'dark') => 
@@ -141,7 +141,7 @@ export const TruckTelematicsCard: React.FC<TruckTelematicsCardProps> = ({
               </span>
             </div>
             <p className={`text-[11px] text-[${mutedFg}] font-mono`}>
-              Vehicle {data.vehicleNumber} • Ref: {data.batchId}
+              Vehicle <span>{data.vehicleNumber}</span> • Ref: <span>{data.batchId}</span>
             </p>
           </div>
         </div>
@@ -232,7 +232,13 @@ export const TruckTelematicsCard: React.FC<TruckTelematicsCardProps> = ({
               </span>
               {data.temperatureHistory && data.temperatureHistory.length > 0 ? (
                 <div className="h-4 w-full mt-1 relative">
-                  <svg className="absolute inset-0 pointer-events-none" width="100%" height="100%">
+                  <svg
+                    role="img"
+                    aria-label="Temperature Stability"
+                    className="absolute inset-0 pointer-events-none"
+                    width="100%"
+                    height="100%"
+                  >
                     <polyline
                       points={calculateSparklinePoints(data.temperatureHistory, data.targetTempRange.min, data.targetTempRange.max)}
                       fill="none"
