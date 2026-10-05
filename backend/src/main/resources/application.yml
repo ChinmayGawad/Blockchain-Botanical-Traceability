@@ -24,9 +24,14 @@ app:
     contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0x2B04B82dD07F1938E74b0CDCA9Fa5693Df147a87}
     network-name: ${BLOCKCHAIN_NETWORK_NAME:Ethereum Sepolia Testnet (Chain ID 11155111)}
     private-key: ${BLOCKCHAIN_RELAYER_PRIVATE_KEY:}
+  mapbox:
+    access-token: ${MAPBOX_ACCESS_TOKEN:}
   ipfs:
-    gateway-url: https://gateway.pinata.cloud/ipfs/
-    mock-mode: true
+    gateway-url: ${IPFS_GATEWAY_URL:https://gateway.pinata.cloud/ipfs/}
+    pinata-api-key: ${PINATA_API_KEY:}
+    pinata-secret-key: ${PINATA_SECRET_KEY:}
+    pinata-jwt: ${PINATA_JWT:}
+    mock-mode: ${IPFS_MOCK_MODE:true}
   cors:
     allowed-origins:
       - http://localhost:5173

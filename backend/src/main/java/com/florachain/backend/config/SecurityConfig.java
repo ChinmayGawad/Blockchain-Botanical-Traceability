@@ -81,6 +81,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/verify/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/blockchain/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/config/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/reports").permitAll()
                     // Actuator health & readiness probes
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()

@@ -5,6 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { MOCK_USERS } from '../../data/mockData';
 import { User } from '../../types';
 import { MapPin, Search, CheckCircle2 } from 'lucide-react';
+import apiClient from '../../services/api';
 
 // Hardcoded coordinates for mock users to simulate a map environment
 // Real app would have these in the database
@@ -34,6 +35,26 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [radiusKm, setRadiusKm] = useState<number>(500); // Default 500km radius for demo
+  const [mapboxToken, setMapboxToken] = useState<string>(import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '');
+
+  // Asynchronously fetch Mapbox token from backend if missing from frontend env
+  useEffect(() => {
+    if (!mapboxToken) {
+      let isMounted = true;
+      apiClient.get('/config/mapbox')
+        .then(res => {
+          if (isMounted && res.data?.token) {
+            setMapboxToken(res.data.token);
+          }
+        })
+        .catch(() => {
+          // Token will remain empty if backend unreachable
+        });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [mapboxToken]);
   
   const [selectedPartners, setSelectedPartners] = useState<{
     PROCESSOR: User | null;
@@ -74,10 +95,9 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
 
   // Mapbox Lifecycle
   useEffect(() => {
-    const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    if (!token) return;
+    if (!mapboxToken) return;
 
-    mapboxgl.accessToken = token;
+    mapboxgl.accessToken = mapboxToken;
 
     if (mapContainerRef.current) {
       mapRef.current = new mapboxgl.Map({
@@ -219,9 +239,9 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
         </p>
       </div>
 
-      {!import.meta.env.VITE_MAPBOX_ACCESS_TOKEN && (
+      {!mapboxToken && (
         <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-sm">
-          <strong>Missing Mapbox Token:</strong> Please add <code>VITE_MAPBOX_ACCESS_TOKEN</code> to your .env file to view the interactive map.
+          <strong>Missing Mapbox Token:</strong> Please configure <code>MAPBOX_ACCESS_TOKEN</code> in your backend or <code>VITE_MAPBOX_ACCESS_TOKEN</code> in your .env file to view the interactive map.
         </div>
       )}
 

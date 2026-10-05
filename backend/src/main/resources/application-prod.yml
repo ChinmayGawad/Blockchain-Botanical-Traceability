@@ -30,6 +30,8 @@ app:
     contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0x5FbDB2315678afecb367f032d93F642f64180aa3}
     network-name: ${BLOCKCHAIN_NETWORK_NAME:Polygon Amoy Testnet (Chain ID 80002)}
     private-key: ${BLOCKCHAIN_RELAYER_PRIVATE_KEY:}
+  mapbox:
+    access-token: ${MAPBOX_ACCESS_TOKEN:}
   ipfs:
     gateway-url: ${IPFS_GATEWAY_URL:https://gateway.pinata.cloud/ipfs/}
     pinata-api-key: ${PINATA_API_KEY:}
