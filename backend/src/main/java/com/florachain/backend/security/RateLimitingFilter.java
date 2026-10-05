@@ -54,8 +54,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Skip rate limiting for static assets, h2-console or actuator health checks
-        if (path.startsWith("/actuator") || path.startsWith("/h2-console") || path.startsWith("/error")) {
+        // Skip rate limiting for static assets, h2-console, actuator health checks, root /, or CORS preflight OPTIONS
+        if (request.getMethod().equalsIgnoreCase("OPTIONS") || path.equals("/") || path.startsWith("/actuator") || path.startsWith("/h2-console") || path.startsWith("/error")) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -76,6 +76,9 @@ public class SecurityConfig {
             })
             .authorizeHttpRequests(auth -> {
                 auth
+                    // Root health & preflight requests
+                    .requestMatchers("/").permitAll()
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     // Public authentication & verification endpoints
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/verify/**").permitAll()
@@ -105,7 +108,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
+        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+            configuration.setAllowedOrigins(allowedOrigins);
+        }
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
         configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Authorization"));
