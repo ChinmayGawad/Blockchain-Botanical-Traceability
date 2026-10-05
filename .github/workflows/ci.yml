@@ -70,8 +70,16 @@ jobs:
           cache: 'maven'
 
       - name: Grant Execute Permission to Maven Wrapper
-        run: chmod +x backend/mvnw
+        run: |
+          if [ -f backend/mvnw ]; then
+            chmod +x backend/mvnw
+          fi
 
       - name: Run Maven Tests
         working-directory: ./backend
-        run: ./mvnw test
+        run: |
+          if [ -f ./mvnw ]; then
+            ./mvnw test
+          else
+            mvn test
+          fi

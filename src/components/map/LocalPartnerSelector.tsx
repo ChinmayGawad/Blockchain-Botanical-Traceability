@@ -166,7 +166,7 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
       mapRef.current?.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [farmerLat, farmerLng]);
+  }, [farmerLat, farmerLng, mapboxToken]);
 
   // Update Map visual layer when radius or partners change
   const markersRef = useRef<mapboxgl.Marker[]>([]);
