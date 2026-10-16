@@ -22,7 +22,6 @@ import {
   FlaskConical,
   Truck,
   Store,
-  Sparkles,
   Menu,
   X,
   Package,
@@ -38,7 +37,7 @@ import { useTranslation } from 'react-i18next';
 export const Navbar: React.FC = () => {
   const { t } = useTranslation();
   const { currentUser, role, isAuthenticated, switchRole, logout } = useAuth();
-  const { networkStats, resetToDefaultData } = useBlockchain();
+  const { resetToDefaultData } = useBlockchain();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -147,67 +146,6 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header className="sticky top-0 z-50 glass-nav transition-all duration-300">
-        {/* Simple, Readable Network Ticker + Demo Login Toggle */}
-        <div className="h-9 bg-slate-900 text-slate-300 text-xs px-3 sm:px-6 flex items-center border-b border-slate-800 overflow-hidden">
-          <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2 sm:gap-3">
-            <div className="flex items-center gap-2 sm:gap-3 font-medium min-w-0">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold whitespace-nowrap text-[11px] sm:text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                <span>{t('nav.blockchainActive')}</span>
-              </span>
-              <span className="text-slate-600 hidden sm:inline">•</span>
-              <span className="hidden sm:inline text-slate-300 whitespace-nowrap">
-                {t('nav.block')} <strong className="text-white font-mono font-bold">#{networkStats.blockHeight}</strong>
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-              <LanguageSwitcher variant="ticker" />
-
-              {/* Quick 1-Click Demo Login Role Switcher */}
-              <div className="flex items-center gap-1 sm:gap-1.5 bg-slate-800 border border-slate-700/80 rounded-lg px-1.5 sm:px-2 py-0.5 max-w-[125px] xs:max-w-[160px] sm:max-w-none">
-                <Sparkles size={11} className="text-amber-400 shrink-0" />
-                <span className="text-[11px] font-bold text-slate-300 hidden md:inline whitespace-nowrap">{t('nav.demoLogin')}</span>
-                <select
-                  value={role}
-                  onChange={(e) => {
-                    const newRole = e.target.value as UserRole;
-                    switchRole(newRole);
-                    if (newRole === 'CONSUMER') {
-                      navigate('/home');
-                    } else {
-                      navigate(`/${newRole.toLowerCase()}/dashboard`);
-                    }
-                  }}
-                  className="bg-transparent text-emerald-400 text-[11px] sm:text-xs font-bold focus:outline-none cursor-pointer pr-1 truncate"
-                >
-                  <option value="FARMER" className="bg-slate-900 text-white">🌾 Farmer (Rajesh)</option>
-                  <option value="PROCESSOR" className="bg-slate-900 text-white">⚙️ Processor (Dr. Sunita)</option>
-                  <option value="LABORATORY" className="bg-slate-900 text-white">🧪 Lab QA (Marcus)</option>
-                  <option value="DISTRIBUTOR" className="bg-slate-900 text-white">🚚 Logistics (Klaus)</option>
-                  <option value="RETAILER" className="bg-slate-900 text-white">🏪 Retailer (Emma)</option>
-                  <option value="ADMIN" className="bg-slate-900 text-white">🛡️ Admin (Dr. Evelyn)</option>
-                  <option value="CONSUMER" className="bg-slate-900 text-white">👤 Consumer Guest</option>
-                </select>
-              </div>
-
-              <button
-                onClick={() => {
-                  if (window.confirm(t('nav.resetConfirm'))) {
-                    resetToDefaultData();
-                    window.location.reload();
-                  }
-                }}
-                className="text-slate-400 hover:text-emerald-400 text-xs flex items-center gap-1 font-medium transition-colors cursor-pointer whitespace-nowrap p-1"
-                title="Reset state to initial seed data"
-              >
-                <RefreshCw size={12} />
-                <span className="hidden sm:inline">{t('nav.resetState')}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Main Navbar */}
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Logo & Brand */}
