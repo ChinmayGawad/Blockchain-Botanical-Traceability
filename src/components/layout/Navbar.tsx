@@ -30,14 +30,13 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { QRScannerModal } from '../verification/QRScannerModal';
-import { WalletConnectButton } from '../common/WalletConnectButton';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 export const Navbar: React.FC = () => {
   const { t } = useTranslation();
   const { currentUser, role, isAuthenticated, switchRole, logout } = useAuth();
-  const { resetToDefaultData } = useBlockchain();
+  const { resetToDefaultData, walletState } = useBlockchain();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -230,9 +229,24 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <LanguageSwitcher variant="navbar" />
 
-            <div className="shrink-0">
-              <WalletConnectButton />
-            </div>
+            {/* Automated Web3 Node Status Badge (Replaces manual button) */}
+            {walletState.isConnected && (
+              <div
+                id="automated-web3-node-badge"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50/90 border border-emerald-200/80 text-emerald-900 text-xs font-medium shadow-2xs shrink-0 select-none cursor-default"
+                title={`FloraChain Web3 Node: ${walletState.address} (${walletState.networkName || 'Hardhat EVM'})`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="font-mono text-[11px] font-bold text-emerald-950">
+                  {walletState.address?.substring(0, 4)}...{walletState.address?.substring(walletState.address.length - 2)}
+                </span>
+                {walletState.balanceEth && (
+                  <span className="hidden md:inline text-[10px] font-mono font-semibold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.5 rounded border border-emerald-300/80">
+                    {walletState.balanceEth} ETH
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Quick QR Scanner */}
             <button

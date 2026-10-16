@@ -349,16 +349,7 @@ export const WalletConnectButton: React.FC = () => {
             </span>
           )}
         </button>
-      ) : (
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm cursor-pointer border border-slate-800 group shrink-0 whitespace-nowrap"
-          title="Click to open Web3 Wallet & Blockchain connection dialog"
-        >
-          <Wallet size={14} className="text-emerald-400 group-hover:scale-110 transition-transform shrink-0" />
-          <span className="hidden sm:inline whitespace-nowrap">Connect Wallet</span>
-        </button>
-      )}
+      ) : null}
 
       {createPortal(modalJSX, document.body)}
     </>

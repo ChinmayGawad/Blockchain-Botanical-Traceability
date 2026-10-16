@@ -13,8 +13,19 @@ import {
 } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_SUSPICIOUS_REPORTS } from '../data/mockData';
 import { getBotanicalProductImage } from '../utils/imageUtils';
-import web3Service, { WalletState } from '../services/web3Service';
+import web3Service, { WalletState, HARDHAT_DEMO_ACCOUNTS } from '../services/web3Service';
 import apiClient from '../services/api';
+import { AuthContext } from './AuthContext';
+
+const ROLE_TO_ACCOUNT_INDEX: Record<string, number> = {
+  ADMIN: 0,
+  FARMER: 1,
+  PROCESSOR: 2,
+  LABORATORY: 3,
+  DISTRIBUTOR: 4,
+  RETAILER: 5,
+  CONSUMER: 0,
+};
 
 interface BlockchainContextType {
   products: BotanicalProduct[];
@@ -62,6 +73,10 @@ function generateTxHash(): string {
 }
 
 export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const authContext = useContext(AuthContext);
+  const role = authContext?.role;
+  const currentUser = authContext?.currentUser;
+
   const [products, setProducts] = useState<BotanicalProduct[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
     if (saved) {
@@ -90,18 +105,61 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return INITIAL_SUSPICIOUS_REPORTS;
   });
 
-  const [walletState, setWalletState] = useState<WalletState>({
-    isConnected: false,
-    address: null,
-    chainId: null,
-    balanceEth: null,
-    networkName: null,
-    connectionType: null,
-    error: null,
+  const [walletState, setWalletState] = useState<WalletState>(() => {
+    const initialRole = role || 'FARMER';
+    const accIdx = ROLE_TO_ACCOUNT_INDEX[initialRole] ?? 1;
+    const acc = HARDHAT_DEMO_ACCOUNTS[accIdx] || HARDHAT_DEMO_ACCOUNTS[0];
+    return {
+      isConnected: true,
+      address: acc.address,
+      chainId: 31337,
+      balanceEth: '10000.0',
+      networkName: `Hardhat Local Node (${acc.role})`,
+      connectionType: 'LOCAL_HARDHAT',
+      error: null,
+    };
   });
 
   const [liveBlockHeight, setLiveBlockHeight] = useState<number>(10742);
   const [liveNetworkName, setLiveNetworkName] = useState<string>('Hardhat EVM Localhost (31337)');
+
+  // Fully automated Web3 wallet connection based on authenticated stakeholder role
+  useEffect(() => {
+    let isCancelled = false;
+
+    const autoConnectWallet = async () => {
+      // 1. If MetaMask is actively unlocked and connected by the user, respect it
+      if (web3Service.isMetaMaskInstalled() && (window as any).ethereum?.selectedAddress) {
+        try {
+          const res = await web3Service.connectMetaMask();
+          if (!isCancelled && res.isConnected) {
+            setWalletState(res);
+            return;
+          }
+        } catch {
+          // Fall through to automated role account
+        }
+      }
+
+      // 2. Automatically bind the stakeholder role account in web3Service
+      const targetRole = role || 'FARMER';
+      const accountIndex = ROLE_TO_ACCOUNT_INDEX[targetRole] ?? 0;
+      try {
+        const res = await web3Service.connectLocalTestWallet(accountIndex);
+        if (!isCancelled) {
+          setWalletState(res);
+        }
+      } catch (err) {
+        console.warn('Automated wallet connection fallback:', err);
+      }
+    };
+
+    autoConnectWallet();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [role, currentUser?.id]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
