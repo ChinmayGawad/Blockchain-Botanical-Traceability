@@ -8,6 +8,7 @@ import {
   Lock,
   Mail,
   ArrowRight,
+  ArrowLeft,
   Eye,
   EyeOff,
   AlertCircle,
@@ -19,8 +20,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
   const { login, users } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,12 +72,27 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F0FDF4]/60 via-[#F0FDF4]/40 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-x-hidden">
-      <Card className="max-w-md w-full bg-white border-slate-200/90 shadow-xl overflow-hidden">
-        {/* Header with botanical accent */}
-        <div className="bg-[#0F766E] px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-[#F0FDF4]/60 via-[#F0FDF4]/40 to-slate-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+      {/* Top Navigation Bar with Back link & Language Switcher */}
+      <div className="w-full max-w-md mx-auto flex items-center justify-between py-2">
+        <Link
+          to="/home"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-800 bg-white/80 hover:bg-white border border-slate-200/80 shadow-2xs transition-all"
+        >
+          <ArrowLeft size={14} />
+          <span>{t('auth.backToOverview', 'Back to Overview')}</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher variant="navbar" />
+        </div>
+      </div>
+
+      {/* Main Form Card Container */}
+      <div className="flex-1 flex items-center justify-center py-4">
+        <Card className="max-w-md w-full bg-white border-slate-200/90 shadow-xl overflow-visible">
+          {/* Header with botanical accent */}
+          <div className="bg-[#0F766E] px-6 py-4 rounded-t-2xl flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <Sprout size={24} className="text-white" />
             </div>
             <div>
@@ -83,23 +102,22 @@ export const LoginPage: React.FC = () => {
               <p className="text-[11px] text-emerald-200">Blockchain Botanical Traceability</p>
             </div>
           </div>
-        </div>
 
-        <CardContent className="p-6 sm:p-8 space-y-6">
-          {/* Card Header */}
-          <div className="text-center space-y-2">
-            <CardTitle className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Sign In
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm text-slate-600">
-              Enter credentials to access your authorized stakeholder node
-            </CardDescription>
-            <div className="flex justify-center gap-2 mt-2">
-              <Badge variant="botanical">Botanical</Badge>
-              <Badge variant="outline">Secure</Badge>
-              <Badge variant="secondary">Verified</Badge>
+          <CardContent className="p-6 sm:p-8 space-y-6">
+            {/* Card Header */}
+            <div className="text-center space-y-2">
+              <CardTitle className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                {t('auth.loginTitle', 'Sign In')}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm text-slate-600">
+                {t('auth.loginSubtitle', 'Enter credentials to access your authorized stakeholder node')}
+              </CardDescription>
+              <div className="flex justify-center gap-2 mt-2">
+                <Badge variant="botanical">Botanical</Badge>
+                <Badge variant="outline">Secure</Badge>
+                <Badge variant="secondary">Verified</Badge>
+              </div>
             </div>
-          </div>
 
           {errorMessage && (
             <Alert variant="destructive">
@@ -186,7 +204,7 @@ export const LoginPage: React.FC = () => {
               ) : (
                 <>
                   <KeyRound size={16} />
-                  <span>Sign In as {role}</span>
+                  <span>{t('auth.signInBtn', `Sign In as ${role}`)}</span>
                   <ArrowRight size={16} />
                 </>
               )}
@@ -207,7 +225,7 @@ export const LoginPage: React.FC = () => {
                 to="/home"
                 className="hover:text-[#0F766E] font-semibold transition-colors"
               >
-                ← Back to Overview
+                ← {t('auth.backToOverview', 'Back to Overview')}
               </Link>
               <span>•</span>
               <Link
@@ -221,6 +239,8 @@ export const LoginPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
+      <div className="py-1" />
     </div>
   );
 };

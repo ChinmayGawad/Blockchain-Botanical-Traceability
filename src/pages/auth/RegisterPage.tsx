@@ -10,6 +10,7 @@ import {
   Truck,
   Store,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
   Fingerprint,
 } from 'lucide-react';
@@ -18,6 +19,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 // Verhoeff algorithm logic for Aadhaar Validation (keep as-is)
 const d = [
@@ -55,6 +58,7 @@ function validateAadhaar(aadhaar: string) {
 }
 
 export const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
   const { registerUser, switchRole } = useAuth();
   const navigate = useNavigate();
 
@@ -140,36 +144,50 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F0FDF4]/60 via-[#F0FDF4]/40 to-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-x-hidden">
-      <Card className="max-w-2xl w-full bg-white border-slate-200/90 rounded-3xl shadow-xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-[#0F766E] px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-[#F0FDF4]/60 via-[#F0FDF4]/40 to-slate-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+      {/* Top Navigation Bar with Back link & Language Switcher */}
+      <div className="w-full max-w-2xl mx-auto flex items-center justify-between py-2">
+        <Link
+          to="/home"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-800 bg-white/80 hover:bg-white border border-slate-200/80 shadow-2xs transition-all"
+        >
+          <ArrowLeft size={14} />
+          <span>{t('auth.backToOverview', 'Back to Overview')}</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher variant="navbar" />
+        </div>
+      </div>
+
+      {/* Main Registration Card Container */}
+      <div className="flex-1 flex items-center justify-center py-4">
+        <Card className="max-w-2xl w-full bg-white border-slate-200/90 rounded-3xl shadow-xl overflow-visible">
+          {/* Header */}
+          <div className="bg-[#0F766E] px-6 py-4 rounded-t-3xl flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <Sprout size={24} className="text-white" />
             </div>
             <div>
               <h2 className="text-xl font-black text-white tracking-tight">
-                Register Stakeholder Node
+                {t('auth.registerTitle', 'Register Stakeholder Node')}
               </h2>
               <p className="text-[11px] text-emerald-200">Apply for cryptographic membership</p>
             </div>
           </div>
-        </div>
 
-        <CardContent className="p-6 sm:p-8 space-y-6">
-          <div className="text-center space-y-1.5">
-            <div className="flex justify-center mb-2">
-              <Badge variant="botanical">Verified Network</Badge>
-              <Badge variant="outline">Cryptographic Membership</Badge>
+          <CardContent className="p-6 sm:p-8 space-y-6">
+            <div className="text-center space-y-1.5">
+              <div className="flex justify-center mb-2">
+                <Badge variant="botanical">Verified Network</Badge>
+                <Badge variant="outline">Cryptographic Membership</Badge>
+              </div>
+              <CardTitle className="text-2xl font-black tracking-tight text-slate-900">
+                {t('auth.registerTitle', 'Join the FloraChain Network')}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm text-slate-600">
+                {t('auth.registerSubtitle', 'Apply for cryptographic membership on the FloraChain Botanical Traceability Network')}
+              </CardDescription>
             </div>
-            <CardTitle className="text-2xl font-black tracking-tight text-slate-900">
-              Join the FloraChain Network
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm text-slate-600">
-              Apply for cryptographic membership on the FloraChain Botanical Traceability Network
-            </CardDescription>
-          </div>
 
           {isSuccess ? (
             <div className="text-center py-8 space-y-5 bg-emerald-50/70 rounded-2xl border border-emerald-200 p-6">
@@ -399,7 +417,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
                 <div>
                   <Link to="/home" className="text-xs text-slate-500 hover:text-[#0F766E] font-medium">
-                    ← Back to Overview
+                    ← {t('auth.backToOverview', 'Back to Overview')}
                   </Link>
                 </div>
               </div>
@@ -407,6 +425,8 @@ export const RegisterPage: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      </div>
+      <div className="py-1" />
     </div>
   );
 };

@@ -478,6 +478,7 @@ export const en = {
     certificationsLabel: 'Certifications (NPOP, GMP, NABL, ISO)',
     applyBtn: 'Submit Node Registration',
     alreadyHaveAccount: 'Already have an approved node credential? Sign In',
+    backToOverview: 'Back to Overview',
   },
   footer: {
     description: 'Decentralized botanical supply chain provenance and verification platform powered by Hyperledger Fabric, IPFS, and Spring Boot.',

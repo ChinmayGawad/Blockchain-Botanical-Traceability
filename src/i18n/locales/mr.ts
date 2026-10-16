@@ -478,6 +478,7 @@ export const mr = {
     certificationsLabel: 'प्रमाणपत्रे (NPOP, GMP, NABL, ISO)',
     applyBtn: 'नोड नोंदणी अर्ज सादर करा',
     alreadyHaveAccount: 'आधीपासून मंजूर नोड क्रेडेंशियल आहे? साइन इन करा',
+    backToOverview: 'आढाव्यावर परत या',
   },
   footer: {
     description: 'हायपरलेजर फॅब्रिक, IPFS आणि स्प्रिंग बूटद्वारे संचालित विकेंद्रित वनस्पती पुरवठा साखळी मूळ व पडताळणी मंच.',

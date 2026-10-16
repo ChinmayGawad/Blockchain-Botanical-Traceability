@@ -478,6 +478,7 @@ export const hi = {
     certificationsLabel: 'प्रमाणपत्र (NPOP, GMP, NABL, ISO)',
     applyBtn: 'नोड पंजीकरण आवेदन जमा करें',
     alreadyHaveAccount: 'क्या आपके पास पहले से स्वीकृत नोड क्रेडेंशियल है? साइन इन करें',
+    backToOverview: 'अवलोकन पर वापस जाएं',
   },
   footer: {
     description: 'हाइपरलेज़र फैब्रिक, IPFS और स्प्रिंग बूट द्वारा संचालित विकेंद्रीकृत वानस्पतिक आपूर्ति श्रृंखला उद्गम एवं सत्यापन मंच।',
