@@ -26,6 +26,7 @@ import { WizardStepper } from '../../components/common/WizardStepper';
 import { WizardAlert } from '../../components/common/WizardAlert';
 import { UnauthorizedCard } from '../../components/common/UnauthorizedCard';
 import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation';
+import { DocumentUploadDropzone, UploadedDocumentMeta } from '../../components/common/DocumentUploadDropzone';
 
 export const RegisterProductPage: React.FC = () => {
   const { registerProduct } = useBlockchain();
@@ -70,7 +71,8 @@ export const RegisterProductPage: React.FC = () => {
   // Certificates
   const [certType, setCertType] = useState('India Organic (NPOP) & FSSAI Jaivik Bharat');
   const [certNumber, setCertNumber] = useState(`NPOP-IND-2024-${Math.floor(1000 + Math.random() * 9000)}`);
-  const [ipfsHash, setIpfsHash] = useState(() => generateMockIpfsCid('ShatavariCert'));
+  const [ipfsHash, setIpfsHash] = useState('');
+  const [uploadedDoc, setUploadedDoc] = useState<UploadedDocumentMeta | null>(null);
 
   // Supply Chain Partners
   const [selectedPartners, setSelectedPartners] = useState<any>({
@@ -579,20 +581,20 @@ export const RegisterProductPage: React.FC = () => {
                   />
                 </div>
 
-                {/* Simulated IPFS Drop Area */}
-                <div className="p-6 border-2 border-dashed border-emerald-300 bg-emerald-50/50 rounded-2xl text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                    <UploadCloud size={20} />
-                  </div>
-                  <div className="text-xs font-bold text-slate-900">
-                    Organic Certificate PDF Attached
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-mono">
-                    IPFS CID: {ipfsHash}
-                  </div>
-                  <span className="inline-block text-[10px] text-emerald-800 font-bold bg-emerald-200/80 px-2 py-0.5 rounded">
-                    PINNED TO IPFS CLUSTER ✓
-                  </span>
+                {/* Decentralized IPFS Document Upload Dropzone */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Organic Certificate Document (PDF / DOC / Image): *
+                  </label>
+                  <DocumentUploadDropzone
+                    documentTitle="Organic Certificate PDF"
+                    documentSubtitle="Decentralized cryptographic certificate committed to IPFS cluster"
+                    ipfsHash={ipfsHash}
+                    onIpfsHashChange={setIpfsHash}
+                    onDocumentChange={setUploadedDoc}
+                    themeColor="emerald"
+                    sampleDocName="NPOP_Organic_Certificate_2024.pdf"
+                  />
                 </div>
               </div>
 
@@ -661,6 +663,12 @@ export const RegisterProductPage: React.FC = () => {
                 <div className="flex justify-between border-b border-slate-200/70 pb-2">
                   <span className="text-slate-500">Submitting Node:</span>
                   <span className="font-semibold text-slate-800">{currentUser.name} ({currentUser.organization})</span>
+                </div>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2">
+                  <span className="text-slate-500">Certificate Document:</span>
+                  <span className="font-semibold text-slate-800 truncate max-w-[240px]">
+                    {uploadedDoc?.name || 'Organic Certificate PDF'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">IPFS Certificate Hash:</span>

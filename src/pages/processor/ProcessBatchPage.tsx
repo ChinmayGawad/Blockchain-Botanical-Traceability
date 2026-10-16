@@ -24,6 +24,7 @@ import { WizardStepper } from '../../components/common/WizardStepper';
 import { WizardAlert } from '../../components/common/WizardAlert';
 import { UnauthorizedCard } from '../../components/common/UnauthorizedCard';
 import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation';
+import { DocumentUploadDropzone } from '../../components/common/DocumentUploadDropzone';
 
 export const ProcessBatchPage: React.FC = () => {
   const { products, processBatch } = useBlockchain();
@@ -506,20 +507,19 @@ export const ProcessBatchPage: React.FC = () => {
                   ></textarea>
                 </div>
 
-                {/* IPFS Hash */}
-                <div className="bg-purple-50/50 p-4 rounded-2xl border border-purple-200 text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center mx-auto">
-                    <UploadCloud size={20} />
-                  </div>
-                  <div className="text-xs font-bold text-slate-900">
-                    Processing SOP & Machine Telemetry Log Attached
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-mono">
-                    IPFS CID: {ipfsCid}
-                  </div>
-                  <span className="inline-block text-[10px] text-purple-800 font-bold bg-purple-200/80 px-2 py-0.5 rounded">
-                    PINNED TO IPFS CLUSTER ✓
-                  </span>
+                {/* IPFS Hash Upload Dropzone */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Processing SOP & Machine Telemetry Log: *
+                  </label>
+                  <DocumentUploadDropzone
+                    documentTitle="Processing SOP & Telemetry Document"
+                    documentSubtitle="Extraction protocol log pinned to decentralized IPFS cluster"
+                    ipfsHash={ipfsCid}
+                    onIpfsHashChange={setIpfsCid}
+                    themeColor="purple"
+                    sampleDocName="PhytoExtracts_SOP_Telemetry_Log.pdf"
+                  />
                 </div>
               </div>
 

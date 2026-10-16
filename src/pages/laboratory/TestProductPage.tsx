@@ -25,6 +25,7 @@ import { WizardStepper } from '../../components/common/WizardStepper';
 import { WizardAlert } from '../../components/common/WizardAlert';
 import { UnauthorizedCard } from '../../components/common/UnauthorizedCard';
 import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation';
+import { DocumentUploadDropzone } from '../../components/common/DocumentUploadDropzone';
 
 export const TestProductPage: React.FC = () => {
   const { products, submitLabResult, getProductById } = useBlockchain();
@@ -633,20 +634,19 @@ export const TestProductPage: React.FC = () => {
                       ></textarea>
                     </div>
 
-                    {/* IPFS Certificate Hash */}
-                    <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-200 text-center space-y-2">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center mx-auto">
-                        <UploadCloud size={20} />
-                      </div>
-                      <div className="text-xs font-bold text-slate-900">
-                        NABL Accredited Certificate of Analysis (COA) Attached
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-mono">
-                        IPFS CID: {ipfsCid}
-                      </div>
-                      <span className="inline-block text-[10px] text-indigo-800 font-bold bg-indigo-200/80 px-2 py-0.5 rounded">
-                        PINNED TO IPFS CLUSTER ✓
-                      </span>
+                    {/* IPFS Certificate Dropzone */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        NABL Accredited Certificate of Analysis (COA): *
+                      </label>
+                      <DocumentUploadDropzone
+                        documentTitle="Certificate of Analysis (COA) PDF"
+                        documentSubtitle="Lab gas chromatography-mass spectrometry test report"
+                        ipfsHash={ipfsCid}
+                        onIpfsHashChange={setIpfsCid}
+                        themeColor="indigo"
+                        sampleDocName="Eurofins_NABL_Certificate_Of_Analysis.pdf"
+                      />
                     </div>
                   </div>
 

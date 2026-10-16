@@ -16,3 +16,13 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Mock URL.createObjectURL and URL.revokeObjectURL
+if (typeof window !== 'undefined') {
+  if (!window.URL.createObjectURL) {
+    window.URL.createObjectURL = vi.fn(() => 'blob:http://localhost:5173/mock-doc-blob-id');
+  }
+  if (!window.URL.revokeObjectURL) {
+    window.URL.revokeObjectURL = vi.fn();
+  }
+}
