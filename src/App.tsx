@@ -35,15 +35,19 @@ const AppLayout: React.FC = () => {
   );
 };
 
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+
 export function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <BlockchainProvider>
-          <AppLayout />
-        </BlockchainProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <BlockchainProvider>
+            <AppLayout />
+          </BlockchainProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

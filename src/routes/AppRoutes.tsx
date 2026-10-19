@@ -4,43 +4,43 @@ import { useAuth } from '../context/AuthContext';
 import { ProtectedRoute } from './ProtectedRoute';
 
 // Public Pages
-import { HomePage } from '../pages/public/HomePage';
-import { VerifyProductPage } from '../pages/public/VerifyProductPage';
+const HomePage = React.lazy(() => import('../pages/public/HomePage').then(m => ({ default: m.HomePage })));
+const VerifyProductPage = React.lazy(() => import('../pages/public/VerifyProductPage').then(m => ({ default: m.VerifyProductPage })));
 
 // Auth Pages
-import { LoginPage } from '../pages/auth/LoginPage';
-import { RegisterPage } from '../pages/auth/RegisterPage';
+const LoginPage = React.lazy(() => import('../pages/auth/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = React.lazy(() => import('../pages/auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
 
 // Admin Pages
-import { AdminDashboard } from '../pages/admin/AdminDashboard';
-import { UserApprovalsPage } from '../pages/admin/UserApprovalsPage';
-import { BlockchainExplorerPage } from '../pages/admin/BlockchainExplorerPage';
-import { SuspiciousReportsPage } from '../pages/admin/SuspiciousReportsPage';
+const AdminDashboard = React.lazy(() => import('../pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const UserApprovalsPage = React.lazy(() => import('../pages/admin/UserApprovalsPage').then(m => ({ default: m.UserApprovalsPage })));
+const BlockchainExplorerPage = React.lazy(() => import('../pages/admin/BlockchainExplorerPage').then(m => ({ default: m.BlockchainExplorerPage })));
+const SuspiciousReportsPage = React.lazy(() => import('../pages/admin/SuspiciousReportsPage').then(m => ({ default: m.SuspiciousReportsPage })));
 
 // Farmer Pages
-import { FarmerDashboard } from '../pages/farmer/FarmerDashboard';
-import { RegisterProductPage } from '../pages/farmer/RegisterProductPage';
+const FarmerDashboard = React.lazy(() => import('../pages/farmer/FarmerDashboard').then(m => ({ default: m.FarmerDashboard })));
+const RegisterProductPage = React.lazy(() => import('../pages/farmer/RegisterProductPage').then(m => ({ default: m.RegisterProductPage })));
 
 // Processor Pages
-import { ProcessorDashboard } from '../pages/processor/ProcessorDashboard';
-import { ProcessBatchPage } from '../pages/processor/ProcessBatchPage';
+const ProcessorDashboard = React.lazy(() => import('../pages/processor/ProcessorDashboard').then(m => ({ default: m.ProcessorDashboard })));
+const ProcessBatchPage = React.lazy(() => import('../pages/processor/ProcessBatchPage').then(m => ({ default: m.ProcessBatchPage })));
 
 // Laboratory Pages
-import { LaboratoryDashboard } from '../pages/laboratory/LaboratoryDashboard';
-import { TestProductPage } from '../pages/laboratory/TestProductPage';
+const LaboratoryDashboard = React.lazy(() => import('../pages/laboratory/LaboratoryDashboard').then(m => ({ default: m.LaboratoryDashboard })));
+const TestProductPage = React.lazy(() => import('../pages/laboratory/TestProductPage').then(m => ({ default: m.TestProductPage })));
 
 // Distributor Pages
-import { DistributorDashboard } from '../pages/distributor/DistributorDashboard';
-import { CreateShipmentPage } from '../pages/distributor/CreateShipmentPage';
+const DistributorDashboard = React.lazy(() => import('../pages/distributor/DistributorDashboard').then(m => ({ default: m.DistributorDashboard })));
+const CreateShipmentPage = React.lazy(() => import('../pages/distributor/CreateShipmentPage').then(m => ({ default: m.CreateShipmentPage })));
 
 // Retailer Pages
-import { RetailerDashboard } from '../pages/retailer/RetailerDashboard';
-import { GenerateQRPage } from '../pages/retailer/GenerateQRPage';
+const RetailerDashboard = React.lazy(() => import('../pages/retailer/RetailerDashboard').then(m => ({ default: m.RetailerDashboard })));
+const GenerateQRPage = React.lazy(() => import('../pages/retailer/GenerateQRPage').then(m => ({ default: m.GenerateQRPage })));
 
 // Fleet Command & Animated Journey Map Pages (Option 3 & Showcase)
-import { DemoFleetCommandPage } from '../pages/demo/DemoFleetCommandPage';
-import { DemoVerificationHeroPage } from '../pages/demo/DemoVerificationHeroPage';
-import { DemoShowcaseHubPage } from '../pages/demo/DemoShowcaseHubPage';
+const DemoFleetCommandPage = React.lazy(() => import('../pages/demo/DemoFleetCommandPage').then(m => ({ default: m.DemoFleetCommandPage })));
+const DemoVerificationHeroPage = React.lazy(() => import('../pages/demo/DemoVerificationHeroPage').then(m => ({ default: m.DemoVerificationHeroPage })));
+const DemoShowcaseHubPage = React.lazy(() => import('../pages/demo/DemoShowcaseHubPage').then(m => ({ default: m.DemoShowcaseHubPage })));
 
 // Root Route Handler: Opens Authentication first when launching the web app
 const RootEntryPage: React.FC = () => {
@@ -54,6 +54,16 @@ const RootEntryPage: React.FC = () => {
 
 import { motion } from 'framer-motion';
 
+// Loading fallback spinner for lazy-loaded route views
+const PageLoadingSpinner: React.FC = () => (
+  <div className="flex-1 min-h-[350px] flex items-center justify-center p-8">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-8 h-8 border-3 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin" />
+      <span className="text-xs text-muted-foreground font-medium">Loading view...</span>
+    </div>
+  </div>
+);
+
 // Page Transition Wrapper
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <motion.div
@@ -63,7 +73,9 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
     transition={{ duration: 0.3, ease: 'easeOut' }}
     className="flex-1 flex flex-col w-full h-full"
   >
-    {children}
+    <React.Suspense fallback={<PageLoadingSpinner />}>
+      {children}
+    </React.Suspense>
   </motion.div>
 );
 
