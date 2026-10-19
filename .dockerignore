@@ -1,0 +1,45 @@
+# Version control
+.git
+.gitignore
+.github
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+
+# Node dependencies and build artifacts
+node_modules
+dist
+dist-ssr
+build
+.npm
+*.tsbuildinfo
+
+# Test outputs
+coverage
+test-results
+playwright-report
+
+# Hardhat & Smart contract artifacts
+cache
+artifacts
+typechain
+typechain-types
+
+# Backend local artifacts
+backend/target
+backend/.mvn
+backend/src/test
+
+# IDE and OS
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
