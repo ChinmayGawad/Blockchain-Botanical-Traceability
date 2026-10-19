@@ -1,0 +1,109 @@
+[
+  {
+    "id": "USR-ADM-01",
+    "name": "Dr. Rameshwar Varma",
+    "email": "admin@florachain.org",
+    "role": "ADMIN",
+    "organization": "National Botanical Provenance Authority of India",
+    "location": "New Delhi, India",
+    "status": "ACTIVE",
+    "joinedDate": "2023-01-15",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "USR-FRM-01",
+    "name": "Rajesh Patel",
+    "email": "rajesh@vedicfarms.org",
+    "role": "FARMER",
+    "organization": "Vedic Agro Organic Cooperative",
+    "location": "Neemuch, Madhya Pradesh, India",
+    "status": "ACTIVE",
+    "joinedDate": "2023-03-10",
+    "certifications": [
+      "India Organic NPOP",
+      "FSSAI Jaivik Bharat",
+      "AYUSH Premium Mark",
+      "FairWild Certified"
+    ],
+    "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "USR-PRC-01",
+    "name": "Mahesh Deshmukh",
+    "email": "mahesh@phytoextracts.in",
+    "role": "PROCESSOR",
+    "organization": "PhytoExtracts Bio-Refining India Ltd",
+    "location": "Peenya Industrial Complex, Bengaluru, Karnataka",
+    "status": "ACTIVE",
+    "joinedDate": "2023-04-18",
+    "certifications": [
+      "GMP Certified (AYUSH)",
+      "ISO 22000:2018",
+      "FSSAI Manufacturing License"
+    ],
+    "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "USR-LAB-01",
+    "name": "Dr. Ananya Sharma",
+    "email": "ananya@agrilabs.in",
+    "role": "LABORATORY",
+    "organization": "Eurofins NABL Analytical Testing Lab",
+    "location": "Hyderabad & Bengaluru Biotech Park, India",
+    "status": "ACTIVE",
+    "joinedDate": "2023-02-22",
+    "certifications": [
+      "ISO/IEC 17025 NABL Accredited",
+      "FSSAI Notified Laboratory",
+      "AYUSH Approved Drug Testing Lab"
+    ],
+    "avatarUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "USR-DST-01",
+    "name": "Vikramjit Singh",
+    "email": "vikram@transglobalcoldchain.in",
+    "role": "DISTRIBUTOR",
+    "organization": "TransGlobal Cold-Chain Logistics India Pvt Ltd",
+    "location": "Nelamangala Logistics Park, Bengaluru & Delhi-NCR Hub",
+    "status": "ACTIVE",
+    "joinedDate": "2023-05-11",
+    "certifications": [
+      "GDP Compliant (Good Distribution Practice)",
+      "ISO 9001:2015",
+      "FSSAI Logistics License"
+    ],
+    "avatarUrl": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "USR-RET-01",
+    "name": "Aarav Mehta",
+    "email": "aarav@arogyawellness.in",
+    "role": "RETAILER",
+    "organization": "Arogya Pure Herbals & Ayurvedic Dispensary",
+    "location": "Indiranagar Flagship Store, Bengaluru, Karnataka",
+    "status": "ACTIVE",
+    "joinedDate": "2023-06-01",
+    "certifications": [
+      "FSSAI Retail License",
+      "AYUSH Premium Retailer Guild",
+      "Jaivik Bharat Member"
+    ],
+    "avatarUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "USR-FRM-02",
+    "name": "Kavita Sundaram",
+    "email": "kavita@nilgiricoop.in",
+    "role": "FARMER",
+    "organization": "Nilgiri Mountain Herbs Alliance",
+    "location": "Ooty, Tamil Nadu, India",
+    "status": "PENDING_APPROVAL",
+    "joinedDate": "2024-08-20",
+    "certifications": [
+      "Rainforest Alliance (Under Audit)",
+      "India Organic NPOP"
+    ],
+    "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80"
+  }
+]
