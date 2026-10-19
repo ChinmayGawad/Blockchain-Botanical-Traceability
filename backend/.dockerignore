@@ -1,0 +1,14 @@
+target/
+.git/
+.mvn/
+*.log
+.env
+.env.*
+.DS_Store
+Thumbs.db
+src/test/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties

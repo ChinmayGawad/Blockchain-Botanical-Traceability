@@ -32,11 +32,10 @@ public class JwtTokenProvider {
     }
 
     private static String ensureBase64(String secret) {
-        // If not base64 encoded or too short, pad safely
-        if (secret.length() < 32) {
-            secret = secret + "01234567890123456789012345678901";
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 32 characters long to ensure 256-bit cryptographic strength.");
         }
-        return io.jsonwebtoken.io.Encoders.BASE64.encode(secret.getBytes());
+        return io.jsonwebtoken.io.Encoders.BASE64.encode(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     public String generateToken(Authentication authentication) {
