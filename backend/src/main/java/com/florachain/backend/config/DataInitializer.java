@@ -1,4 +1,4 @@
-package com.florachain.backend.config;
+﻿package com.florachain.backend.config;
 
 import com.florachain.backend.entity.BlockchainTransactionEntity;
 import com.florachain.backend.entity.CertificateEntity;
@@ -227,7 +227,7 @@ public class DataInitializer implements CommandLineRunner {
                 .yieldLossPercentage(12.0)
                 .equipmentUsed(Arrays.asList("CryoMill CM-800", "Supercritical Fluid Extractor SFE-500", "Fluidized Bed Dryer"))
                 .ipfsDocumentCid("QmZtmD2qt8SrhB8vnvsn8Go25vqRzkvNenGYjppsGo2Za")
-                .notes("Cryogenic milling at -40°C preserved thermo-sensitive withanolide glycosides without thermal degradation under AYUSH GMP.")
+                .notes("Cryogenic milling at -40Â°C preserved thermo-sensitive withanolide glycosides without thermal degradation under AYUSH GMP.")
                 .txHash("0x8f23b1c4e5a67890123456789abcdef0123456789abcdef0123456789abcdef0")
                 .product(p1)
                 .build());
@@ -253,10 +253,10 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         lab1.getParameters().addAll(Arrays.asList(
-                LabTestParameterEntity.builder().name("Total Withanolides (HPLC-UV)").value("5.42").unit("% w/w").standardLimit("≥ 2.5%").passed(true).labReport(lab1).build(),
+                LabTestParameterEntity.builder().name("Total Withanolides (HPLC-UV)").value("5.42").unit("% w/w").standardLimit("â‰¥ 2.5%").passed(true).labReport(lab1).build(),
                 LabTestParameterEntity.builder().name("Lead (Pb) - ICP-MS").value("0.08").unit("ppm (mg/kg)").standardLimit("< 3.0 ppm").passed(true).labReport(lab1).build(),
                 LabTestParameterEntity.builder().name("Cadmium (Cd) - ICP-MS").value("0.02").unit("ppm (mg/kg)").standardLimit("< 0.5 ppm").passed(true).labReport(lab1).build(),
-                LabTestParameterEntity.builder().name("Aflatoxins (B1+B2+G1+G2)").value("< 0.5").unit("ppb (µg/kg)").standardLimit("< 4.0 ppb").passed(true).labReport(lab1).build()
+                LabTestParameterEntity.builder().name("Aflatoxins (B1+B2+G1+G2)").value("< 0.5").unit("ppb (Âµg/kg)").standardLimit("< 4.0 ppb").passed(true).labReport(lab1).build()
         ));
         p1.setLabReport(lab1);
 
@@ -268,7 +268,7 @@ public class DataInitializer implements CommandLineRunner {
                 .destinationLocation("Arogya Pure Herbals Dispensary, Indiranagar, Bengaluru, India")
                 .vehicleNumber("KA-01-TG-8442")
                 .transportType(TransportType.REFRIGERATED_TRUCK)
-                .temperatureRange("15°C – 22°C (Monitored)")
+                .temperatureRange("15Â°C â€“ 22Â°C (Monitored)")
                 .dispatchDate(LocalDate.of(2024, 7, 8))
                 .expectedDeliveryDate(LocalDate.of(2024, 7, 12))
                 .actualDeliveryDate(LocalDate.of(2024, 7, 12))
@@ -295,7 +295,7 @@ public class DataInitializer implements CommandLineRunner {
         // Timeline events for Product 1
         p1.getTimeline().addAll(Arrays.asList(
                 TimelineEventEntity.builder().id("EVT-001").title("Harvest & On-Farm Batch Registration").stage("FARM_HARVEST").timestamp(LocalDateTime.of(2024, 6, 14, 6, 45)).actorName("Rajesh Patel").actorRole(UserRole.FARMER).location("Neemuch, Madhya Pradesh, India").description("Harvested 450kg organic root crop.").txHash("0x3a1b2c...").status("COMPLETED").product(p1).build(),
-                TimelineEventEntity.builder().id("EVT-002").title("Bio-Processing & Cryogenic Milling").stage("PROCESSING").timestamp(LocalDateTime.of(2024, 6, 22, 14, 0)).actorName("Mahesh Deshmukh").actorRole(UserRole.PROCESSOR).location("Peenya, Bengaluru, India").description("Cryogenic milling at -40°C completed.").txHash("0x8f23b1...").status("COMPLETED").product(p1).build(),
+                TimelineEventEntity.builder().id("EVT-002").title("Bio-Processing & Cryogenic Milling").stage("PROCESSING").timestamp(LocalDateTime.of(2024, 6, 22, 14, 0)).actorName("Mahesh Deshmukh").actorRole(UserRole.PROCESSOR).location("Peenya, Bengaluru, India").description("Cryogenic milling at -40Â°C completed.").txHash("0x8f23b1...").status("COMPLETED").product(p1).build(),
                 TimelineEventEntity.builder().id("EVT-003").title("Laboratory Purity & Contaminant Analysis").stage("LAB_TESTING").timestamp(LocalDateTime.of(2024, 7, 2, 11, 30)).actorName("Dr. Ananya Sharma").actorRole(UserRole.LABORATORY).location("Eurofins NABL Lab").description("Passed all HPLC & heavy metal assays.").txHash("0x4a7c8e...").status("COMPLETED").product(p1).build(),
                 TimelineEventEntity.builder().id("EVT-004").title("Cold-Chain Transit Dispatched & Delivered").stage("LOGISTICS_TRANSIT").timestamp(LocalDateTime.of(2024, 7, 12, 16, 20)).actorName("Vikramjit Singh").actorRole(UserRole.DISTRIBUTOR).location("Nelamangala to Indiranagar, Bengaluru").description("Delivered safely to Bengaluru retail hub.").txHash("0x2c5e8b...").status("COMPLETED").product(p1).build(),
                 TimelineEventEntity.builder().id("EVT-005").title("Retail Stocking & Consumer QR Active").stage("RETAIL_ARRIVAL").timestamp(LocalDateTime.of(2024, 7, 14, 9, 30)).actorName("Aarav Mehta").actorRole(UserRole.RETAILER).location("Indiranagar Bengaluru").description("Active on shelf. Authenticity QR live.").txHash("0x1a3d5f...").status("COMPLETED").product(p1).build()
@@ -395,6 +395,35 @@ public class DataInitializer implements CommandLineRunner {
                 .blockchainTransactions(new ArrayList<>())
                 .build();
         productRepository.save(p4);
+
+        // 5. Rejected / Failed QA Neem Leaf Extract
+        ProductEntity p5 = ProductEntity.builder()
+                .id(BOT-2024-9981)
+                .batchId(NEM-2024-012)
+                .name(Wild-Crafted Neem Leaf Extract (Failed QA))
+                .botanicalName(Azadirachta indica)
+                .category(ProductCategory.EXTRACT)
+                .cultivationMethod(CultivationMethod.WILD_CRAFTED)
+                .quantityKg(200.0)
+                .harvestDate(LocalDate.of(2024, 7, 5))
+                .farmLocation(Wild Forest Reserve Buffer Zone, Rajasthan)
+                .gpsLat(26.9124)
+                .gpsLng(75.7873)
+                .farmerId(USR-FRM-01)
+                .farmerName(Rajesh Patel)
+                .farmerOrg(Vedic Agro Organic Cooperative)
+                .status(ProductStatus.REJECTED)
+                .verificationState(VerificationState.REJECTED)
+                .qrCodeValue(https://florachain.verify/BOT-2024-9981)
+                .description(Raw Neem leaf batch flagged during multi-residue GC-MS laboratory screening due to synthetic organophosphate traces from adjacent non-organic spray drift.)
+                .imageUrl(https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600)
+                .createdTimestamp(LocalDateTime.of(2024, 7, 6, 10, 0))
+                .activeCompounds(Arrays.asList(Azadirachtin, Nimbin, Salannin))
+                .certificates(new ArrayList<>())
+                .timeline(new ArrayList<>())
+                .blockchainTransactions(new ArrayList<>())
+                .build();
+        productRepository.save(p5);
     }
 
     private void seedReports() {
@@ -414,3 +443,4 @@ public class DataInitializer implements CommandLineRunner {
         suspiciousReportRepository.save(r1);
     }
 }
+
