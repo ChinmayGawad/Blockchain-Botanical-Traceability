@@ -36,6 +36,9 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
 
+    @org.springframework.beans.factory.annotation.Value("${spring.profiles.active:dev}")
+    private String activeProfile;
+
     @Transactional
     public AuthResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -119,6 +122,12 @@ public class AuthService {
 
     @Transactional
     public AuthResponse switchRole(UserRole targetRole) {
+        if ("prod".equalsIgnoreCase(activeProfile)) {
+            throw new com.florachain.backend.exception.UnauthorizedException(
+                    "Demo role switching is strictly disabled in production environments."
+            );
+        }
+
         List<UserEntity> roleUsers = userRepository.findByRole(targetRole);
         UserEntity user;
 

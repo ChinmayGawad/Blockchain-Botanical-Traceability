@@ -46,7 +46,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
     }
 
+    private static final long CLEANUP_INTERVAL_MS = 60_000L;
+    private static final int MAX_TRACKED_IPS = 10_000;
+
     private final Map<String, RequestCounter> ipCounters = new ConcurrentHashMap<>();
+    private volatile long lastCleanupTime = System.currentTimeMillis();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -66,6 +70,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         String cacheKey = clientIp + ":" + (isAuthEndpoint ? "AUTH" : "GEN");
 
         long now = System.currentTimeMillis();
+        if (now - lastCleanupTime > CLEANUP_INTERVAL_MS || ipCounters.size() > MAX_TRACKED_IPS) {
+            lastCleanupTime = now;
+            ipCounters.entrySet().removeIf(entry -> (now - entry.getValue().windowStart) > WINDOW_MS);
+        }
+
         RequestCounter counter = ipCounters.computeIfAbsent(cacheKey, k -> new RequestCounter());
         int currentCount = counter.incrementAndGet(now);
 
