@@ -18,6 +18,10 @@ echo "[pre-commit] Checking for accidentally staged secrets..."
 STAGED=$(git diff --cached --name-only)
 for file in $STAGED; do
   case "$file" in
+    .env.example|.env.sample)
+      # Template files with placeholder values are safe to commit.
+      continue
+      ;;
     .env|.env.*|*.pem|*.key|id_rsa|*.keystore)
       echo "[pre-commit] ERROR: refusing to commit secret file '$file'."
       echo "[pre-commit] Add it to .gitignore and store the value in your environment instead."

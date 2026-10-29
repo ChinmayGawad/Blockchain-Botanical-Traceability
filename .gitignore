@@ -213,6 +213,8 @@ ENV/
 .copilot/
 .aider*
 skills-lock.json
+.kilo/worktrees/
+.kilo/agent-manager.json
 # =============================================================================
 # Added by AI Assistant - Additional Best Practice Ignores
 # =============================================================================
