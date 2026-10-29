@@ -20,7 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { SupplyChainJourneyMap } from '../../components/map/SupplyChainJourneyMap';
+import { LazySupplyChainJourneyMap } from '../../components/map/LazySupplyChainJourneyMap';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { SupplyChainTimeline } from '../../components/timeline/SupplyChainTimeline';
 
@@ -102,7 +102,7 @@ export const DemoVerificationHeroPage: React.FC = () => {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {viewMode === 'MAP' ? (
           <div className="space-y-6">
-            <SupplyChainJourneyMap
+            <LazySupplyChainJourneyMap
               batchId={batchId}
               productName={productName}
               botanicalName={currentProduct?.botanicalName}

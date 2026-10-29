@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import { X, Truck, ExternalLink, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { SupplyChainJourneyMap } from '../map/SupplyChainJourneyMap';
+import { LazySupplyChainJourneyMap } from '../map/LazySupplyChainJourneyMap';
 import { useNavigate } from 'react-router-dom';
 
 interface DemoDashboardDrawerModalProps {
@@ -91,7 +91,7 @@ export const DemoDashboardDrawerModal: React.FC<DemoDashboardDrawerModalProps> =
 
         {/* Drawer Body */}
         <div className="flex-1 p-6 overflow-y-auto space-y-6">
-          <SupplyChainJourneyMap
+          <LazySupplyChainJourneyMap
             batchId={batchId}
             productName={productName}
           />

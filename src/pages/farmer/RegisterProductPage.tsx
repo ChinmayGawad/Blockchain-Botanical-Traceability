@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { CultivationMethod, Certificate } from '../../types';
-import { LocalPartnerSelector } from '../../components/map/LocalPartnerSelector';
 import {
   Sprout,
   ArrowRight,
@@ -27,6 +26,18 @@ import { WizardAlert } from '../../components/common/WizardAlert';
 import { UnauthorizedCard } from '../../components/common/UnauthorizedCard';
 import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation';
 import { DocumentUploadDropzone, UploadedDocumentMeta } from '../../components/common/DocumentUploadDropzone';
+
+// The partner map pulls in the whole Mapbox + Turf runtime (~540 kB gzipped).
+// It is only needed in the last step of the wizard, so it is loaded on demand.
+const LocalPartnerSelector = React.lazy(() =>
+  import('../../components/map/LocalPartnerSelector').then(m => ({ default: m.LocalPartnerSelector })),
+);
+
+const PartnerSelectorFallback: React.FC = () => (
+  <div className="h-[420px] w-full rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center">
+    <span className="text-xs font-medium text-slate-500">Loading partner map...</span>
+  </div>
+);
 
 export const RegisterProductPage: React.FC = () => {
   const { registerProduct } = useBlockchain();
@@ -507,11 +518,13 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
               </div>
 
-              <LocalPartnerSelector
-                farmerLat={lat}
-                farmerLng={lng}
-                onSelectionComplete={(selections) => setSelectedPartners(selections)}
-              />
+              <Suspense fallback={<PartnerSelectorFallback />}>
+                <LocalPartnerSelector
+                  farmerLat={lat}
+                  farmerLng={lng}
+                  onSelectionComplete={(selections) => setSelectedPartners(selections)}
+                />
+              </Suspense>
               <div className="flex justify-between pt-3 border-t border-slate-100">
                 <motion.button
                   whileHover={{ scale: 1.03, y: -1 }}

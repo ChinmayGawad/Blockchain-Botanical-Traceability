@@ -152,6 +152,7 @@ describe('AuthContext Login Logic & Password Validation', () => {
 
   it('prevents unapproved users from logging in until approved', async () => {
     vi.spyOn(apiClient, 'post').mockRejectedValue(new Error('Network Error'));
+    vi.spyOn(apiClient, 'put').mockResolvedValue({});
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 

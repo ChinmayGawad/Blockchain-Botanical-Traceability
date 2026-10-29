@@ -53,6 +53,7 @@ const RootEntryPage: React.FC = () => {
 };
 
 import { motion } from 'framer-motion';
+import { ErrorBoundary } from '../components/common/ErrorBoundary';
 
 // Loading fallback spinner for lazy-loaded route views
 const PageLoadingSpinner: React.FC = () => (
@@ -73,9 +74,12 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
     transition={{ duration: 0.3, ease: 'easeOut' }}
     className="flex-1 flex flex-col w-full h-full"
   >
-    <React.Suspense fallback={<PageLoadingSpinner />}>
-      {children}
-    </React.Suspense>
+    {/* Route level boundary: a failing lazy chunk must not take down the whole app */}
+    <ErrorBoundary variant="route" component="AppRoutes">
+      <React.Suspense fallback={<PageLoadingSpinner />}>
+        {children}
+      </React.Suspense>
+    </ErrorBoundary>
   </motion.div>
 );
 

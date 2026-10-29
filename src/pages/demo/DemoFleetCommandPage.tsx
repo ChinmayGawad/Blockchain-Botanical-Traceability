@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/common/MetricCard';
-import { SupplyChainJourneyMap } from '../../components/map/SupplyChainJourneyMap';
+import { LazySupplyChainJourneyMap } from '../../components/map/LazySupplyChainJourneyMap';
 import contractConfig from '../../contracts/contractConfig.json';
 import { useBlockchain } from '../../context/BlockchainContext';
 
@@ -239,7 +239,7 @@ export const DemoFleetCommandPage: React.FC = () => {
 
       {/* Main Clear Real Journey Presentation */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
-        <SupplyChainJourneyMap
+        <LazySupplyChainJourneyMap
           key={selectedBatch.batchId}
           batchId={selectedBatch.batchId}
           productName={selectedBatch.name}

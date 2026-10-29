@@ -499,7 +499,7 @@ export function generateLaboratoryPdfBytes(product: BotanicalProduct, password?:
   // Info Dictionary (object 9)
   const infoObjNum = encContext ? 9 : 8;
   const infoTitle = `FloraChain Lab Report - ${product.batchId}`;
-  let infoBodyStr = `<< /Title (${escapePdf(infoTitle)}) /Producer (FloraChain Cryptographic Engine) /CreationDate (D:${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14)}Z) >>`;
+  let infoBodyStr = `<< /Title (${escapePdf(infoTitle)}) /Producer (FloraChain Cryptographic Engine) /CreationDate (D:${new Date().toISOString().replace(/\D/g, '').slice(0, 14)}Z) >>`;
   if (encContext) {
     // Encrypt string literals in Info dictionary if needed or keep standard
   }

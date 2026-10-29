@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { TrustSeal } from '../../components/verification/TrustSeal';
 import { SupplyChainTimeline } from '../../components/timeline/SupplyChainTimeline';
-import { SupplyChainJourneyMap } from '../../components/map/SupplyChainJourneyMap';
+import { LazySupplyChainJourneyMap } from '../../components/map/LazySupplyChainJourneyMap';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { QRModal } from '../../components/common/QRModal';
 import { QRScannerModal } from '../../components/verification/QRScannerModal';
@@ -382,7 +382,7 @@ export const VerifyProductPage: React.FC = () => {
                   <CardContent className="p-0 sm:p-4">
                     {journeyViewMode === 'MAP' ? (
                       <div className="p-2 sm:p-0">
-                        <SupplyChainJourneyMap
+                        <LazySupplyChainJourneyMap
                           batchId={currentProduct.batchId}
                           productName={currentProduct.name}
                           botanicalName={currentProduct.botanicalName}

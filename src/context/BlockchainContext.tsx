@@ -13,9 +13,34 @@ import {
 } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_SUSPICIOUS_REPORTS } from '../data/mockData';
 import { getBotanicalProductImage } from '../utils/imageUtils';
-import web3Service, { WalletState, HARDHAT_DEMO_ACCOUNTS } from '../services/web3Service';
+import type { WalletState } from '../services/web3Service';
+import {
+  HARDHAT_DEMO_ACCOUNTS,
+  getConfiguredContractAddress,
+  isBrowserWalletInstalled,
+} from '../services/web3Config';
 import apiClient from '../services/api';
 import { AuthContext } from './AuthContext';
+
+/**
+ * The ethers based web3 service is loaded on demand. It keeps the ~100 kB
+ * (gzipped) web3 runtime out of the initial bundle and only pulls it in when a
+ * wallet interaction actually happens.
+ */
+type Web3ServiceModule = typeof import('../services/web3Service');
+type Web3ServiceInstance = Web3ServiceModule['default'];
+let web3ModulePromise: Promise<Web3ServiceInstance> | null = null;
+let web3ServiceInstance: Web3ServiceInstance | null = null;
+
+const loadWeb3Service = (): Promise<Web3ServiceInstance> => {
+  if (!web3ModulePromise) {
+    web3ModulePromise = import('../services/web3Service').then(module => {
+      web3ServiceInstance = module.default;
+      return module.default;
+    });
+  }
+  return web3ModulePromise;
+};
 
 const ROLE_TO_ACCOUNT_INDEX: Record<string, number> = {
   ADMIN: 0,
@@ -129,8 +154,9 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     const autoConnectWallet = async () => {
       // 1. If MetaMask is actively unlocked and connected by the user, respect it
-      if (web3Service.isMetaMaskInstalled() && (window as any).ethereum?.selectedAddress) {
+      if (isBrowserWalletInstalled() && (window as any).ethereum?.selectedAddress) {
         try {
+          const web3Service = await loadWeb3Service();
           const res = await web3Service.connectMetaMask();
           if (!isCancelled && res.isConnected) {
             setWalletState(res);
@@ -145,6 +171,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const targetRole = role || 'FARMER';
       const accountIndex = ROLE_TO_ACCOUNT_INDEX[targetRole] ?? 0;
       try {
+        const web3Service = await loadWeb3Service();
         const res = await web3Service.connectLocalTestWallet(accountIndex);
         if (!isCancelled) {
           setWalletState(res);
@@ -204,6 +231,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     const updateStats = async () => {
       try {
+        const web3Service = await loadWeb3Service();
         const stats = await web3Service.fetchNetworkStats();
         if (stats.blockHeight) setLiveBlockHeight(stats.blockHeight);
         if (stats.networkName) setLiveNetworkName(stats.networkName);
@@ -217,24 +245,38 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   const connectMetaMask = async (): Promise<WalletState> => {
+    const web3Service = await loadWeb3Service();
     const res = await web3Service.connectMetaMask();
     setWalletState(res);
     return res;
   };
 
   const connectLocalAccount = async (accountIndex = 0): Promise<WalletState> => {
+    const web3Service = await loadWeb3Service();
     const res = await web3Service.connectLocalTestWallet(accountIndex);
     setWalletState(res);
     return res;
   };
 
   const disconnectWallet = () => {
-    const res = web3Service.disconnect();
+    if (!web3ServiceInstance) {
+      setWalletState({
+        isConnected: false,
+        address: null,
+        chainId: null,
+        balanceEth: null,
+        networkName: null,
+        connectionType: null,
+        error: null,
+      });
+      return;
+    }
+    const res = web3ServiceInstance.disconnect();
     setWalletState(res);
   };
 
   const connectWallet = async () => {
-    if (web3Service.isMetaMaskInstalled()) {
+    if (isBrowserWalletInstalled()) {
       await connectMetaMask();
     } else {
       await connectLocalAccount(0);
@@ -252,7 +294,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     tps: 8.5,
     verifiedBatches: products.filter(p => p.verificationState === 'VERIFIED').length,
     networkName: liveNetworkName,
-    contractAddress: web3Service.getContractAddress(),
+    contractAddress: getConfiguredContractAddress(),
   };
 
   const getProductById = (idOrBatch: string): BotanicalProduct | undefined => {
@@ -303,6 +345,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     let blockNum = blockHeight + 1;
 
     try {
+      const web3Service = await loadWeb3Service();
       const res = await web3Service.registerHarvestOnChain(productData);
       if (res && res.txHash) {
         txHash = res.txHash;
@@ -377,6 +420,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const targetProduct = products.find(p => p.id === productId);
       const batchId = targetProduct?.batchId || productId;
+      const web3Service = await loadWeb3Service();
       const res = await web3Service.recordProcessingOnChain(batchId, details);
       if (res && res.txHash) {
         txHash = res.txHash;
@@ -452,6 +496,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const targetProduct = products.find(p => p.id === productId);
       const batchId = targetProduct?.batchId || productId;
+      const web3Service = await loadWeb3Service();
       const res = await web3Service.submitLabReportOnChain(batchId, labReportData, approve);
       if (res && res.txHash) {
         txHash = res.txHash;
@@ -531,6 +576,7 @@ export const BlockchainProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const targetProduct = products.find(p => p.id === productId);
       const batchId = targetProduct?.batchId || productId;
+      const web3Service = await loadWeb3Service();
       const res = await web3Service.dispatchShipmentOnChain(batchId, shipmentData);
       if (res && res.txHash) {
         txHash = res.txHash;
