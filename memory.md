@@ -68,7 +68,44 @@ To run the full stack locally:
 
 ## 💡 8. Key Developer Notes
 - **Web3Service (`src/services/web3Service.ts`)**: Look here for all Ethereum/Ethers.js interactions. The `signAndRelayMetaTransaction` function is the core of the gasless implementation.
-- **Contract Compilation**: The `hardhat.config.cjs` uses `evmVersion: "cancun"` to support the `mcopy` opcode used by OpenZeppelin v5.
+- **Contract Compilation**: The `hardhat.config.cjs` uses `evcVersion: "cancun"` to support the `mcopy` opcode used by OpenZeppelin v5.
 - **Backend Port**: Spring Boot runs on `8080`.
 - **Frontend Port**: Vite runs on `5173` (or `5174` if `5173` is busy).
 - **Artifact Generation**: Deploying the contract automatically generates `src/contracts/contractConfig.json`, feeding the ABI and forwarder addresses to the React frontend.
+
+## 🗄️ 9. Data Layer (Flyway owns the schema)
+- **Migrations live in `backend/src/main/resources/db/migration`** and run on every boot:
+  - `V1__init_schema.sql` – baseline schema.
+  - `V2__align_schema_with_jpa_entities.sql` – reconciles the physical schema with the JPA entity model, adds `NOT NULL`/FK/CHECK constraints and lookup indexes.
+  - `V3__seed_reference_data.sql` – the demo dataset (7 users, 5 batches, provenance history).
+- **No runtime seeding any more**: the old `DataInitializer` was deleted. Dev, test and prod all use the same migrations, so the environments cannot drift.
+- `ddl-auto` is `none` for dev/test and `validate` for prod – Hibernate never creates or alters tables, Flyway does.
+- **Tests run against an isolated H2 database** (`florachain_test_db`) through the `test` profile (`backend/src/test/resources/application-test.yml`). `SchemaMigrationTest` boots the app with `ddl-auto=validate` to prove the migrated schema still matches the entities.
+
+## 🔐 10. Security Posture
+- **JWT secret**: environment only (`JWT_SECRET`). `JwtTokenProvider` enforces ≥ 256 bit of key material in every profile, rejects the placeholder secret that was published in earlier revisions, and the `prod` profile refuses to start without a strong secret (dev/test generate an ephemeral key per boot).
+- **Rate limiting**: `RateLimitingFilter` applies a sliding window budget – tight on `/api/auth/**`, looser elsewhere – configurable via `RATE_LIMIT_AUTH_PER_MINUTE` / `RATE_LIMIT_GENERAL_PER_MINUTE`.
+- **Input handling**: bean validation on the DTOs plus `InputSanitizer` (control characters, whitespace, length, email normalisation) in the services; `GlobalExceptionHandler` maps validation failures to `400`.
+- **Endpoint guards**: `/api/auth/**` (except login/register/switch-role), `/api/admin/**` and the write endpoints are token protected; the catalogue and the verification endpoints stay public.
+
+## 📈 11. Observability
+- **Structured logging**: `RequestCorrelationFilter` puts `requestId`, `userId`, `role`, `method` and `path` into the SLF4J MDC; `logback-spring.xml` renders them as key/value pairs. The correlation id is taken from (or echoed into) the `X-Request-Id` header.
+- **Health**: Actuator exposes `/actuator/health`, `/actuator/health/liveness` and `/actuator/health/readiness` (public, used by the compose healthchecks and by orchestrators).
+- **Frontend error reporting**: `src/services/errorReporting.ts` collects uncaught errors, unhandled rejections and error-boundary failures, and can ship them to `VITE_ERROR_REPORTING_URL`. The route level boundary in `AppRoutes` keeps a failing lazy chunk from taking down the app.
+
+## ⚡ 12. Frontend Performance
+- Routes are code split with `React.lazy`; the journey map (`LazySupplyChainJourneyMap`) and the partner map (`LocalPartnerSelector`, Mapbox + Turf) load on demand.
+- **ethers is deferred**: `BlockchainContext` loads `web3Service` through a dynamic import, so the ~100 kB gzipped web3 runtime is not part of the initial payload. The ethers free configuration lives in `src/services/web3Config.ts`.
+- `npm run analyze:bundle` prints the chunk report and fails the build when a chunk exceeds its budget (also enforced in CI).
+
+## ✅ 13. Quality Gates
+- **Backend**: `./mvnw verify` runs 90+ JUnit tests (service, controller, security and migration suites) and enforces a JaCoCo line-coverage gate; the report is uploaded as a CI artifact.
+- **Frontend**: `npm run test:unit` (Vitest), `npm run typecheck`, `npm run build` and `npm run analyze:bundle`.
+- **CI**: `.github/workflows/ci.yml` runs contracts, frontend and backend jobs on every push/PR.
+- **Pre-commit hook**: `.githooks/pre-commit` (installed via `npm run prepare`) blocks staged secret files and runs the type check, the unit tests and the backend compilation.
+
+## 14. Final Validation Snapshot (2026-10-21)
+- Backend: `mvnw verify` = BUILD SUCCESS, 92 tests, 0 failures, JaCoCo line coverage 77.7 % (gate 35 %).
+- Frontend: `npm run test:unit` = 20 files / 135 tests, `npm run typecheck` clean, entry chunk 90.71 kB gzipped, `npm run analyze:bundle` = all chunks within budget.
+- Git hooks: `npm run prepare` sets `core.hooksPath=.githooks` (the hook file is chmod-ed to 755 on POSIX systems).
+- V2 migration hardening: legacy `VARCHAR` -> `DATE` / `DOUBLE` casts skip empty strings so blank production rows cannot abort the migration; the migration header documents that the tables are expected to originate from V1 (Hibernate-provisioned databases need a Flyway baseline/repair first).

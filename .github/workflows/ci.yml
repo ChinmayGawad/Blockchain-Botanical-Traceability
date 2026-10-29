@@ -52,8 +52,21 @@ jobs:
       - name: Run Vitest Unit Tests
         run: npm run test:unit
 
+      - name: Type Check
+        run: npm run typecheck
+
       - name: Build Production Assets
         run: npm run build
+
+      - name: Check Bundle Budget
+        run: npm run analyze:bundle
+
+      - name: Upload Production Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist
+          retention-days: 7
 
   backend:
     name: Spring Boot Backend & Flyway Tests
@@ -75,11 +88,21 @@ jobs:
             chmod +x backend/mvnw
           fi
 
-      - name: Run Maven Tests
+      - name: Run Maven Tests (with coverage gate)
         working-directory: ./backend
+        env:
+          JWT_SECRET: ci-only-signing-key-0123456789-abcdef
         run: |
           if [ -f ./mvnw ]; then
-            ./mvnw test
+            ./mvnw --batch-mode verify
           else
-            mvn test
+            mvn --batch-mode verify
           fi
+
+      - name: Upload JaCoCo Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/target/site/jacoco
+          retention-days: 7

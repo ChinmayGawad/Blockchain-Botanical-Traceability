@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# FloraChain pre-commit hook.
+#
+# Runs the fast quality gates before a commit is created:
+#   1. secret hygiene (no .env / key files staged)
+#   2. TypeScript type check
+#   3. frontend unit tests
+#   4. backend compilation (set PRE_COMMIT_BACKEND_TESTS=1 to also run the
+#      backend test suite, which is slower)
+#
+set -e
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+
+echo "[pre-commit] Checking for accidentally staged secrets..."
+STAGED=$(git diff --cached --name-only)
+for file in $STAGED; do
+  case "$file" in
+    .env|.env.*|*.pem|*.key|id_rsa|*.keystore)
+      echo "[pre-commit] ERROR: refusing to commit secret file '$file'."
+      echo "[pre-commit] Add it to .gitignore and store the value in your environment instead."
+      exit 1
+      ;;
+  esac
+done
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "[pre-commit] node not found - skipping frontend checks."
+  exit 0
+fi
+
+echo "[pre-commit] Running TypeScript type check..."
+npm run --silent typecheck
+
+echo "[pre-commit] Running frontend unit tests..."
+npx vitest run --reporter=dot
+
+if [ -x "$REPO_ROOT/backend/mvnw" ] || [ -x "$REPO_ROOT/backend/mvnw.cmd" ]; then
+  echo "[pre-commit] Compiling the backend..."
+  ( cd backend && ./mvnw -q -DskipTests compile )
+  if [ "$PRE_COMMIT_BACKEND_TESTS" = "1" ]; then
+    echo "[pre-commit] Running backend tests..."
+    ( cd backend && ./mvnw -q test )
+  fi
+fi
+
+echo "[pre-commit] All checks passed."

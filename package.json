@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "compile": "hardhat compile --config hardhat.config.cjs",
     "test:contracts": "hardhat test --config hardhat.config.cjs",
@@ -19,6 +20,8 @@
     "test:unit:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "analyze:bundle": "node scripts/check-bundle-size.mjs",
+    "prepare": "node scripts/setup-git-hooks.mjs",
     "dev:all": "concurrently -c \"cyan.bold,blue.bold\" -n \"FRONTEND,BACKEND\" \"npm run dev\" \"cd backend && mvnw.cmd spring-boot:run\""
   },
   "dependencies": {
