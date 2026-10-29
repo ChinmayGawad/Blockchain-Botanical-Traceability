@@ -17,8 +17,14 @@ spring:
 
 app:
   jwt:
-    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-    expiration-ms: 86400000 # 24 hours
+    # Secrets are environment-only. When unset, a random per-boot 256-bit key is
+    # generated for non-production profiles; the prod profile fails fast instead.
+    secret: ${JWT_SECRET:}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  security:
+    rate-limit:
+      auth-requests-per-minute: ${RATE_LIMIT_AUTH_PER_MINUTE:15}
+      general-requests-per-minute: ${RATE_LIMIT_GENERAL_PER_MINUTE:180}
   blockchain:
     rpc-url: ${BLOCKCHAIN_RPC_URL:https://ethereum-sepolia-rpc.publicnode.com}
     contract-address: ${BLOCKCHAIN_CONTRACT_ADDRESS:0x2B04B82dD07F1938E74b0CDCA9Fa5693Df147a87}
@@ -46,3 +52,21 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    db:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.florachain.backend: ${LOG_LEVEL_APP:INFO}
+    org.springframework.security: INFO

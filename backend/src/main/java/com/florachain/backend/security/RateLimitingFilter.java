@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,17 +17,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Production Sliding Window Rate Limiting Filter.
- * Protects authentication endpoints from credential brute-forcing
- * and limits abuse across sensitive API routes.
+ * Sliding window rate limiting filter.
+ *
+ * <p>Authentication endpoints ({@code /api/auth/**}) use a much tighter budget than
+ * the rest of the API to slow down credential brute-forcing. Limits are
+ * configurable through {@code app.security.rate-limit.*} so that deployments can
+ * tune them without code changes.
  */
 @Slf4j
 @Component
 public class RateLimitingFilter extends OncePerRequestFilter {
 
-    private static final int AUTH_LIMIT_PER_MINUTE = 15;
-    private static final int GENERAL_LIMIT_PER_MINUTE = 180;
     private static final long WINDOW_MS = 60_000L;
+    private static final long CLEANUP_INTERVAL_MS = 60_000L;
+    private static final int MAX_TRACKED_IPS = 10_000;
+
+    private final int authLimitPerMinute;
+    private final int generalLimitPerMinute;
+
+    private final Map<String, RequestCounter> ipCounters = new ConcurrentHashMap<>();
+    private volatile long lastCleanupTime = System.currentTimeMillis();
+
+    public RateLimitingFilter(
+            @Value("${app.security.rate-limit.auth-requests-per-minute:15}") int authLimitPerMinute,
+            @Value("${app.security.rate-limit.general-requests-per-minute:180}") int generalLimitPerMinute) {
+        this.authLimitPerMinute = Math.max(1, authLimitPerMinute);
+        this.generalLimitPerMinute = Math.max(1, generalLimitPerMinute);
+    }
 
     private static class RequestCounter {
         final AtomicInteger count = new AtomicInteger(0);
@@ -46,12 +63,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
     }
 
-    private static final long CLEANUP_INTERVAL_MS = 60_000L;
-    private static final int MAX_TRACKED_IPS = 10_000;
-
-    private final Map<String, RequestCounter> ipCounters = new ConcurrentHashMap<>();
-    private volatile long lastCleanupTime = System.currentTimeMillis();
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -66,7 +77,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         String clientIp = extractClientIp(request);
         boolean isAuthEndpoint = path.startsWith("/api/auth");
-        int maxLimit = isAuthEndpoint ? AUTH_LIMIT_PER_MINUTE : GENERAL_LIMIT_PER_MINUTE;
+        int maxLimit = isAuthEndpoint ? authLimitPerMinute : generalLimitPerMinute;
         String cacheKey = clientIp + ":" + (isAuthEndpoint ? "AUTH" : "GEN");
 
         long now = System.currentTimeMillis();

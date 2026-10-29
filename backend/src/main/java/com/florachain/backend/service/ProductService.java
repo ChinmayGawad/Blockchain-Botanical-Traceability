@@ -20,8 +20,10 @@ import com.florachain.backend.enums.UserRole;
 import com.florachain.backend.enums.VerificationState;
 import com.florachain.backend.exception.BadRequestException;
 import com.florachain.backend.exception.ResourceNotFoundException;
+import com.florachain.backend.repository.BlockchainTransactionRepository;
 import com.florachain.backend.repository.ProductRepository;
 import com.florachain.backend.repository.TimelineEventRepository;
+import com.florachain.backend.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -42,16 +44,18 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final TimelineEventRepository timelineEventRepository;
+    private final BlockchainTransactionRepository blockchainTransactionRepository;
     private final BlockchainBridgeService blockchainBridgeService;
     private final IpfsStorageService ipfsStorageService;
 
     @Transactional
     public ProductResponse registerProduct(ProductRegistrationRequest request) {
-        if (request.getBatchId() == null || request.getBatchId().isBlank()) {
+        String batchId = InputSanitizer.sanitize(request.getBatchId(), 64);
+        if (batchId == null || batchId.isEmpty()) {
             throw new BadRequestException("Batch ID is required for product registration");
         }
-        if (productRepository.findByBatchId(request.getBatchId().trim()).isPresent()) {
-            throw new BadRequestException("A product with Batch ID '" + request.getBatchId() + "' already exists");
+        if (productRepository.findByBatchId(batchId).isPresent()) {
+            throw new BadRequestException("A product with Batch ID '" + batchId + "' already exists");
         }
 
         String year = String.valueOf(LocalDate.now().getYear());
@@ -70,14 +74,40 @@ public class ProductService {
             harvestDate = LocalDate.now();
         }
 
-        String farmerName = request.getFarmerName() != null && !request.getFarmerName().isBlank() ? request.getFarmerName().trim() : "Organic Farmer";
-        String farmLocation = request.getFarmLocation() != null && !request.getFarmLocation().isBlank() ? request.getFarmLocation().trim() : "Certified Botanical Estate";
+        String farmerName = InputSanitizer.sanitize(request.getFarmerName(), 150);
+        if (farmerName == null || farmerName.isEmpty()) {
+            farmerName = "Organic Farmer";
+        }
+        String farmLocation = InputSanitizer.sanitize(request.getFarmLocation(), 256);
+        if (farmLocation == null || farmLocation.isEmpty()) {
+            farmLocation = "Certified Botanical Estate";
+        }
+        String productName = InputSanitizer.sanitize(request.getName(), 200);
+        if (productName == null || productName.isEmpty()) {
+            productName = "Botanical Herb";
+        }
+        String botanicalName = InputSanitizer.sanitize(request.getBotanicalName(), 200);
+        if (botanicalName == null || botanicalName.isEmpty()) {
+            botanicalName = "Botanical Specimen";
+        }
+        String farmerOrg = InputSanitizer.sanitize(request.getFarmerOrg(), 150);
+        if (farmerOrg == null || farmerOrg.isEmpty()) {
+            farmerOrg = "Certified Farm Co-op";
+        }
+        String description = InputSanitizer.sanitize(request.getDescription(), 2000);
+        if (description == null || description.isEmpty()) {
+            description = "Freshly harvested certified botanical batch.";
+        }
+        String imageUrl = InputSanitizer.sanitize(request.getImageUrl(), 512);
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            imageUrl = "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600";
+        }
 
         ProductEntity product = ProductEntity.builder()
                 .id(productId)
-                .batchId(request.getBatchId().trim())
-                .name(request.getName() != null ? request.getName().trim() : "Botanical Herb")
-                .botanicalName(request.getBotanicalName() != null ? request.getBotanicalName().trim() : "Botanical Specimen")
+                .batchId(batchId)
+                .name(productName)
+                .botanicalName(botanicalName)
                 .category(request.getCategory() != null ? request.getCategory() : ProductCategory.MEDICINAL_HERB)
                 .cultivationMethod(request.getCultivationMethod() != null ? request.getCultivationMethod() : com.florachain.backend.enums.CultivationMethod.ORGANIC)
                 .quantityKg(request.getQuantityKg() != null ? request.getQuantityKg() : 100.0)
@@ -87,12 +117,12 @@ public class ProductService {
                 .gpsLng(request.getGpsCoordinates() != null ? request.getGpsCoordinates().getLng() : 74.8718)
                 .farmerId(request.getFarmerId() != null ? request.getFarmerId() : "USR-FRM-01")
                 .farmerName(farmerName)
-                .farmerOrg(request.getFarmerOrg() != null ? request.getFarmerOrg() : "Certified Farm Co-op")
+                .farmerOrg(farmerOrg)
                 .status(ProductStatus.REGISTERED)
                 .verificationState(VerificationState.IN_PROGRESS)
                 .qrCodeValue(qrCodeValue)
-                .description(request.getDescription() != null ? request.getDescription() : "Freshly harvested certified botanical batch.")
-                .imageUrl(request.getImageUrl() != null && !request.getImageUrl().isBlank() ? request.getImageUrl() : "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600")
+                .description(description)
+                .imageUrl(imageUrl)
                 .createdTimestamp(LocalDateTime.now())
                 .activeCompounds(request.getActiveCompounds() != null ? request.getActiveCompounds() : List.of("Standard Botanical Extract"))
                 .certificates(new ArrayList<>())
@@ -333,7 +363,7 @@ public class ProductService {
                         .notes(p.getRetailDetails().getNotes())
                         .txHash(p.getRetailDetails().getTxHash())
                         .build() : null)
-                .timeline(p.getTimeline() != null ? p.getTimeline().stream().map(t -> TimelineEventDto.builder()
+                .timeline(timelineEventRepository.findByProductIdOrderByTimestampAsc(p.getId()).stream().map(t -> TimelineEventDto.builder()
                         .id(t.getId())
                         .title(t.getTitle())
                         .stage(t.getStage())
@@ -345,8 +375,8 @@ public class ProductService {
                         .txHash(t.getTxHash())
                         .status(t.getStatus())
                         .ipfsHash(t.getIpfsHash())
-                        .build()).collect(Collectors.toList()) : List.of())
-                .blockchainTransactions(p.getBlockchainTransactions() != null ? p.getBlockchainTransactions().stream().map(tx -> TransactionDto.builder()
+                        .build()).collect(Collectors.toList()))
+                .blockchainTransactions(blockchainTransactionRepository.findByProductIdOrderByTimestampDesc(p.getId()).stream().map(tx -> TransactionDto.builder()
                         .txId(tx.getTxId())
                         .blockNumber(tx.getBlockNumber())
                         .timestamp(tx.getTimestamp() != null ? tx.getTimestamp().toString() : "")
@@ -359,7 +389,7 @@ public class ProductService {
                         .channelName(tx.getChannelName())
                         .chaincode(tx.getChaincode())
                         .productId(p.getId())
-                        .build()).collect(Collectors.toList()) : List.of())
+                        .build()).collect(Collectors.toList()))
                 .build();
     }
 }

@@ -3,18 +3,29 @@ spring:
     url: jdbc:h2:mem:florachain_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
+    password:
   h2:
     console:
       enabled: true
       path: /h2-console
       settings:
-        web-allow-others: true
+        web-allow-others: false
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+
+app:
+  ipfs:
+    mock-mode: true
+  blockchain:
+    rpc-url: ${BLOCKCHAIN_RPC_URL:http://127.0.0.1:8545}
 
 logging:
   level:

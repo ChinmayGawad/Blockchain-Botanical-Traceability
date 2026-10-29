@@ -11,6 +11,7 @@ import com.florachain.backend.exception.BadRequestException;
 import com.florachain.backend.exception.ResourceNotFoundException;
 import com.florachain.backend.repository.UserRepository;
 import com.florachain.backend.security.JwtTokenProvider;
+import com.florachain.backend.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -63,8 +64,9 @@ public class AuthService {
         if (request.getEmail() == null || request.getEmail().isBlank()) {
             throw new BadRequestException("Email is required for registration");
         }
-        if (userRepository.existsByEmailIgnoreCase(request.getEmail().trim())) {
-            throw new BadRequestException("Email address is already in use: " + request.getEmail());
+        String normalizedEmail = InputSanitizer.requireEmail(request.getEmail());
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new BadRequestException("Email address is already in use: " + normalizedEmail);
         }
 
         UserRole role = request.getRole() != null ? request.getRole() : UserRole.FARMER;
@@ -89,12 +91,16 @@ public class AuthService {
 
         UserEntity user = UserEntity.builder()
                 .id(generatedId)
-                .name(request.getName() != null ? request.getName().trim() : "FloraChain User")
-                .email(request.getEmail().trim().toLowerCase())
+                .name(InputSanitizer.requireText(request.getName(), 100, "Name"))
+                .email(normalizedEmail)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
-                .organization(request.getOrganization() != null ? request.getOrganization() : role.name() + " Hub")
-                .location(request.getLocation() != null ? request.getLocation() : "Verified Node")
+                .organization(InputSanitizer.sanitize(request.getOrganization(), 150) != null
+                        ? InputSanitizer.sanitize(request.getOrganization(), 150)
+                        : role.name() + " Hub")
+                .location(InputSanitizer.sanitize(request.getLocation(), 150) != null
+                        ? InputSanitizer.sanitize(request.getLocation(), 150)
+                        : "Verified Node")
                 .status(UserStatus.ACTIVE)
                 .joinedDate(LocalDate.now())
                 .certifications(request.getCertifications() != null ? request.getCertifications() : List.of())

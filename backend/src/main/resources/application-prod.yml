@@ -23,7 +23,9 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    # No default on purpose: the prod profile refuses to start without a strong
+    # (>= 256 bit) secret - see JwtTokenProvider.
+    secret: ${JWT_SECRET:}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   blockchain:
     rpc-url: ${BLOCKCHAIN_RPC_URL:https://rpc-amoy.polygon.technology}

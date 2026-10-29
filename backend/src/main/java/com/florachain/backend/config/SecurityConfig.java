@@ -79,15 +79,17 @@ public class SecurityConfig {
                     // Root health & preflight requests
                     .requestMatchers("/").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    // Public authentication & verification endpoints
-                    .requestMatchers("/api/auth/**").permitAll()
+                    // Public authentication endpoints (login/register are open, the rest is token protected)
+                    .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/auth/switch-role").permitAll()
+                    .requestMatchers("/api/auth/**").authenticated()
                     .requestMatchers("/api/verify/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/blockchain/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/config/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/reports").permitAll()
-                    // Actuator health & readiness probes
-                    .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                    // Actuator health, liveness & readiness probes
+                    .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                     .requestMatchers("/error").permitAll();
 
                 if (isDev) {

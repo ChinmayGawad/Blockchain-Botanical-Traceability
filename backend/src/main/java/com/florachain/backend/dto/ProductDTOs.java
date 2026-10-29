@@ -41,12 +41,15 @@ public class ProductDTOs {
     @Builder
     public static class ProductRegistrationRequest {
         @NotBlank(message = "Product name is required")
+        @Size(max = 200, message = "Product name must not exceed 200 characters")
         private String name;
 
         @NotBlank(message = "Botanical name is required")
+        @Size(max = 200, message = "Botanical name must not exceed 200 characters")
         private String botanicalName;
 
         @NotBlank(message = "Batch ID is required")
+        @Size(max = 64, message = "Batch ID must not exceed 64 characters")
         private String batchId;
 
         @NotNull(message = "Category is required")
@@ -60,17 +63,30 @@ public class ProductDTOs {
         private Double quantityKg;
 
         @NotBlank(message = "Harvest date is required")
+        @Size(max = 32, message = "Harvest date must not exceed 32 characters")
         private String harvestDate;
 
         @NotBlank(message = "Farm location is required")
+        @Size(max = 256, message = "Farm location must not exceed 256 characters")
         private String farmLocation;
 
         private GpsCoordinatesDto gpsCoordinates;
+
+        @Size(max = 64, message = "Farmer ID must not exceed 64 characters")
         private String farmerId;
+
+        @Size(max = 150, message = "Farmer name must not exceed 150 characters")
         private String farmerName;
+
+        @Size(max = 150, message = "Farmer organisation must not exceed 150 characters")
         private String farmerOrg;
+
+        @Size(max = 2000, message = "Description must not exceed 2000 characters")
         private String description;
+
+        @Size(max = 512, message = "Image URL must not exceed 512 characters")
         private String imageUrl;
+
         private List<String> activeCompounds;
         private List<CertificateDto> certificates;
     }
