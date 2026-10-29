@@ -19,7 +19,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @Transactional
 class LaboratoryServiceTest {
 

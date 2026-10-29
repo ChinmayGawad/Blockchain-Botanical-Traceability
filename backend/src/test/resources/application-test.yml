@@ -1,0 +1,38 @@
+spring:
+  # Isolated in-memory H2 database. Tests never touch the PostgreSQL/prod datasource.
+  datasource:
+    url: jdbc:h2:mem:florachain_test_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    # Deterministic test-only key (>= 256 bit). Never reused outside the test profile.
+    secret: ${JWT_SECRET:florachain-test-profile-signing-key-0123456789abcdef}
+    expiration-ms: 3600000
+  ipfs:
+    mock-mode: true
+  blockchain:
+    rpc-url: ${BLOCKCHAIN_RPC_URL:http://127.0.0.1:8545}
+  security:
+    rate-limit:
+      auth-requests-per-minute: ${RATE_LIMIT_AUTH_PER_MINUTE:15}
+      general-requests-per-minute: ${RATE_LIMIT_GENERAL_PER_MINUTE:180}
+
+logging:
+  level:
+    root: WARN
+    com.florachain.backend: INFO
+    org.springframework.security: WARN
+    org.flywaydb: INFO

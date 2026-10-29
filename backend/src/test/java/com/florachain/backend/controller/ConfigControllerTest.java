@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(properties = "app.mapbox.access-token=pk.mock_test_mapbox_token_for_ci")
 @AutoConfigureMockMvc
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 class ConfigControllerTest {
 
     @Autowired
