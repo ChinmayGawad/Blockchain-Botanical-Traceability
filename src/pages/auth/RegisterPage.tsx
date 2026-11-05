@@ -64,7 +64,7 @@ export const RegisterPage: React.FC = () => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('password123');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('FARMER');
   const [organization, setOrganization] = useState('');
   const [location, setLocation] = useState('');
@@ -236,10 +236,12 @@ export const RegisterPage: React.FC = () => {
                 <Input
                   type="text"
                   required
+                  aria-label="Enter 6-digit OTP"
                   placeholder="Enter 6-digit OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   maxLength={6}
+                  inputMode="numeric"
                   className="w-full text-center tracking-widest bg-white border-slate-200 focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 text-lg font-medium"
                 />
                 {otpError && <p className="text-xs text-red-500 font-bold text-center mt-1">{otpError}</p>}
@@ -265,10 +267,10 @@ export const RegisterPage: React.FC = () => {
             <form onSubmit={initiateRegistration} className="space-y-4">
               {/* Role Radio Group */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800">
+                <label id="register-role-label" className="text-xs font-bold text-slate-800">
                   Select Stakeholder Role & Network Tier:
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div role="radiogroup" aria-labelledby="register-role-label" className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {roleOptions.map((opt) => {
                     const Icon = opt.icon;
                     const isSelected = role === opt.role;
@@ -276,6 +278,8 @@ export const RegisterPage: React.FC = () => {
                       <button
                         type="button"
                         key={opt.role}
+                        role="radio"
+                        aria-checked={isSelected}
                         onClick={() => setRole(opt.role)}
                         className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                           isSelected
@@ -284,8 +288,8 @@ export const RegisterPage: React.FC = () => {
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <Icon size={16} className={isSelected ? 'text-[#0F766E]' : 'text-slate-500'} />
-                          {isSelected && <span className="w-2 h-2 rounded-full bg-[#0F766E]"></span>}
+                          <Icon size={16} className={isSelected ? 'text-[#0F766E]' : 'text-slate-500'} aria-hidden="true" />
+                          {isSelected && <span className="w-2 h-2 rounded-full bg-[#0F766E]" aria-hidden="true"></span>}
                         </div>
                         <span className="text-xs font-bold">{opt.label}</span>
                       </button>
@@ -297,20 +301,24 @@ export const RegisterPage: React.FC = () => {
               {/* Name and Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Full Name / Lead Official</label>
+                  <label htmlFor="register-name" className="text-xs font-bold text-slate-700">Full Name / Lead Official</label>
                   <Input
+                    id="register-name"
                     type="text"
                     required
+                    autoComplete="name"
                     placeholder="e.g. Rajesh Patel"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Official Email</label>
+                  <label htmlFor="register-email" className="text-xs font-bold text-slate-700">Official Email</label>
                   <Input
+                    id="register-email"
                     type="email"
                     required
+                    autoComplete="email"
                     placeholder="e.g. rajesh@vedicfarms.org"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -321,8 +329,9 @@ export const RegisterPage: React.FC = () => {
               {/* Organization and Location */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Organization / Cluster Entity</label>
+                  <label htmlFor="register-organization" className="text-xs font-bold text-slate-700">Organization / Cluster Entity</label>
                   <Input
+                    id="register-organization"
                     type="text"
                     required
                     placeholder={currentRoleOpt.placeholder}
@@ -331,8 +340,9 @@ export const RegisterPage: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Physical Region / Location</label>
+                  <label htmlFor="register-location" className="text-xs font-bold text-slate-700">Physical Region / Location</label>
                   <Input
+                    id="register-location"
                     type="text"
                     required
                     placeholder="e.g. Madhya Pradesh, India"
@@ -341,29 +351,34 @@ export const RegisterPage: React.FC = () => {
                   />
                 </div>
               </div>
-              
+
               {/* Aadhaar Input */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
-                  <Fingerprint size={14} className="text-slate-500" />
+                <label htmlFor="register-aadhaar" className="text-xs font-bold text-slate-700 flex items-center gap-2">
+                  <Fingerprint size={14} className="text-slate-500" aria-hidden="true" />
                   Aadhaar Number (Optional / e-KYC Verification)
                 </label>
                 <Input
+                  id="register-aadhaar"
                   type="text"
+                  inputMode="numeric"
                   maxLength={12}
                   placeholder="12-digit Aadhaar Number"
                   value={aadhaar}
                   onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, ''))}
+                  aria-invalid={!!aadhaarError}
+                  aria-describedby={aadhaarError ? 'register-aadhaar-error' : undefined}
                 />
-                {aadhaarError && <p className="text-xs text-red-500 font-bold mt-1">{aadhaarError}</p>}
+                {aadhaarError && <p id="register-aadhaar-error" className="text-xs text-red-500 font-bold mt-1">{aadhaarError}</p>}
               </div>
 
               {/* Certifications and Role-Specific Detail */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">
+                <label htmlFor="register-certifications" className="text-xs font-bold text-slate-700">
                   Certifications / Standards Held (Comma separated)
                 </label>
                 <Input
+                  id="register-certifications"
                   type="text"
                   placeholder="e.g. India Organic (NPOP), FSSAI Jaivik Bharat"
                   value={certifications}
@@ -372,8 +387,9 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">{currentRoleOpt.extraLabel}</label>
+                <label htmlFor="register-extra-detail" className="text-xs font-bold text-slate-700">{currentRoleOpt.extraLabel}</label>
                 <Input
+                  id="register-extra-detail"
                   type="text"
                   placeholder="Enter node specific verification details..."
                   value={extraDetail}
@@ -383,10 +399,12 @@ export const RegisterPage: React.FC = () => {
 
               {/* Password */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Account Password</label>
+                <label htmlFor="register-password" className="text-xs font-bold text-slate-700">Account Password</label>
                 <Input
+                  id="register-password"
                   type="password"
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

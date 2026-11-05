@@ -14,6 +14,7 @@ import {
   AlertCircle,
   KeyRound,
   UserCheck,
+  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,8 +30,8 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState('rajesh@vedicfarms.org');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('FARMER');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,10 +63,10 @@ export const LoginPage: React.FC = () => {
           navigate(`/${role.toLowerCase()}/dashboard`);
         }
       } else {
-        setErrorMessage('Invalid credentials or account is pending admin approval.');
+        setErrorMessage(t('auth.invalidCredentials', 'Invalid credentials or account is pending admin approval.'));
       }
     } catch {
-      setErrorMessage('Login failed. Please check your network connection.');
+      setErrorMessage(t('auth.loginFailed', 'Login failed. Please check your network connection.'));
     } finally {
       setIsLoading(false);
     }
@@ -129,11 +130,12 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Stakeholder Role Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                <span>Stakeholder Role</span>
-                <span className="text-[11px] font-semibold text-[#0F766E]">Select Active Role</span>
+              <label htmlFor="login-role" className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                <span>{t('auth.stakeholderRole', 'Stakeholder Role')}</span>
+                <span className="text-[11px] font-semibold text-[#0F766E]">{t('auth.selectActiveRole', 'Select Active Role')}</span>
               </label>
               <select
+                id="login-role"
                 value={role}
                 onChange={(e) => handleRoleChange(e.target.value as UserRole)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 focus:border-[#0F766E] focus:bg-white focus:ring-2 focus:ring-[#0F766E]/20 rounded-xl text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
@@ -150,15 +152,17 @@ export const LoginPage: React.FC = () => {
 
             {/* Email Address */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Official Email Address</label>
+              <label htmlFor="login-email" className="text-xs font-bold text-slate-700">{t('auth.emailLabel', 'Official Email Address')}</label>
               <div className="relative">
-                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
                 <Input
+                  id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="Enter email address"
+                  autoComplete="email"
+                  placeholder={t('auth.emailPlaceholder', 'Enter email address')}
                   className="pl-10"
                 />
               </div>
@@ -166,26 +170,24 @@ export const LoginPage: React.FC = () => {
 
             {/* Password Input */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-700">Password</label>
-                <span className="text-[11px] text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                  Demo: password123
-                </span>
-              </div>
+              <label htmlFor="login-password" className="text-xs font-bold text-slate-700">{t('auth.passwordLabel', 'Password')}</label>
               <div className="relative">
-                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
                 <Input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Enter password"
+                  autoComplete="current-password"
+                  placeholder={t('auth.passwordPlaceholder', 'Enter password')}
                   className="pl-10 pr-11"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                  aria-label={showPassword ? t('auth.hidePassword', 'Hide password') : t('auth.showPassword', 'Show password')}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -214,9 +216,9 @@ export const LoginPage: React.FC = () => {
           {/* Footer Navigation Links */}
           <div className="space-y-3 pt-4 border-t border-slate-200 text-center text-xs">
             <p className="text-slate-600">
-              New supply chain participant?{' '}
+              {t('auth.newParticipant', 'New supply chain participant?')}{' '}
               <Link to="/register" className="text-[#0F766E] font-bold hover:underline">
-                Register Stakeholder Node
+                {t('auth.registerNode', 'Register Stakeholder Node')}
               </Link>
             </p>
 
@@ -232,10 +234,41 @@ export const LoginPage: React.FC = () => {
                 to="/verify"
                 className="inline-flex items-center gap-1 hover:text-[#0F766E] font-semibold transition-colors"
               >
-                <ShieldCheck size={14} className="text-[#0F766E]" />
-                <span>Public Verification</span>
+                <ShieldCheck size={14} className="text-[#0F766E]" aria-hidden="true" />
+                <span>{t('auth.publicVerification', 'Public Verification')}</span>
               </Link>
             </div>
+
+            {/* Demo access — kept subtle, collapsed by default */}
+            <details className="group text-left rounded-xl border border-slate-200/80 bg-slate-50/60">
+              <summary className="flex cursor-pointer select-none items-center justify-between gap-2 rounded-xl px-3 py-2 text-[11px] font-semibold text-slate-500 hover:text-slate-700">
+                <span>{t('auth.demoAccess', 'Demo access')}</span>
+                <ChevronDown size={14} className="transition-transform group-open:rotate-180" aria-hidden="true" />
+              </summary>
+              <div className="px-3 pb-3 pt-1 space-y-2">
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  {t('auth.demoAccessHint', 'Quick-fill sandbox personas for testing (password: password123).')}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {users
+                    .filter((u) => u.role !== 'CONSUMER')
+                    .map((u) => (
+                      <button
+                        key={u.email}
+                        type="button"
+                        onClick={() => {
+                          setRole(u.role);
+                          setEmail(u.email);
+                          setPassword('password123');
+                        }}
+                        className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:border-[#0F766E]/40 hover:text-[#0F766E] transition-colors min-h-[32px]"
+                      >
+                        {t('auth.demoFill', 'Use {{name}}', { name: u.name })}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            </details>
           </div>
         </CardContent>
       </Card>
