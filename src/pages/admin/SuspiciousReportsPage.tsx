@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
@@ -30,6 +31,7 @@ import {
 } from 'lucide-react';
 
 export const SuspiciousReportsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { suspiciousReports, updateReportStatus } = useBlockchain();
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [newStatus, setNewStatus] = useState<SuspiciousReport['status']>('INVESTIGATING');
@@ -78,14 +80,14 @@ export const SuspiciousReportsPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Fraud & Suspicious Incident Governance"
-      subtitle="Review consumer reports, broken QR signatures, unauthorized supply-chain nodes, and packaging tamper alerts."
+      title={t('dashboard.portal.suspiciousReportsTitle')}
+      subtitle={t('dashboard.portal.suspiciousReportsSubtitle')}
     >
       <div className="space-y-6">
         <Card className="shadow-xs overflow-hidden">
           <CardHeader className="p-5 border-b border-border flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base font-bold flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-rose-600" />
+              <AlertTriangle className="h-5 w-5 text-rose-600 dark:text-rose-400" />
               <span>Incident Incident Log</span>
             </CardTitle>
             <Badge variant="secondary" className="font-semibold text-xs">

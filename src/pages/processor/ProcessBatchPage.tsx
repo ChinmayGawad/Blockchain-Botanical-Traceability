@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -27,6 +28,7 @@ import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation
 import { DocumentUploadDropzone } from '../../components/common/DocumentUploadDropzone';
 
 export const ProcessBatchPage: React.FC = () => {
+  const { t } = useTranslation();
   const { products, processBatch } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -36,8 +38,8 @@ export const ProcessBatchPage: React.FC = () => {
   if (currentUser?.role !== 'PROCESSOR' && currentUser?.role !== 'ADMIN') {
     return (
       <DashboardLayout
-        title="Botanical Processing & Refinement"
-        subtitle="Log cryogenic milling, extraction parameters, mass balance yield, and SOP execution to the blockchain."
+        title={t('dashboard.portal.processBatchUnauthorizedTitle')}
+        subtitle={t('dashboard.portal.processBatchUnauthorizedSubtitle')}
       >
         <UnauthorizedCard
           currentRole={currentUser?.role || 'UNKNOWN'}
@@ -193,8 +195,8 @@ export const ProcessBatchPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Process Raw Botanical Harvest"
-      subtitle="5-step verification wizard to record bio-refining parameters, output mass, and GMP facility certificates on Hyperledger Fabric."
+      title={t('dashboard.portal.processBatchTitle')}
+      subtitle={t('dashboard.portal.processBatchSubtitle')}
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Interactive Progress Tab Stepper */}
@@ -225,27 +227,28 @@ export const ProcessBatchPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-purple-100 text-purple-700">
-                  <Package size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400">
+                  <Package size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 1: Raw Harvest Batch Intake</h3>
-                  <p className="text-xs text-slate-500">Select arriving botanical crop from farm registry</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 1: Raw Harvest Batch Intake</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Select arriving botanical crop from farm registry</p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="proc-batch-select" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                   Select Raw Botanical Harvest Batch: *
                 </label>
                 {eligibleProducts.length === 0 ? (
-                  <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                  <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 text-xs rounded-xl">
                     ⚠️ No batches currently in <strong>REGISTERED</strong> status awaiting processing. Newly registered harvest batches will appear here.
                   </div>
                 ) : (
                   <select
+                    id="proc-batch-select"
                     value={selectedProductId}
                     onChange={e => setSelectedProductId(e.target.value)}
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white font-mono"
@@ -260,12 +263,12 @@ export const ProcessBatchPage: React.FC = () => {
               </div>
 
               {selectedProduct && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
-                  <div className="font-bold text-slate-900 border-b border-slate-200 pb-1.5">Verified Crop Origin:</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600">
-                    <div>Farmer: <span className="font-semibold text-slate-800">{selectedProduct.farmerName} ({selectedProduct.farmerOrg})</span></div>
-                    <div>Initial Mass: <span className="font-bold text-purple-700">{selectedProduct.quantityKg} kg</span></div>
-                    <div className="sm:col-span-2">Farm Location: <span className="font-medium text-slate-700">{selectedProduct.farmLocation}</span></div>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 text-xs space-y-2">
+                  <div className="font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-1.5">Verified Crop Origin:</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 dark:text-slate-300">
+                    <div>Farmer: <span className="font-semibold text-slate-800 dark:text-slate-100">{selectedProduct.farmerName} ({selectedProduct.farmerOrg})</span></div>
+                    <div>Initial Mass: <span className="font-bold text-purple-700 dark:text-purple-400">{selectedProduct.quantityKg} kg</span></div>
+                    <div className="sm:col-span-2">Farm Location: <span className="font-medium text-slate-700 dark:text-slate-300">{selectedProduct.farmLocation}</span></div>
                   </div>
                 </div>
               )}
@@ -279,7 +282,7 @@ export const ProcessBatchPage: React.FC = () => {
                   className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
                 >
                   <span>Continue to Method & Facility</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -294,23 +297,24 @@ export const ProcessBatchPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-purple-100 text-purple-700">
-                  <Cog size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400">
+                  <Cog size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 2: Bio-Refining & Facility Details</h3>
-                  <p className="text-xs text-slate-500">Record transformation methods and cleanroom facility location</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 2: Bio-Refining & Facility Details</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Record transformation methods and cleanroom facility location</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="proc-method" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                     Extraction / Processing Method: *
                   </label>
                   <input
+                    id="proc-method"
                     type="text"
                     required
                     value={method}
@@ -321,10 +325,11 @@ export const ProcessBatchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="proc-facility" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                     Facility Name & Cleanroom Location: *
                   </label>
                   <input
+                    id="proc-facility"
                     type="text"
                     required
                     value={facilityLocation}
@@ -343,7 +348,7 @@ export const ProcessBatchPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -353,7 +358,7 @@ export const ProcessBatchPage: React.FC = () => {
                   className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Continue to Mass Balance</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -368,24 +373,25 @@ export const ProcessBatchPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-purple-100 text-purple-700">
-                  <Scale size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400">
+                  <Scale size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 3: Mass Balance & Yield Calculation</h3>
-                  <p className="text-xs text-slate-500">Record transformation mass metrics and automatic yield loss calculation</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 3: Mass Balance & Yield Calculation</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Record transformation mass metrics and automatic yield loss calculation</p>
                 </div>
               </div>
 
               {/* Yield calculation */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-purple-50/50 p-4 rounded-2xl border border-purple-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-purple-50/50 p-4 rounded-2xl border border-purple-100 dark:bg-purple-900/20 dark:border-purple-800">
                 <div>
-                  <label className="block text-[11px] font-bold text-purple-900 uppercase mb-1">
+                  <label htmlFor="proc-input-qty" className="block text-[11px] font-bold text-purple-900 dark:text-purple-300 uppercase mb-1">
                     Raw Input Mass (kg): *
                   </label>
                   <input
+                    id="proc-input-qty"
                     type="number"
                     min="1"
                     required
@@ -396,10 +402,11 @@ export const ProcessBatchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-purple-900 uppercase mb-1">
+                  <label htmlFor="proc-output-qty" className="block text-[11px] font-bold text-purple-900 dark:text-purple-300 uppercase mb-1">
                     Refined Output Mass (kg): *
                   </label>
                   <input
+                    id="proc-output-qty"
                     type="number"
                     min="1"
                     max={initialQty > 0 ? initialQty : undefined}
@@ -418,14 +425,14 @@ export const ProcessBatchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-purple-900 uppercase mb-1">
+                  <label className="block text-[11px] font-bold text-purple-900 dark:text-purple-300 uppercase mb-1">
                     Calculated Yield Loss (%):
                   </label>
                   <div
                     className={`px-3 py-2 text-xs font-bold rounded-lg border ${
                       processedQty > initialQty
-                        ? 'text-rose-800 bg-rose-100 border-rose-200'
-                        : 'text-purple-900 bg-purple-100 border-purple-200'
+                        ? 'text-rose-800 bg-rose-100 border-rose-200 dark:text-rose-300 dark:bg-rose-900/40 dark:border-rose-800'
+                        : 'text-purple-900 bg-purple-100 border-purple-200 dark:text-purple-300 dark:bg-purple-900/40 dark:border-purple-800'
                     }`}
                   >
                     {processedQty > initialQty
@@ -443,7 +450,7 @@ export const ProcessBatchPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -453,7 +460,7 @@ export const ProcessBatchPage: React.FC = () => {
                   className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Continue to SOP & IPFS</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -468,23 +475,24 @@ export const ProcessBatchPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-purple-100 text-purple-700">
-                  <FileCheck size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400">
+                  <FileCheck size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 4: Equipment & IPFS SOP Log</h3>
-                  <p className="text-xs text-slate-500">Document machinery used and cryptographic proof CID</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 4: Equipment & IPFS SOP Log</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Document machinery used and cryptographic proof CID</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="proc-equipment" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                     Equipment Used (Separated by Commas): *
                   </label>
                   <input
+                    id="proc-equipment"
                     type="text"
                     required
                     value={equipment}
@@ -495,10 +503,11 @@ export const ProcessBatchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="proc-notes" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                     Processing Observations & Notes: *
                   </label>
                   <textarea
+                    id="proc-notes"
                     rows={3}
                     required
                     value={notes}
@@ -509,7 +518,7 @@ export const ProcessBatchPage: React.FC = () => {
 
                 {/* IPFS Hash Upload Dropzone */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="document-upload-input" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                     Processing SOP & Machine Telemetry Log: *
                   </label>
                   <DocumentUploadDropzone
@@ -531,7 +540,7 @@ export const ProcessBatchPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -541,7 +550,7 @@ export const ProcessBatchPage: React.FC = () => {
                   className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Review & Commit On-Chain</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -556,42 +565,42 @@ export const ProcessBatchPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-purple-100 text-purple-700">
-                  <Blocks size={20} />
+            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400">
+                  <Blocks size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 5: Cryptographic Review & Commit</h3>
-                  <p className="text-xs text-slate-500">Sign bio-refining transaction with Processor node identity</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 5: Cryptographic Review & Commit</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Sign bio-refining transaction with Processor node identity</p>
                 </div>
               </div>
 
               {/* Review Card */}
-              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3 text-xs">
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Batch Name:</span>
-                  <span className="font-bold text-slate-900">{selectedProduct?.name} ({selectedProduct?.botanicalName})</span>
+              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 space-y-3 text-xs">
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Batch Name:</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{selectedProduct?.name} ({selectedProduct?.botanicalName})</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Extraction Method:</span>
-                  <span className="font-semibold text-slate-800">{method}</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Extraction Method:</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">{method}</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Cleanroom Facility:</span>
-                  <span className="text-slate-700">{facilityLocation}</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Cleanroom Facility:</span>
+                  <span className="text-slate-700 dark:text-slate-300">{facilityLocation}</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Mass Balance:</span>
-                  <span className="font-mono font-bold text-purple-700">{initialQty} kg in → {processedQty} kg out ({yieldLoss}% loss)</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Mass Balance:</span>
+                  <span className="font-mono font-bold text-purple-700 dark:text-purple-400">{initialQty} kg in → {processedQty} kg out ({yieldLoss}% loss)</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Submitting Processor:</span>
-                  <span className="font-semibold text-slate-800">{currentUser.name} ({currentUser.organization || 'PhytoExtracts'})</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Submitting Processor:</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">{currentUser.name} ({currentUser.organization || 'PhytoExtracts'})</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">IPFS Log CID:</span>
-                  <span className="font-mono text-purple-700">{ipfsCid}</span>
+                  <span className="text-slate-500 dark:text-slate-400">IPFS Log CID:</span>
+                  <span className="font-mono text-purple-700 dark:text-purple-400">{ipfsCid}</span>
                 </div>
               </div>
 
@@ -611,7 +620,7 @@ export const ProcessBatchPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -628,7 +637,7 @@ export const ProcessBatchPage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Blocks size={16} />
+                      <Blocks size={16} aria-hidden="true" />
                       <span>Sign Processing & Dispatch Sample to Lab</span>
                     </>
                   )}
@@ -640,20 +649,20 @@ export const ProcessBatchPage: React.FC = () => {
 
         {/* Success Screen after Processing */}
         {isSuccess && (
-          <div className="bg-white p-8 rounded-3xl border border-purple-200 shadow-xl text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle2 size={36} />
+          <div className="bg-white p-8 rounded-3xl border border-purple-200 dark:bg-slate-900 dark:border-purple-800 shadow-xl text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-400 flex items-center justify-center mx-auto shadow-inner">
+              <CheckCircle2 size={36} aria-hidden="true" />
             </div>
 
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
+              <span className="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-50 dark:bg-purple-900/20 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800 dark:text-purple-400">
                 Processing Step Committed
               </span>
-              <h2 className="text-2xl font-extrabold text-slate-900 mt-2">
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
                 Batch Refined & Forwarded to Laboratory
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Yield: {processedQty} kg recorded • Status updated to <span className="font-bold text-indigo-600">IN_TESTING</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Yield: {processedQty} kg recorded • Status updated to <span className="font-bold text-indigo-600 dark:text-indigo-400">IN_TESTING</span>
               </p>
             </div>
 
@@ -678,7 +687,7 @@ export const ProcessBatchPage: React.FC = () => {
                 className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View Updated Provenance Timeline</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={14} aria-hidden="true" />
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.04, y: -1 }}

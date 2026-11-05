@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { BlockchainTransaction } from '../../types';
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react';
 
 export const BlockchainExplorerPage: React.FC = () => {
+  const { t } = useTranslation();
   const { transactions, networkStats } = useBlockchain();
   const [selectedTx, setSelectedTx] = useState<BlockchainTransaction | null>(null);
   const [searchTx, setSearchTx] = useState('');
@@ -43,8 +45,8 @@ export const BlockchainExplorerPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Blockchain Ledger Explorer"
-      subtitle="Public audit explorer for immutable on-chain smart contract transactions, cryptographic event logs, and state proofs."
+      title={t('dashboard.portal.blockchainExplorerTitle')}
+      subtitle={t('dashboard.portal.blockchainExplorerSubtitle')}
     >
       <div className="space-y-6">
         {/* Network Metrics Header */}
@@ -52,7 +54,7 @@ export const BlockchainExplorerPage: React.FC = () => {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-5">
               <div className="text-xs text-emerald-800 dark:text-emerald-300 font-extrabold uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                <Blocks className="h-4 w-4 text-emerald-700" />
+                <Blocks className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
                 <span>Current Block Height</span>
               </div>
               <div className="text-3xl font-black font-mono text-foreground">
@@ -67,7 +69,7 @@ export const BlockchainExplorerPage: React.FC = () => {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-5">
               <div className="text-xs text-indigo-800 dark:text-indigo-300 font-extrabold uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                <Network className="h-4 w-4 text-indigo-700" />
+                <Network className="h-4 w-4 text-indigo-700 dark:text-indigo-400" />
                 <span>Network Protocol</span>
               </div>
               <div className="text-sm font-bold font-mono text-indigo-900 dark:text-indigo-200 truncate">
@@ -82,7 +84,7 @@ export const BlockchainExplorerPage: React.FC = () => {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-5">
               <div className="text-xs text-teal-800 dark:text-teal-300 font-extrabold uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                <Cpu className="h-4 w-4 text-teal-700" />
+                <Cpu className="h-4 w-4 text-teal-700 dark:text-teal-400" />
                 <span>Smart Contract</span>
               </div>
               <div className="text-sm font-bold font-mono text-teal-900 dark:text-teal-200 truncate">
@@ -99,7 +101,7 @@ export const BlockchainExplorerPage: React.FC = () => {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-5">
               <div className="text-xs text-amber-800 dark:text-amber-300 font-extrabold uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                <Activity className="h-4 w-4 text-amber-700" />
+                <Activity className="h-4 w-4 text-amber-700 dark:text-amber-400" />
                 <span>Total Transactions</span>
               </div>
               <div className="text-3xl font-black font-mono text-foreground">

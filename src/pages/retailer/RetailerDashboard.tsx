@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { MetricCard } from '../../components/common/MetricCard';
 import { StatusBadge } from '../../components/common/StatusBadge';
@@ -21,8 +23,10 @@ import {
 import confetti from 'canvas-confetti';
 
 export const RetailerDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { products, confirmRetailReceipt } = useBlockchain();
   const { currentUser } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
 
   const [selectedProductForQR, setSelectedProductForQR] = useState<BotanicalProduct | null>(null);
@@ -48,37 +52,55 @@ export const RetailerDashboard: React.FC = () => {
   const handleConfirmReceipt = async (productId: string) => {
     if (isSubmittingReceipt) return;
     if (isNaN(price) || price <= 0) {
-      alert('Please specify a positive retail unit price (greater than ₹0).');
+      toast.error({
+        title: 'Invalid retail price',
+        description: 'Please specify a positive retail unit price (greater than ₹0).',
+      });
       return;
     }
     if (!shelfId.trim()) {
-      alert('Please specify a valid retail shelf batch tag.');
+      toast.error({
+        title: 'Missing shelf batch tag',
+        description: 'Please specify a valid retail shelf batch tag.',
+      });
       return;
     }
 
     setIsSubmittingReceipt(true);
-    await new Promise(resolve => setTimeout(resolve, 450));
-    await confirmRetailReceipt(productId, {
-      retailerId: currentUser.id,
-      retailerName: `${currentUser.name} (${currentUser.organization || 'Arogya Pure Herbals'})`,
-      storeLocation: currentUser.location || 'Indiranagar, Bengaluru, Karnataka',
-      receivedDate: new Date().toISOString(),
-      shelfBatchId: shelfId.trim().slice(0, 50),
-      unitPrice: Number(price.toFixed(2)),
-      notes: 'Tamper seals verified intact. Matched with smart contract hash.',
-    });
-
-    setIsSubmittingReceipt(false);
-    setReceivingProductId(null);
     try {
-      confetti({ particleCount: 40, spread: 65, origin: { y: 0.6 } });
-    } catch (e) {}
+      await new Promise(resolve => setTimeout(resolve, 450));
+      await confirmRetailReceipt(productId, {
+        retailerId: currentUser.id,
+        retailerName: `${currentUser.name} (${currentUser.organization || 'Arogya Pure Herbals'})`,
+        storeLocation: currentUser.location || 'Indiranagar, Bengaluru, Karnataka',
+        receivedDate: new Date().toISOString(),
+        shelfBatchId: shelfId.trim().slice(0, 50),
+        unitPrice: Number(price.toFixed(2)),
+        notes: 'Tamper seals verified intact. Matched with smart contract hash.',
+      });
+
+      setReceivingProductId(null);
+      toast.success({
+        title: 'Batch stocked on shelf',
+        description: 'Retail receipt committed to the ledger.',
+      });
+      try {
+        confetti({ particleCount: 40, spread: 65, origin: { y: 0.6 } });
+      } catch (e) {}
+    } catch {
+      toast.error({
+        title: 'Receipt failed',
+        description: 'Could not commit the retail receipt. Please try again.',
+      });
+    } finally {
+      setIsSubmittingReceipt(false);
+    }
   };
 
   return (
     <DashboardLayout
-      title="Retailer Apothecary Portal"
-      subtitle={`${currentUser.name} • ${currentUser.organization || 'Arogya Pure Herbals Bengaluru'} (ID: ${currentUser.id}) • Storefront: ${currentUser.location || 'Indiranagar, Bengaluru'}`}
+      title={t('dashboard.portal.retailerTitle')}
+      subtitle={t('dashboard.portal.retailerSubtitle', { name: currentUser.name, org: currentUser.organization || 'Arogya Pure Herbals Bengaluru', id: currentUser.id, location: currentUser.location || 'Indiranagar, Bengaluru' })}
       action={
         <Link
           to="/retailer/generate-qr"
@@ -97,46 +119,46 @@ export const RetailerDashboard: React.FC = () => {
             value={myRetailInventory.length}
             subtitle="Ready for consumer scan"
             icon={Store}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
           <MetricCard
             title="Incoming Logistics Lots"
             value={incomingShipments.length}
             subtitle="Awaiting store check-in"
             icon={PackageCheck}
-            iconColor="text-sky-700"
-            bgColor="bg-sky-50"
+            iconColor="text-sky-700 dark:text-sky-400"
+            bgColor="bg-sky-50 dark:bg-sky-900/20"
           />
           <MetricCard
             title="QR Authenticity Rate"
             value="100%"
             subtitle="Zero reported counterfeit"
             icon={CheckCircle2}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
           <MetricCard
             title="Avg Retail Unit Price"
             value="₹850.00"
             subtitle="Certified Organic Botanical"
             icon={IndianRupee}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
         </div>
 
         {/* Incoming Logistics Batches Awaiting Receipt */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Incoming Transport Deliveries</span>
-                <span className="text-xs font-bold bg-sky-100 text-sky-900 px-2.5 py-0.5 rounded-full border border-sky-200">
+                <span className="text-xs font-bold bg-sky-100 text-sky-900 dark:bg-sky-900/40 dark:text-sky-200 px-2.5 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
                   {incomingShipments.length} Available
                 </span>
               </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                 Cold-chain consignments delivered to store ready for retail inventory check-in
               </p>
             </div>
@@ -144,7 +166,7 @@ export const RetailerDashboard: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+              <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-5 py-3.5">Product Name</th>
                   <th className="px-5 py-3.5">Batch ID</th>
@@ -153,29 +175,29 @@ export const RetailerDashboard: React.FC = () => {
                   <th className="px-5 py-3.5 text-right">Store Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {incomingShipments.map(product => (
-                  <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4 font-bold text-slate-900">
+                  <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                    <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                       {product.name}
-                      <span className="block text-xs text-slate-500 font-mono italic mt-0.5">{product.botanicalName}</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400 font-mono italic mt-0.5">{product.botanicalName}</span>
                     </td>
-                    <td className="px-5 py-4 font-mono font-bold text-xs text-emerald-900">
-                      <span className="bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
+                    <td className="px-5 py-4 font-mono font-bold text-xs text-emerald-900 dark:text-emerald-300">
+                      <span className="bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700 inline-block">
                         {product.batchId}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-slate-700">
-                      <div className="font-semibold text-slate-900">{product.shipmentDetails?.distributorName || 'Cold-Chain Transport'}</div>
-                      <div className="text-xs text-slate-500 font-mono mt-0.5">Track: {product.shipmentDetails?.trackingNumber || 'N/A'}</div>
+                    <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
+                      <div className="font-semibold text-slate-900 dark:text-white">{product.shipmentDetails?.distributorName || 'Cold-Chain Transport'}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">Track: {product.shipmentDetails?.trackingNumber || 'N/A'}</div>
                     </td>
                     <td className="px-5 py-4">
                       <StatusBadge status={product.status} />
                     </td>
                     <td className="px-5 py-4 text-right">
                       {product.status === 'RETAIL_READY' ? (
-                        <span className="text-emerald-800 font-bold text-xs inline-flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                          <CheckCircle2 size={14} className="text-emerald-600" /> On Shelf
+                        <span className="text-emerald-800 dark:text-emerald-300 font-bold text-xs inline-flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                          <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" /> On Shelf
                         </span>
                       ) : (
                         <motion.button
@@ -220,20 +242,20 @@ export const RetailerDashboard: React.FC = () => {
               animate={{ opacity: 1, height: 'auto', y: 0, scale: 1 }}
               exit={{ opacity: 0, height: 0, y: -10, scale: 0.98 }}
               transition={{ type: 'spring', stiffness: 350, damping: 26 }}
-              className="p-5 bg-gradient-to-r from-emerald-50 via-teal-50/50 to-emerald-50 border-2 border-emerald-300 rounded-2xl space-y-4 shadow-lg shadow-emerald-950/5 overflow-hidden"
+              className="p-5 bg-gradient-to-r from-emerald-50 via-teal-50/50 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/40 border-2 border-emerald-300 dark:border-emerald-800 rounded-2xl space-y-4 shadow-lg shadow-emerald-950/5 overflow-hidden"
             >
-              <div className="flex items-center justify-between border-b border-emerald-200/70 pb-3">
+              <div className="flex items-center justify-between border-b border-emerald-200/70 dark:border-emerald-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-emerald-200 text-emerald-800 rounded-lg">
+                  <div className="p-1.5 bg-emerald-200 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 rounded-lg">
                     <Tag size={16} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-emerald-950">
+                    <h4 className="text-sm font-bold text-emerald-950 dark:text-emerald-200">
                       Confirm Retail Intake & Shelf Tag Assignment
                     </h4>
                     {receivingProduct && (
-                      <p className="text-xs text-emerald-700 font-medium">
-                        Assigning shelf location for <span className="font-bold text-emerald-900">{receivingProduct.name}</span> (Batch #{receivingProduct.batchId})
+                      <p className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+                        Assigning shelf location for <span className="font-bold text-emerald-900 dark:text-emerald-300">{receivingProduct.name}</span> (Batch #{receivingProduct.batchId})
                       </p>
                     )}
                   </div>
@@ -249,10 +271,11 @@ export const RetailerDashboard: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="retail-shelf-tag" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Retail Shelf Batch Tag:
                   </label>
                   <input
+                    id="retail-shelf-tag"
                     type="text"
                     value={shelfId}
                     onChange={e => setShelfId(e.target.value)}
@@ -261,10 +284,11 @@ export const RetailerDashboard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label htmlFor="retail-unit-price" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Shelf Unit Price (₹ INR):
                   </label>
                   <input
+                    id="retail-unit-price"
                     type="number"
                     step="10"
                     min="1"
@@ -305,26 +329,26 @@ export const RetailerDashboard: React.FC = () => {
         </AnimatePresence>
 
         {/* My Store Shelf Inventory */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
                 My Verified Retail Stock
               </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                 Products stocked by {currentUser.name} ({currentUser.organization})
               </p>
             </div>
           </div>
 
           {myRetailInventory.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500">
+            <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
               No inventory has been received under this retailer account yet. Accept an incoming delivery above to stock your shelf.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+                <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="px-5 py-3.5">Product</th>
                     <th className="px-5 py-3.5">Shelf Batch ID</th>
@@ -333,17 +357,17 @@ export const RetailerDashboard: React.FC = () => {
                     <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {myRetailInventory.map(product => (
-                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-5 py-4 font-bold text-slate-900">
+                    <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                      <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                         {product.name}
-                        <span className="block text-xs text-slate-500 font-mono mt-0.5">{product.batchId}</span>
+                        <span className="block text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{product.batchId}</span>
                       </td>
-                      <td className="px-5 py-4 font-mono font-bold text-emerald-800">
+                      <td className="px-5 py-4 font-mono font-bold text-emerald-800 dark:text-emerald-300">
                         {product.retailDetails?.shelfBatchId}
                       </td>
-                      <td className="px-5 py-4 font-bold text-slate-900">
+                      <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                         ₹{product.retailDetails?.unitPrice.toFixed(2)}
                       </td>
                       <td className="px-5 py-4">

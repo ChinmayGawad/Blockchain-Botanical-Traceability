@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -28,6 +29,7 @@ import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation
 import { DocumentUploadDropzone } from '../../components/common/DocumentUploadDropzone';
 
 export const TestProductPage: React.FC = () => {
+  const { t } = useTranslation();
   const { products, submitLabResult, getProductById } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -37,8 +39,8 @@ export const TestProductPage: React.FC = () => {
   if (currentUser?.role !== 'LABORATORY' && currentUser?.role !== 'ADMIN') {
     return (
       <DashboardLayout
-        title="Botanical Monograph & Safety Testing"
-        subtitle="Perform ISO 17025 accredited laboratory assays, purity validation, and sign cryptographic Certificates of Analysis (COA)."
+        title={t('dashboard.portal.testProductUnauthorizedTitle')}
+        subtitle={t('dashboard.portal.testProductUnauthorizedSubtitle')}
       >
         <UnauthorizedCard
           currentRole={currentUser?.role || 'UNKNOWN'}
@@ -227,8 +229,8 @@ export const TestProductPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Laboratory QA Inspection & Cryptographic Certification"
-      subtitle="5-step verification wizard to conduct HPLC assays, heavy metal ICP-MS screening, and invoke chaincode to Approve or Reject batches on Hyperledger Fabric."
+      title={t('dashboard.portal.testProductTitle')}
+      subtitle={t('dashboard.portal.testProductSubtitle')}
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Interactive Progress Tab Stepper */}
@@ -254,36 +256,36 @@ export const TestProductPage: React.FC = () => {
         {/* Success / Rejected Screen */}
         {decisionResult ? (
           <div
-            className={`bg-white p-8 rounded-3xl border ${
-              decisionResult === 'APPROVED' ? 'border-emerald-200' : 'border-rose-200'
+            className={`bg-white p-8 rounded-3xl border dark:bg-slate-900 ${
+              decisionResult === 'APPROVED' ? 'border-emerald-200 dark:border-emerald-800' : 'border-rose-200 dark:border-rose-800'
             } shadow-xl text-center space-y-6`}
           >
             <div
               className={`w-16 h-16 rounded-full ${
                 decisionResult === 'APPROVED'
-                  ? 'bg-emerald-100 text-emerald-600'
-                  : 'bg-rose-100 text-rose-600'
+                  ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400'
+                  : 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400'
               } flex items-center justify-center mx-auto shadow-inner`}
             >
-              {decisionResult === 'APPROVED' ? <CheckCircle2 size={36} /> : <ShieldX size={36} />}
+              {decisionResult === 'APPROVED' ? <CheckCircle2 size={36} aria-hidden="true" /> : <ShieldX size={36} aria-hidden="true" />}
             </div>
 
             <div>
               <span
                 className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                   decisionResult === 'APPROVED'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                    : 'bg-rose-50 text-rose-800 border-rose-200'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'
+                    : 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800'
                 }`}
               >
                 {decisionResult === 'APPROVED' ? 'QA Approval Committed' : 'Batch Locked on Blockchain'}
               </span>
-              <h2 className="text-2xl font-extrabold text-slate-900 mt-2">
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
                 {decisionResult === 'APPROVED'
                   ? 'Laboratory Quality Approved ✓'
                   : 'Batch Rejected & Locked by Smart Contract ✗'}
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {decisionResult === 'APPROVED'
                   ? 'Batch is now cryptographically verified and ready for Distributor dispatch.'
                   : 'Batch has been flagged as failed. Downstream distributors cannot create shipping orders.'}
@@ -311,7 +313,7 @@ export const TestProductPage: React.FC = () => {
                 className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 title="Share Password-Protected QA Certificate"
               >
-                <Share2 size={14} />
+                <Share2 size={14} aria-hidden="true" />
                 <span>Share Password-Protected Report</span>
               </motion.button>
               <motion.button
@@ -322,7 +324,7 @@ export const TestProductPage: React.FC = () => {
                 className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View Public Consumer Verification</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={14} aria-hidden="true" />
               </motion.button>
               {decisionResult === 'APPROVED' && (
                 <motion.button
@@ -347,27 +349,28 @@ export const TestProductPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-                      <Package size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                      <Package size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 1: Botanical Batch Inspection Target</h3>
-                      <p className="text-xs text-slate-500">Select processed botanical sample awaiting quality control certification</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 1: Botanical Batch Inspection Target</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Select processed botanical sample awaiting quality control certification</p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label htmlFor="lab-batch-select" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                       Select Botanical Sample Batch to Inspect: *
                     </label>
                     {eligibleProducts.length === 0 ? (
-                      <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                      <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 text-xs rounded-xl">
                         ⚠️ No batches currently in <strong>PROCESSED</strong> or <strong>IN_TESTING</strong> status. Harvested crops must first be processed before quality assurance testing can be conducted.
                       </div>
                     ) : (
                       <select
+                        id="lab-batch-select"
                         value={selectedProductId}
                         onChange={e => setSelectedProductId(e.target.value)}
                         className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-mono"
@@ -382,13 +385,13 @@ export const TestProductPage: React.FC = () => {
                   </div>
 
                   {selectedProduct && (
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
-                      <div className="font-bold text-slate-900 border-b border-slate-200 pb-1.5">Batch Provenance Data:</div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600">
-                        <div>Product: <span className="font-semibold text-slate-800">{selectedProduct.name} ({selectedProduct.botanicalName})</span></div>
-                        <div>Status: <span className="font-mono font-bold text-indigo-600">{selectedProduct.status}</span></div>
-                        <div>Farmer: <span className="font-medium text-slate-700">{selectedProduct.farmerName}</span></div>
-                        <div>Quantity: <span className="font-medium text-slate-700">{selectedProduct.quantityKg} kg</span></div>
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 text-xs space-y-2">
+                      <div className="font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-1.5">Batch Provenance Data:</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 dark:text-slate-300">
+                        <div>Product: <span className="font-semibold text-slate-800 dark:text-slate-100">{selectedProduct.name} ({selectedProduct.botanicalName})</span></div>
+                        <div>Status: <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{selectedProduct.status}</span></div>
+                        <div>Farmer: <span className="font-medium text-slate-700 dark:text-slate-300">{selectedProduct.farmerName}</span></div>
+                        <div>Quantity: <span className="font-medium text-slate-700 dark:text-slate-300">{selectedProduct.quantityKg} kg</span></div>
                       </div>
                     </div>
                   )}
@@ -402,7 +405,7 @@ export const TestProductPage: React.FC = () => {
                       className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
                     >
                       <span>Continue to Assay Specs</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -417,23 +420,24 @@ export const TestProductPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-                      <FlaskConical size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                      <FlaskConical size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 2: Phytochemical Potency & Moisture Assay</h3>
-                      <p className="text-xs text-slate-500">Record certified chemical purity and moisture limits</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 2: Phytochemical Potency & Moisture Assay</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Record certified chemical purity and moisture limits</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1.5">
-                      <label className="block text-xs font-semibold text-slate-700">
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 space-y-1.5">
+                      <label htmlFor="lab-purity" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                         HPLC Active Phytochemical Purity (%): *
                       </label>
                       <input
+                        id="lab-purity"
                         type="number"
                         step="0.1"
                         min="0"
@@ -444,18 +448,19 @@ export const TestProductPage: React.FC = () => {
                         className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
                       />
                       <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="text-slate-400">USP Threshold: ≥ 95.0%</span>
-                        <span className={`font-bold ${purity >= 95 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <span className="text-slate-400 dark:text-slate-400">USP Threshold: ≥ 95.0%</span>
+                        <span className={`font-bold ${purity >= 95 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                           {purity >= 95 ? '✓ Compliant' : '⚠ Below Standard'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1.5">
-                      <label className="block text-xs font-semibold text-slate-700">
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 space-y-1.5">
+                      <label htmlFor="lab-moisture" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                         Moisture Content (Karl Fischer) (%): *
                       </label>
                       <input
+                        id="lab-moisture"
                         type="number"
                         step="0.1"
                         min="0"
@@ -466,8 +471,8 @@ export const TestProductPage: React.FC = () => {
                         className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
                       />
                       <div className="flex items-center justify-between text-[11px] pt-1">
-                        <span className="text-slate-400">API Threshold: ≤ 8.0%</span>
-                        <span className={`font-bold ${moisture <= 8 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <span className="text-slate-400 dark:text-slate-400">API Threshold: ≤ 8.0%</span>
+                        <span className={`font-bold ${moisture <= 8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                           {moisture <= 8 ? '✓ Compliant' : '⚠ Excess Moisture'}
                         </span>
                       </div>
@@ -482,7 +487,7 @@ export const TestProductPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -492,7 +497,7 @@ export const TestProductPage: React.FC = () => {
                       className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                     >
                       <span>Continue to Safety Screen</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -507,23 +512,24 @@ export const TestProductPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-                      <ShieldCheck size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                      <ShieldCheck size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 3: Contaminant & Toxicology Screening</h3>
-                      <p className="text-xs text-slate-500">Test for toxic heavy metals, microbial bioburden, and pesticide residues</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 3: Contaminant & Toxicology Screening</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Test for toxic heavy metals, microbial bioburden, and pesticide residues</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label htmlFor="lab-heavy-metals" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                         Heavy Metals ICP-MS (Lead, Arsenic, Cadmium, Mercury): *
                       </label>
                       <select
+                        id="lab-heavy-metals"
                         value={heavyMetals}
                         onChange={e => setHeavyMetals(e.target.value as any)}
                         className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
@@ -534,10 +540,11 @@ export const TestProductPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label htmlFor="lab-microbial" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                         Microbial & Salmonella Screen (CFU/g): *
                       </label>
                       <select
+                        id="lab-microbial"
                         value={microbial}
                         onChange={e => setMicrobial(e.target.value as any)}
                         className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
@@ -548,10 +555,11 @@ export const TestProductPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label htmlFor="lab-pesticides" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                         Pesticide Residue Screen (GC-MS / LC-MS Multi-Residue): *
                       </label>
                       <select
+                        id="lab-pesticides"
                         value={pesticides}
                         onChange={e => setPesticides(e.target.value as any)}
                         className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-bold"
@@ -570,7 +578,7 @@ export const TestProductPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -580,7 +588,7 @@ export const TestProductPage: React.FC = () => {
                       className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                     >
                       <span>Continue to COA & IPFS</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -595,23 +603,24 @@ export const TestProductPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-                      <FileCheck size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                      <FileCheck size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 4: Analyst Sign-Off & IPFS Certificate</h3>
-                      <p className="text-xs text-slate-500">Record certified testing officer identity and pin raw lab data to IPFS</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 4: Analyst Sign-Off & IPFS Certificate</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Record certified testing officer identity and pin raw lab data to IPFS</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label htmlFor="lab-analyst" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                         Lead Testing Biochemist / Analyst Name: *
                       </label>
                       <input
+                        id="lab-analyst"
                         type="text"
                         required
                         value={testedBy}
@@ -622,10 +631,11 @@ export const TestProductPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label htmlFor="lab-notes" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                         Monograph Conformance Notes: *
                       </label>
                       <textarea
+                        id="lab-notes"
                         rows={3}
                         required
                         value={notes}
@@ -636,7 +646,7 @@ export const TestProductPage: React.FC = () => {
 
                     {/* IPFS Certificate Dropzone */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label htmlFor="document-upload-input" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                         NABL Accredited Certificate of Analysis (COA): *
                       </label>
                       <DocumentUploadDropzone
@@ -658,7 +668,7 @@ export const TestProductPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -668,7 +678,7 @@ export const TestProductPage: React.FC = () => {
                       className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                     >
                       <span>Review & Ledger Decision</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -683,40 +693,40 @@ export const TestProductPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700">
-                      <Blocks size={20} />
+                <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                      <Blocks size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 5: Cryptographic Decision Sign-Off</h3>
-                      <p className="text-xs text-slate-500">Sign ledger endorsement to permanently certify or reject batch</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 5: Cryptographic Decision Sign-Off</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Sign ledger endorsement to permanently certify or reject batch</p>
                     </div>
                   </div>
 
                   {/* Summary Dossier */}
-                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3 text-xs">
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Inspected Product:</span>
-                      <span className="font-bold text-slate-900">{selectedProduct?.name} ({selectedProduct?.batchId})</span>
+                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 space-y-3 text-xs">
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Inspected Product:</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{selectedProduct?.name} ({selectedProduct?.batchId})</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">HPLC Purity & Moisture:</span>
-                      <span className="font-bold text-indigo-700">{purity}% Purity • {moisture}% Moisture</span>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">HPLC Purity & Moisture:</span>
+                      <span className="font-bold text-indigo-700 dark:text-indigo-400">{purity}% Purity • {moisture}% Moisture</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Safety Screening:</span>
-                      <span className="font-semibold text-slate-800">
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Safety Screening:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">
                         Metals: {heavyMetals} | Microbial: {microbial} | Pesticides: {pesticides}
                       </span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Certified By:</span>
-                      <span className="font-semibold text-slate-800">{testedBy} ({currentUser.organization || 'Eurofins Lab'})</span>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Certified By:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">{testedBy} ({currentUser.organization || 'Eurofins Lab'})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">IPFS COA Hash:</span>
-                      <span className="font-mono text-indigo-700">{ipfsCid}</span>
+                      <span className="text-slate-500 dark:text-slate-400">IPFS COA Hash:</span>
+                      <span className="font-mono text-indigo-700 dark:text-indigo-400">{ipfsCid}</span>
                     </div>
                   </div>
 
@@ -737,7 +747,7 @@ export const TestProductPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer w-full sm:w-auto justify-center"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
 
@@ -750,7 +760,7 @@ export const TestProductPage: React.FC = () => {
                         onClick={() => handleDecision(false)}
                         className="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed hover:shadow-xs"
                       >
-                        <ShieldX size={15} />
+                        <ShieldX size={15} aria-hidden="true" />
                         <span>REJECT BATCH (Lock Smart Contract)</span>
                       </motion.button>
 
@@ -769,7 +779,7 @@ export const TestProductPage: React.FC = () => {
                           </>
                         ) : (
                           <>
-                            <ShieldCheck size={16} />
+                            <ShieldCheck size={16} aria-hidden="true" />
                             <span>APPROVE & ISSUE CERTIFICATE</span>
                           </>
                         )}

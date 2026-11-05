@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export const FarmerDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { products } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -42,8 +44,8 @@ export const FarmerDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Farmer Botanical Portal"
-      subtitle={`${currentUser.name} • ${currentUser.organization || 'Organic Farm Cooperative'} (ID: ${currentUser.id}) • ${currentUser.location || 'Certified Farm Parcel'}`}
+      title={t('dashboard.portal.farmerTitle')}
+      subtitle={t('dashboard.portal.farmerSubtitle', { name: currentUser.name, org: currentUser.organization || 'Organic Farm Cooperative', id: currentUser.id, location: currentUser.location || 'Certified Farm Parcel' })}
       action={
         <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
           <Link
@@ -64,46 +66,46 @@ export const FarmerDashboard: React.FC = () => {
             value={`${totalKg.toLocaleString()} kg`}
             subtitle="Across your registered crops"
             icon={Scale}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
           <MetricCard
             title="My Registered Batches"
             value={farmerProducts.length}
             subtitle="Committed to blockchain"
             icon={Sprout}
-            iconColor="text-teal-700"
-            bgColor="bg-teal-50"
+            iconColor="text-teal-700 dark:text-teal-400"
+            bgColor="bg-teal-50 dark:bg-teal-900/20"
           />
           <MetricCard
             title="Verified & Approved"
             value={approvedBatches}
             subtitle="Passed QA lab assay"
             icon={CheckCircle2}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
           <MetricCard
             title="In Pipeline"
             value={inProgressBatches}
             subtitle="Processing / Testing"
             icon={Clock}
-            iconColor="text-amber-700"
-            bgColor="bg-amber-50"
+            iconColor="text-amber-700 dark:text-amber-400"
+            bgColor="bg-amber-50 dark:bg-amber-900/20"
           />
         </div>
 
         {/* Crops Data Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                 <span>My Registered Botanical Crops</span>
-                <span className="text-xs font-bold bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-xs font-bold bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                   {farmerProducts.length} Batches
                 </span>
               </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                 Botanical crops registered under your account on the blockchain
               </p>
             </div>
@@ -111,11 +113,11 @@ export const FarmerDashboard: React.FC = () => {
 
           {farmerProducts.length === 0 ? (
             <div className="p-10 text-center space-y-3">
-              <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto">
+              <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto">
                 <Sprout size={28} />
               </div>
-              <h4 className="text-sm font-bold text-slate-900">No Harvests Registered Yet</h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white">No Harvests Registered Yet</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 You haven't registered any botanical batches under this farmer account yet. Register your first crop to mint it onto the blockchain.
               </p>
               <Link
@@ -129,7 +131,7 @@ export const FarmerDashboard: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+                <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="px-5 py-3.5">Botanical Crop</th>
                     <th className="px-5 py-3.5">Batch Code</th>
@@ -139,29 +141,29 @@ export const FarmerDashboard: React.FC = () => {
                     <th className="px-5 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {farmerProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="font-bold text-sm text-slate-900">{product.name}</div>
-                        <div className="text-xs font-mono text-slate-500 italic mt-0.5">{product.botanicalName}</div>
+                        <div className="font-bold text-sm text-slate-900 dark:text-white">{product.name}</div>
+                        <div className="text-xs font-mono text-slate-500 dark:text-slate-400 italic mt-0.5">{product.botanicalName}</div>
                       </td>
                       <td className="px-5 py-4">
-                        <span className="font-mono font-bold text-xs text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
+                        <span className="font-mono font-bold text-xs text-emerald-900 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700 inline-block">
                           {product.batchId}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-slate-700">
+                      <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
                         <div className="flex items-center gap-1.5 font-medium">
-                          <Calendar size={13} className="text-slate-400" />
+                          <Calendar size={13} className="text-slate-400 dark:text-slate-400" />
                           <span>{product.harvestDate}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
-                          <MapPin size={13} className="text-emerald-700" />
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          <MapPin size={13} className="text-emerald-700 dark:text-emerald-400" />
                           <span>{product.farmLocation}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-4 font-bold text-slate-900">
+                      <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                         {product.quantityKg.toLocaleString()} kg
                       </td>
                       <td className="px-5 py-4">

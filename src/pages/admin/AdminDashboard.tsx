@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { useAuth } from '../../context/AuthContext';
@@ -31,6 +32,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { products, transactions, suspiciousReports, networkStats } = useBlockchain();
   const { users } = useAuth();
 
@@ -43,8 +45,8 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Consortium Governance Admin Portal"
-      subtitle="Network monitoring, smart contract chaincode verification, stakeholder authorization, and fraud resolution."
+      title={t('dashboard.portal.adminTitle')}
+      subtitle={t('dashboard.portal.adminSubtitle')}
       action={
         <div className="flex flex-wrap gap-2">
           <Link to="/admin/explorer" className="inline-flex items-center gap-1.5 h-11 px-5 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 bg-white shadow-sm hover:bg-slate-50 transition-all min-h-[44px] font-bold text-slate-700">
@@ -153,7 +155,7 @@ export const AdminDashboard: React.FC = () => {
             <CardHeader className="p-5 border-b border-border flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="text-base font-bold flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-emerald-600" />
+                  <Activity className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   <span>Real-Time Hyperledger Fabric Transaction Ledger</span>
                 </CardTitle>
                 <CardDescription className="text-xs mt-1">
@@ -203,7 +205,7 @@ export const AdminDashboard: React.FC = () => {
             <Card className="shadow-xs">
               <CardHeader className="p-5 pb-3">
                 <CardTitle className="text-sm font-bold flex items-center gap-2">
-                  <Cpu className="h-4 w-4 text-indigo-600" />
+                  <Cpu className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Consortium Node Status</span>
                 </CardTitle>
               </CardHeader>
@@ -239,7 +241,7 @@ export const AdminDashboard: React.FC = () => {
             {/* Quick Pending Approvals Alert */}
             {pendingApprovals.length > 0 && (
               <Alert variant="warning" className="space-y-2">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 <AlertTitle className="text-amber-900 dark:text-amber-300 font-bold text-xs">
                   {pendingApprovals.length} Stakeholder Awaiting Approval
                 </AlertTitle>

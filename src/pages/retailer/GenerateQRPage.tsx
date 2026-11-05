@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBlockchain } from '../../context/BlockchainContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { QRCodeSVG } from 'qrcode.react';
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 
 export const GenerateQRPage: React.FC = () => {
+  const { t } = useTranslation();
   const { products } = useBlockchain();
   const [selectedProductId, setSelectedProductId] = useState(products[0]?.id || '');
   const [labelSize, setLabelSize] = useState<'jar' | 'carton' | 'pallet'>('jar');
@@ -52,23 +54,24 @@ export const GenerateQRPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Batch QR Code Label Studio"
-      subtitle="Generate high-resolution SVG/PNG cryptographic QR labels for retail jars, packaging cartons, and shelf displays."
+      title={t('dashboard.portal.generateQrTitle')}
+      subtitle={t('dashboard.portal.generateQrSubtitle')}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Controls Column */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Tag size={16} className="text-teal-600" />
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Tag size={16} className="text-teal-600 dark:text-teal-400" />
               <span>Label Configuration</span>
             </h3>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="qr-label-batch" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Select Botanical Batch:
               </label>
               <select
+                id="qr-label-batch"
                 value={selectedProductId}
                 onChange={e => setSelectedProductId(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white font-mono"
@@ -82,12 +85,13 @@ export const GenerateQRPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label id="qr-label-size-label" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Target Packaging Format:
               </label>
-              <div className="grid grid-cols-3 gap-2 text-xs font-semibold">
+              <div role="group" aria-labelledby="qr-label-size-label" className="grid grid-cols-3 gap-2 text-xs font-semibold">
                 <button
                   type="button"
+                  aria-pressed={labelSize === 'jar'}
                   onClick={() => setLabelSize('jar')}
                   className={`p-2 rounded-xl border text-center transition-colors ${
                     labelSize === 'jar'
@@ -99,6 +103,7 @@ export const GenerateQRPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={labelSize === 'carton'}
                   onClick={() => setLabelSize('carton')}
                   className={`p-2 rounded-xl border text-center transition-colors ${
                     labelSize === 'carton'
@@ -110,6 +115,7 @@ export const GenerateQRPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={labelSize === 'pallet'}
                   onClick={() => setLabelSize('pallet')}
                   className={`p-2 rounded-xl border text-center transition-colors ${
                     labelSize === 'pallet'
@@ -141,9 +147,9 @@ export const GenerateQRPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
-            <span className="font-bold text-slate-700 block">Verification Route:</span>
-            <div className="font-mono text-[11px] text-slate-600 break-all bg-white p-2.5 rounded-lg border border-slate-200">
+          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs space-y-2">
+            <span className="font-bold text-slate-700 dark:text-slate-300 block">Verification Route:</span>
+            <div className="font-mono text-[11px] text-slate-600 dark:text-slate-300 break-all bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
               {verificationUrl}
             </div>
             <button
@@ -158,15 +164,15 @@ export const GenerateQRPage: React.FC = () => {
 
         {/* Label Preview Column */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-100 p-8 rounded-3xl border border-slate-200 flex flex-col items-center justify-center min-h-[480px]">
+          <div className="bg-slate-100 dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center min-h-[480px]">
             {/* Printable Label Card Preview */}
-            <div className="bg-white border-2 border-dashed border-teal-400 rounded-3xl p-8 shadow-xl max-w-sm w-full text-center space-y-5">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 w-fit mx-auto">
-                <ShieldCheck size={14} className="text-emerald-600" />
+            <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-teal-400 dark:border-teal-700 rounded-3xl p-8 shadow-xl max-w-sm w-full text-center space-y-5">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-700 w-fit mx-auto">
+                <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
                 <span>FloraChain Blockchain Verified</span>
               </div>
 
-              <div className="p-4 bg-white rounded-2xl shadow-md border border-slate-100 inline-block">
+              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-100 dark:border-slate-800 inline-block">
                 <QRCodeSVG
                   id="qr-label-svg"
                   value={verificationUrl}
@@ -185,26 +191,26 @@ export const GenerateQRPage: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <h4 className="font-extrabold text-slate-900 text-base">
+                <h4 className="font-extrabold text-slate-900 dark:text-white text-base">
                   {selectedProduct?.name}
                 </h4>
-                <p className="text-xs text-slate-500 italic font-mono">
+                <p className="text-xs text-slate-500 dark:text-slate-400 italic font-mono">
                   {selectedProduct?.botanicalName}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs font-mono text-slate-600">
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="block text-[10px] text-slate-400 uppercase">Batch</span>
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-xs font-mono text-slate-600 dark:text-slate-300">
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="block text-[10px] text-slate-400 dark:text-slate-400 uppercase">Batch</span>
                   <strong>{selectedProduct?.batchId}</strong>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="block text-[10px] text-slate-400 uppercase">Origin</span>
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="block text-[10px] text-slate-400 dark:text-slate-400 uppercase">Origin</span>
                   <strong>{selectedProduct?.farmLocation.split(',')[0]}</strong>
                 </div>
               </div>
 
-              <div className="text-[10px] text-slate-400 uppercase font-semibold">
+              <div className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-semibold">
                 Scan with smartphone camera for Soil-to-Shelf Provenance
               </div>
             </div>

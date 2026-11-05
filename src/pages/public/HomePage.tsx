@@ -117,7 +117,7 @@ export const HomePage: React.FC = () => {
       role: t('roles.FARMER'),
       title: t('home.stage1Title'),
       icon: Sprout,
-      color: 'text-teal-800 bg-teal-50 border-teal-300',
+      color: 'text-teal-800 bg-teal-50 border-teal-300 dark:text-teal-300 dark:bg-teal-900/20 dark:border-teal-800',
       badge: 'Genesis Block',
       desc: t('home.stage1Desc'),
       techProof: 'Smart Contract: CreateProduct() • Signed with Farmer Node Key',
@@ -128,7 +128,7 @@ export const HomePage: React.FC = () => {
       role: t('roles.PROCESSOR'),
       title: t('home.stage2Title'),
       icon: Cog,
-      color: 'text-purple-800 bg-purple-50 border-purple-300',
+      color: 'text-purple-800 bg-purple-50 border-purple-300 dark:text-purple-300 dark:bg-purple-900/20 dark:border-purple-800',
       badge: 'Transformation',
       desc: t('home.stage2Desc'),
       techProof: 'Smart Contract: AddProcessingDetails() • Mass Balance Verified',
@@ -139,7 +139,7 @@ export const HomePage: React.FC = () => {
       role: t('roles.LABORATORY'),
       title: t('home.stage3Title'),
       icon: FlaskConical,
-      color: 'text-indigo-800 bg-indigo-50 border-indigo-300',
+      color: 'text-indigo-800 bg-indigo-50 border-indigo-300 dark:text-indigo-300 dark:bg-indigo-900/20 dark:border-indigo-800',
       badge: 'Assay Verdict',
       desc: t('home.stage3Desc'),
       techProof: 'Smart Contract: AddLabReport() • Cryptographic Pass/Fail Gate',
@@ -150,7 +150,7 @@ export const HomePage: React.FC = () => {
       role: t('roles.DISTRIBUTOR'),
       title: t('home.stage4Title'),
       icon: Truck,
-      color: 'text-sky-800 bg-sky-50 border-sky-300',
+      color: 'text-sky-800 bg-sky-50 border-sky-300 dark:text-sky-300 dark:bg-sky-900/20 dark:border-sky-800',
       badge: 'Telemetry',
       desc: t('home.stage4Desc'),
       techProof: 'Smart Contract: AddShipmentDetails() • IoT Anomaly Check',
@@ -161,7 +161,7 @@ export const HomePage: React.FC = () => {
       role: t('roles.RETAILER'),
       title: t('home.stage5Title'),
       icon: Store,
-      color: 'text-emerald-800 bg-emerald-50 border-emerald-300',
+      color: 'text-emerald-800 bg-emerald-50 border-emerald-300 dark:text-emerald-300 dark:bg-emerald-900/20 dark:border-emerald-800',
       badge: 'Consumer Trust',
       desc: t('home.stage5Desc'),
       techProof: 'Smart Contract: ConfirmRetailReceipt() • Complete Soil-to-Shelf Proof',
@@ -308,7 +308,7 @@ export const HomePage: React.FC = () => {
                 aria-hidden="true"
               />
 
-              <div className="relative bg-white rounded-[24px] border border-[#CCFCDE] shadow-xl p-6 sm:p-8 space-y-6 overflow-hidden">
+              <div className="relative bg-white rounded-[24px] border border-[#CCFCDE] dark:bg-slate-900 dark:border-emerald-800 shadow-xl p-6 sm:p-8 space-y-6 overflow-hidden">
                 {/* Decorative leaf */}
                 <div
                   className="absolute -right-12 -top-12 text-[#F0FDF4] rotate-45 pointer-events-none"
@@ -319,26 +319,26 @@ export const HomePage: React.FC = () => {
 
                 {/* Header row */}
                 <div className="flex items-center justify-between relative z-10">
-                  <div className="flex items-center gap-2 bg-[#F0FDF4] px-3 py-1.5 rounded-full border border-[#CCFCDE]">
+                  <div className="flex items-center gap-2 bg-[#F0FDF4] px-3 py-1.5 rounded-full border border-[#CCFCDE] dark:bg-emerald-900/20 dark:border-emerald-800">
                     <span
                       className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse"
                       aria-label="Live"
                     />
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E] dark:text-teal-300">
                       Live Provenance
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-bold text-[#064E3B] bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                  <span className="text-xs font-mono font-bold text-[#064E3B] bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 dark:text-emerald-300">
                     #ASH-2024-089
                   </span>
                 </div>
 
                 {/* Title */}
                 <div className="space-y-1.5 relative z-10">
-                  <h3 className="text-2xl font-black text-[#064E3B] leading-tight">
+                  <h3 className="text-2xl font-black text-[#064E3B] dark:text-emerald-200 leading-tight">
                     Organic Ashwagandha Extract
                   </h3>
-                  <p className="text-sm font-mono italic text-[#5F7A6B] flex items-center gap-1.5">
+                  <p className="text-sm font-mono italic text-[#5F7A6B] dark:text-slate-400 flex items-center gap-1.5">
                     <Leaf size={14} aria-hidden="true" /> Withania somnifera
                     (80-Mesh)
                   </p>
@@ -346,19 +346,19 @@ export const HomePage: React.FC = () => {
 
                 {/* Data tiles */}
                 <div className="grid grid-cols-2 gap-3 text-sm relative z-10">
-                  <div className="p-3.5 rounded-2xl bg-[#F0FDF4] border border-[#CCFCDE]">
-                    <span className="text-[11px] text-[#065F46] uppercase font-bold block mb-1">
+                  <div className="p-3.5 rounded-2xl bg-[#F0FDF4] border border-[#CCFCDE] dark:bg-emerald-900/20 dark:border-emerald-800">
+                    <span className="text-[11px] text-[#065F46] dark:text-emerald-300 uppercase font-bold block mb-1">
                       HPLC Active Purity
                     </span>
-                    <span className="text-base font-bold text-[#0F766E] font-mono whitespace-nowrap">
+                    <span className="text-base font-bold text-[#0F766E] dark:text-teal-300 font-mono whitespace-nowrap">
                       99.5% Withanolides
                     </span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-[#EFF6FF] border border-blue-100">
-                    <span className="text-[11px] text-blue-800 uppercase font-bold block mb-1">
+                  <div className="p-3.5 rounded-2xl bg-[#EFF6FF] border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800">
+                    <span className="text-[11px] text-blue-800 dark:text-blue-300 uppercase font-bold block mb-1">
                       Farm Coordinates
                     </span>
-                    <span className="text-base font-bold text-blue-900 font-mono whitespace-nowrap flex items-center gap-1">
+                    <span className="text-base font-bold text-blue-900 dark:text-blue-300 font-mono whitespace-nowrap flex items-center gap-1">
                       <MapPin size={14} className="shrink-0" aria-hidden="true" />
                       24.47°N, 74.88°E
                     </span>
@@ -366,8 +366,8 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 {/* 5-Node Consensus */}
-                <div className="space-y-3 pt-4 border-t border-slate-100 relative z-10">
-                  <div className="text-xs font-bold text-[#5F7A6B] uppercase tracking-wider flex items-center gap-2">
+                <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800 relative z-10">
+                  <div className="text-xs font-bold text-[#5F7A6B] dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
                     <Users size={16} aria-hidden="true" />
                     Consensus (5/5 Nodes):
                   </div>
@@ -378,7 +378,7 @@ export const HomePage: React.FC = () => {
                     {['Farm', 'Mill', 'Lab', 'Cold', 'Retail'].map((node) => (
                       <div
                         key={node}
-                        className="bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] py-2 rounded-xl flex flex-col items-center gap-1 hover:bg-[#D1FAE5] transition-colors"
+                        className="bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800 py-2 rounded-xl flex flex-col items-center gap-1 hover:bg-[#D1FAE5] dark:hover:bg-emerald-900/40 transition-colors"
                         title={`${node} Node Verified`}
                       >
                         <CheckCircle2
@@ -435,7 +435,7 @@ export const HomePage: React.FC = () => {
                 icon: Leaf,
                 value: products.length,
                 label: 'Batches Tracked',
-                accent: 'text-[#0F766E]',
+                accent: 'text-[#0F766E] dark:text-teal-300',
               },
               {
                 icon: ShieldCheck,
@@ -447,18 +447,18 @@ export const HomePage: React.FC = () => {
                 icon: LinkIcon,
                 value: `#${networkStats.blockHeight}`,
                 label: 'Ledger Blocks',
-                accent: 'text-[#064E3B]',
+                accent: 'text-[#064E3B] dark:text-emerald-300',
               },
               {
                 icon: Users,
                 value: '5',
                 label: 'Consensus Nodes',
-                accent: 'text-indigo-600',
+                accent: 'text-indigo-600 dark:text-indigo-400',
               },
             ].map((m) => (
               <div
                 key={m.label}
-                className="bg-white rounded-[20px] border border-[#CCFCDE] p-5 sm:p-6 text-center card-elevation-sm hover:-translate-y-1 transition-transform duration-200"
+                className="bg-white rounded-[20px] border border-[#CCFCDE] dark:bg-slate-900 dark:border-emerald-800 p-5 sm:p-6 text-center card-elevation-sm hover:-translate-y-1 transition-transform duration-200"
               >
                 <div
                   className={`flex justify-center mb-2 ${m.accent}`}
@@ -471,7 +471,7 @@ export const HomePage: React.FC = () => {
                 >
                   {m.value}
                 </div>
-                <div className="text-xs sm:text-sm text-[#065F46] font-bold uppercase mt-2 opacity-80">
+                <div className="text-xs sm:text-sm text-[#065F46] dark:text-emerald-300 font-bold uppercase mt-2 opacity-80">
                   {m.label}
                 </div>
               </div>
@@ -484,14 +484,14 @@ export const HomePage: React.FC = () => {
       <section className="py-20 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative">
         {/* Section header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-3">
-          <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider bg-[#F0FDF4] px-4 py-1.5 rounded-full border border-[#CCFCDE] inline-flex items-center gap-2">
+          <span className="text-xs font-bold text-[#0F766E] dark:text-teal-300 uppercase tracking-wider bg-[#F0FDF4] dark:bg-emerald-900/20 px-4 py-1.5 rounded-full border border-[#CCFCDE] dark:border-emerald-800 inline-flex items-center gap-2">
             <Lock size={14} className="text-[#10B981]" aria-hidden="true" />
             Cryptographic Pipeline
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-[#064E3B] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-black text-[#064E3B] dark:text-emerald-200 tracking-tight">
             {t('home.pipelineTitle')}
           </h2>
-          <p className="text-base sm:text-lg text-[#5F7A6B] max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-[#5F7A6B] dark:text-slate-400 max-w-xl mx-auto">
             {t('home.pipelineSubtitle')}
           </p>
         </div>
@@ -504,7 +504,7 @@ export const HomePage: React.FC = () => {
         >
           {/* Connecting progress line (desktop only) */}
           <div
-            className="hidden lg:block absolute top-[44px] left-8 right-8 h-1 bg-slate-200 rounded-full -z-10"
+            className="hidden lg:block absolute top-[44px] left-8 right-8 h-1 bg-slate-200 dark:bg-slate-700 rounded-full -z-10"
             aria-hidden="true"
           >
             <div
@@ -530,8 +530,8 @@ export const HomePage: React.FC = () => {
                 onClick={() => setActiveStageTab(idx)}
                 className={`min-w-[180px] lg:min-w-0 flex-shrink-0 snap-center p-4 rounded-[20px] text-left transition-all duration-300 border cursor-pointer min-h-[44px] ${
                   isActive
-                    ? 'bg-white border-[#10B981] ring-2 ring-[#0F766E]/20 card-elevation-md lg:scale-105'
-                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'bg-white border-[#10B981] dark:bg-slate-900 ring-2 ring-[#0F766E]/20 card-elevation-md lg:scale-105'
+                    : 'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <div className="flex flex-col items-center text-center gap-3">
@@ -540,8 +540,8 @@ export const HomePage: React.FC = () => {
                       isActive
                         ? stage.color + ' shadow-sm'
                         : isPast
-                          ? 'bg-[#F0FDF4] text-[#10B981] border-[#CCFCDE]'
-                          : 'bg-slate-50 text-slate-400 border-slate-200'
+                          ? 'bg-[#F0FDF4] text-[#10B981] border-[#CCFCDE] dark:bg-emerald-900/20 dark:border-emerald-800'
+                          : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-slate-800/50 dark:border-slate-800'
                     }`}
                   >
                     <Icon size={24} aria-hidden="true" />
@@ -549,14 +549,14 @@ export const HomePage: React.FC = () => {
                   <div>
                     <div
                       className={`text-xs font-mono font-bold mb-1 transition-colors ${
-                        isActive ? 'text-[#0F766E]' : 'text-slate-500'
+                        isActive ? 'text-[#0F766E] dark:text-teal-300' : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       Stage {stage.step}
                     </div>
                     <div
                       className={`text-sm font-bold transition-colors ${
-                        isActive ? 'text-slate-900' : 'text-slate-700'
+                        isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       {stage.role}
@@ -570,7 +570,7 @@ export const HomePage: React.FC = () => {
 
         {/* Mobile swipe hint */}
         <div
-          className="lg:hidden text-center text-xs text-slate-500 font-medium mb-6 flex items-center justify-center gap-2"
+          className="lg:hidden text-center text-xs text-slate-500 dark:text-slate-400 font-medium mb-6 flex items-center justify-center gap-2"
           aria-hidden="true"
         >
           <ArrowRight size={12} className="rotate-180" />
@@ -579,7 +579,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* ── Active Stage Detail ── */}
-        <div className="bg-white rounded-[32px] border border-slate-200 card-elevation-md p-6 sm:p-10 transition-all">
+        <div className="bg-white rounded-[32px] border border-slate-200 dark:bg-slate-900 dark:border-slate-800 card-elevation-md p-6 sm:p-10 transition-all">
           {pipelineStages.map((stage, idx) => {
             const Icon = stage.icon;
             if (activeStageTab !== idx) return null;
@@ -601,16 +601,16 @@ export const HomePage: React.FC = () => {
                       <Icon size={14} aria-hidden="true" />
                       Stage {stage.step} • {stage.role}
                     </span>
-                    <span className="text-xs text-slate-500 font-mono font-semibold bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-semibold bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800">
                       {stage.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-3xl font-black text-slate-900 tracking-tight">
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                     {stage.title}
                   </h3>
 
-                  <p className="text-base text-slate-600 leading-relaxed">
+                  <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
                     {stage.desc}
                   </p>
 
@@ -628,8 +628,8 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 {/* Right column — verified data points */}
-                <div className="lg:col-span-5 bg-slate-50 rounded-3xl p-6 sm:p-8 border border-slate-200">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <div className="lg:col-span-5 bg-slate-50 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800">
+                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Layers size={14} aria-hidden="true" />
                     Verified Data Points:
                   </div>
@@ -637,11 +637,11 @@ export const HomePage: React.FC = () => {
                     {stage.metrics.map((metric, i) => (
                       <div
                         key={i}
-                        className="flex items-center gap-3 text-sm font-semibold text-slate-800 bg-white p-3.5 rounded-2xl border border-slate-200 card-elevation-xs"
+                        className="flex items-center gap-3 text-sm font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 card-elevation-xs"
                       >
                         <CheckCircle2
                           size={18}
-                          className="text-emerald-600 shrink-0"
+                          className="text-emerald-600 dark:text-emerald-400 shrink-0"
                           aria-hidden="true"
                         />
                         <span>{metric}</span>

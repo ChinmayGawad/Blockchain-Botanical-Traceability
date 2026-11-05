@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -23,6 +24,7 @@ import { UnauthorizedCard } from '../../components/common/UnauthorizedCard';
 import { useWizardNavigation, WizardStep } from '../../hooks/useWizardNavigation';
 
 export const CreateShipmentPage: React.FC = () => {
+  const { t } = useTranslation();
   const { products, createShipment } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -32,8 +34,8 @@ export const CreateShipmentPage: React.FC = () => {
   if (currentUser?.role !== 'DISTRIBUTOR' && currentUser?.role !== 'ADMIN') {
     return (
       <DashboardLayout
-        title="Create Cold-Chain Dispatch Shipment"
-        subtitle="5-step verification wizard to issue tamper-resistant transport log on Hyperledger Fabric with GDP temperature parameters."
+        title={t('dashboard.portal.createShipmentTitle')}
+        subtitle={t('dashboard.portal.createShipmentSubtitle')}
       >
         <UnauthorizedCard
           currentRole={currentUser?.role || 'UNKNOWN'}
@@ -190,8 +192,8 @@ export const CreateShipmentPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Create Cold-Chain Dispatch Shipment"
-      subtitle="5-step verification wizard to issue tamper-resistant transport log on Hyperledger Fabric with GDP temperature parameters."
+      title={t('dashboard.portal.createShipmentTitle')}
+      subtitle={t('dashboard.portal.createShipmentSubtitle')}
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Interactive Progress Tab Stepper */}
@@ -216,20 +218,20 @@ export const CreateShipmentPage: React.FC = () => {
 
         {/* Success Screen after Dispatch */}
         {isSuccess ? (
-          <div className="bg-white p-8 rounded-3xl border border-sky-200 shadow-xl text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle2 size={36} />
+          <div className="bg-white p-8 rounded-3xl border border-sky-200 dark:bg-slate-900 dark:border-sky-800 shadow-xl text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-600 dark:bg-sky-900/40 dark:text-sky-400 flex items-center justify-center mx-auto shadow-inner">
+              <CheckCircle2 size={36} aria-hidden="true" />
             </div>
 
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+              <span className="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 dark:bg-sky-900/20 px-3 py-1 rounded-full border border-sky-200 dark:border-sky-800 dark:text-sky-400">
                 Shipment Committed On-Chain
               </span>
-              <h2 className="text-2xl font-extrabold text-slate-900 mt-2">
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
                 Batch Dispatched & In Transit
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Tracking #{trackingNumber} • Status updated to <span className="font-bold text-sky-600">IN_TRANSIT</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Tracking #{trackingNumber} • Status updated to <span className="font-bold text-sky-600 dark:text-sky-400">IN_TRANSIT</span>
               </p>
             </div>
 
@@ -254,7 +256,7 @@ export const CreateShipmentPage: React.FC = () => {
                 className="px-6 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View Live Provenance Route</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={14} aria-hidden="true" />
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.04, y: -1 }}
@@ -277,27 +279,28 @@ export const CreateShipmentPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
-                      <Package size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400">
+                      <Package size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 1: Select Approved Botanical Batch</h3>
-                      <p className="text-xs text-slate-500">Pick from batches certified by an accredited testing laboratory</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 1: Select Approved Botanical Batch</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Pick from batches certified by an accredited testing laboratory</p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label htmlFor="ship-batch-select" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                       Select QA Approved Botanical Batch: *
                     </label>
                     {eligibleProducts.length === 0 ? (
-                      <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+                      <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 text-xs rounded-xl">
                         ⚠️ No batches currently in <strong>APPROVED</strong> status. Batches must be processed and verified by an accredited testing laboratory before shipment dispatch can occur.
                       </div>
                     ) : (
                       <select
+                        id="ship-batch-select"
                         value={selectedProductId}
                         onChange={e => setSelectedProductId(e.target.value)}
                         className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white font-mono"
@@ -312,13 +315,13 @@ export const CreateShipmentPage: React.FC = () => {
                   </div>
 
                   {selectedProduct && (
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
-                      <div className="font-bold text-slate-900 border-b border-slate-200 pb-1.5">Certified Batch Overview:</div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600">
-                        <div>Product: <span className="font-semibold text-slate-800">{selectedProduct.name}</span></div>
-                        <div>Quantity: <span className="font-bold text-sky-700">{selectedProduct.quantityKg} kg</span></div>
-                        <div>Farmer: <span className="font-medium text-slate-700">{selectedProduct.farmerName}</span></div>
-                        <div>QA Status: <span className="font-bold text-emerald-600">✓ QA APPROVED</span></div>
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 text-xs space-y-2">
+                      <div className="font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-1.5">Certified Batch Overview:</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 dark:text-slate-300">
+                        <div>Product: <span className="font-semibold text-slate-800 dark:text-slate-100">{selectedProduct.name}</span></div>
+                        <div>Quantity: <span className="font-bold text-sky-700 dark:text-sky-400">{selectedProduct.quantityKg} kg</span></div>
+                        <div>Farmer: <span className="font-medium text-slate-700 dark:text-slate-300">{selectedProduct.farmerName}</span></div>
+                        <div>QA Status: <span className="font-bold text-emerald-600 dark:text-emerald-400">✓ QA APPROVED</span></div>
                       </div>
                     </div>
                   )}
@@ -332,7 +335,7 @@ export const CreateShipmentPage: React.FC = () => {
                       className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-300 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
                     >
                       <span>Continue to Route Hubs</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -347,21 +350,22 @@ export const CreateShipmentPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
-                      <MapPin size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400">
+                      <MapPin size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 2: Logistics Route Origin & Destination</h3>
-                      <p className="text-xs text-slate-500">Designate departure terminal and destination retail warehouse depot</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 2: Logistics Route Origin & Destination</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Designate departure terminal and destination retail warehouse depot</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Origin Logistics Terminal Hub: *</label>
+                      <label htmlFor="ship-origin" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Origin Logistics Terminal Hub: *</label>
                       <input
+                        id="ship-origin"
                         type="text"
                         required
                         value={sourceLocation}
@@ -372,8 +376,9 @@ export const CreateShipmentPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Destination Retail Depot / Warehouse: *</label>
+                      <label htmlFor="ship-destination" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Destination Retail Depot / Warehouse: *</label>
                       <input
+                        id="ship-destination"
                         type="text"
                         required
                         value={destinationLocation}
@@ -392,7 +397,7 @@ export const CreateShipmentPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -402,7 +407,7 @@ export const CreateShipmentPage: React.FC = () => {
                       className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                     >
                       <span>Continue to Fleet Specs</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -417,21 +422,22 @@ export const CreateShipmentPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
-                      <Truck size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400">
+                      <Truck size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 3: Carrier Fleet & GDP Temperature Standards</h3>
-                      <p className="text-xs text-slate-500">Record vehicle registration, refrigeration parameters, and transport modality</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 3: Carrier Fleet & GDP Temperature Standards</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Record vehicle registration, refrigeration parameters, and transport modality</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Vehicle / Carrier Registration Details: *</label>
+                      <label htmlFor="ship-vehicle" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Vehicle / Carrier Registration Details: *</label>
                       <input
+                        id="ship-vehicle"
                         type="text"
                         required
                         value={vehicleNumber}
@@ -443,8 +449,9 @@ export const CreateShipmentPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">Transport Freight Modality: *</label>
+                        <label htmlFor="ship-transport-type" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Transport Freight Modality: *</label>
                         <select
+                          id="ship-transport-type"
                           value={transportType}
                           onChange={e => setTransportType(e.target.value as any)}
                           className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white font-medium"
@@ -456,8 +463,9 @@ export const CreateShipmentPage: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">GDP Temperature Specs: *</label>
+                        <label htmlFor="ship-temp-range" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">GDP Temperature Specs: *</label>
                         <input
+                          id="ship-temp-range"
                           type="text"
                           required
                           value={tempRange}
@@ -477,7 +485,7 @@ export const CreateShipmentPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -487,7 +495,7 @@ export const CreateShipmentPage: React.FC = () => {
                       className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                     >
                       <span>Continue to Manifest</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -502,21 +510,22 @@ export const CreateShipmentPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
-                      <Calendar size={20} />
+                <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400">
+                      <Calendar size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 4: Dispatch Schedule & Tracking Number</h3>
-                      <p className="text-xs text-slate-500">Assign carrier consignment code and estimated timeline</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 4: Dispatch Schedule & Tracking Number</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Assign carrier consignment code and estimated timeline</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Carrier Consignment Tracking Number: *</label>
+                      <label htmlFor="ship-tracking-number" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Carrier Consignment Tracking Number: *</label>
                       <input
+                        id="ship-tracking-number"
                         type="text"
                         required
                         value={trackingNumber}
@@ -527,8 +536,9 @@ export const CreateShipmentPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">Scheduled Dispatch Date: *</label>
+                        <label htmlFor="ship-dispatch-date" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Scheduled Dispatch Date: *</label>
                         <input
+                          id="ship-dispatch-date"
                           type="date"
                           required
                           value={dispatchDate}
@@ -538,8 +548,9 @@ export const CreateShipmentPage: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">Estimated Delivery Date: *</label>
+                        <label htmlFor="ship-expected-date" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Estimated Delivery Date: *</label>
                         <input
+                          id="ship-expected-date"
                           type="date"
                           min={dispatchDate || undefined}
                           required
@@ -564,7 +575,7 @@ export const CreateShipmentPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -574,7 +585,7 @@ export const CreateShipmentPage: React.FC = () => {
                       className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                     >
                       <span>Review & Commit Dispatch</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={16} aria-hidden="true" />
                     </motion.button>
                   </div>
                 </form>
@@ -589,42 +600,42 @@ export const CreateShipmentPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
-                      <Blocks size={20} />
+                <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="p-2 rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400">
+                      <Blocks size={20} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Step 5: Cryptographic Shipment Manifest Review</h3>
-                      <p className="text-xs text-slate-500">Sign payload with Logistics Node identity and commit shipment to ledger</p>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 5: Cryptographic Shipment Manifest Review</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Sign payload with Logistics Node identity and commit shipment to ledger</p>
                     </div>
                   </div>
 
                   {/* Summary Card */}
-                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3 text-xs">
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Batch Dispatched:</span>
-                      <span className="font-bold text-slate-900">{selectedProduct?.name} ({selectedProduct?.batchId})</span>
+                  <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 space-y-3 text-xs">
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Batch Dispatched:</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{selectedProduct?.name} ({selectedProduct?.batchId})</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Logistics Carrier:</span>
-                      <span className="font-semibold text-slate-800">{currentUser.name} ({currentUser.organization || 'TransGlobal Cold-Chain'})</span>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Logistics Carrier:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">{currentUser.name} ({currentUser.organization || 'TransGlobal Cold-Chain'})</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Tracking Code:</span>
-                      <span className="font-mono font-bold text-sky-700">{trackingNumber}</span>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Tracking Code:</span>
+                      <span className="font-mono font-bold text-sky-700 dark:text-sky-400">{trackingNumber}</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Fleet & Temperature:</span>
-                      <span className="text-slate-800">{vehicleNumber} • {transportType} ({tempRange})</span>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Fleet & Temperature:</span>
+                      <span className="text-slate-800 dark:text-slate-100">{vehicleNumber} • {transportType} ({tempRange})</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                      <span className="text-slate-500">Transit Route:</span>
-                      <span className="text-slate-700 text-right max-w-xs">{sourceLocation} → {destinationLocation}</span>
+                    <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Transit Route:</span>
+                      <span className="text-slate-700 text-right max-w-xs dark:text-slate-300">{sourceLocation} → {destinationLocation}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Scheduled Dispatch:</span>
-                      <span className="font-medium text-slate-800">{dispatchDate} (Est. Delivery: {expectedDate})</span>
+                      <span className="text-slate-500 dark:text-slate-400">Scheduled Dispatch:</span>
+                      <span className="font-medium text-slate-800 dark:text-slate-100">{dispatchDate} (Est. Delivery: {expectedDate})</span>
                     </div>
                   </div>
 
@@ -644,7 +655,7 @@ export const CreateShipmentPage: React.FC = () => {
                       onClick={handleBack}
                       className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       <span>Back</span>
                     </motion.button>
                     <motion.button
@@ -661,7 +672,7 @@ export const CreateShipmentPage: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <Truck size={16} />
+                          <Truck size={16} aria-hidden="true" />
                           <span>Commit Shipment & Mark IN_TRANSIT</span>
                         </>
                       )}

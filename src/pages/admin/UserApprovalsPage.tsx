@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { StatusBadge } from '../../components/common/StatusBadge';
@@ -31,6 +32,7 @@ import {
 import confetti from 'canvas-confetti';
 
 export const UserApprovalsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { users, approveUser, rejectUser } = useAuth();
   const [rejectingUserId, setRejectingUserId] = useState<string | null>(null);
 
@@ -52,8 +54,8 @@ export const UserApprovalsPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Stakeholder Governance & Node Approvals"
-      subtitle="Verify credentials of Farmers, Processors, Testing Labs, Distributors, and Retailers before granting Hyperledger Fabric channel membership."
+      title={t('dashboard.portal.userApprovalsTitle')}
+      subtitle={t('dashboard.portal.userApprovalsSubtitle')}
     >
       <div className="space-y-6">
         <Card className="shadow-xs overflow-hidden">

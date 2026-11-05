@@ -403,12 +403,12 @@ export const VerifyProductPage: React.FC = () => {
                   <CardHeader className="pb-3 border-b border-muted-foreground/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2.5 rounded-2xl bg-indigo-100 text-indigo-700">
+                        <div className="p-2.5 rounded-2xl bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
                           <FlaskConical size={20} />
                         </div>
                         <div>
                           <CardTitle className="text-base">Laboratory QA Report</CardTitle>
-                          <span className="text-xs text-slate-500">ISO/IEC 17025 Accredited</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">ISO/IEC 17025 Accredited</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -435,14 +435,14 @@ export const VerifyProductPage: React.FC = () => {
                   <CardContent className="pt-4">
                     {currentProduct.labReport ? (
                       <div className="space-y-4 text-xs">
-                        <div className="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100 space-y-1.5">
-                          <div className="text-xs font-bold text-indigo-950">
+                        <div className="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800 space-y-1.5">
+                          <div className="text-xs font-bold text-indigo-950 dark:text-indigo-200">
                             {currentProduct.labReport.labName}
                           </div>
-                          <div className="text-[11px] text-indigo-700">
+                          <div className="text-[11px] text-indigo-700 dark:text-indigo-400">
                             Tested by: {currentProduct.labReport.testedBy}
                           </div>
-                          <div className="text-[11px] text-indigo-600">
+                          <div className="text-[11px] text-indigo-600 dark:text-indigo-400">
                             Date: {new Date(currentProduct.labReport.testDate).toLocaleDateString()}
                           </div>
                         </div>
@@ -459,14 +459,14 @@ export const VerifyProductPage: React.FC = () => {
                                 className="flex items-center justify-between p-3 rounded-2xl border border-muted-foreground/20"
                               >
                                 <div>
-                                  <span className="font-bold text-slate-900 text-xs block">{param.name}</span>
-                                  <span className="text-[10px] text-slate-400">Limit: {param.standardLimit}</span>
+                                  <span className="font-bold text-slate-900 text-xs block dark:text-white">{param.name}</span>
+                                  <span className="text-[10px] text-slate-400 dark:text-slate-400">Limit: {param.standardLimit}</span>
                                 </div>
                                 <div className="text-right">
-                                  <span className="font-bold text-slate-900 font-mono text-xs block">
+                                  <span className="font-bold text-slate-900 font-mono text-xs block dark:text-white">
                                     {param.value} {param.unit}
                                   </span>
-                                  <span className={`text-[10px] font-bold ${param.passed ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                  <span className={`text-[10px] font-bold ${param.passed ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                     {param.passed ? 'PASS ✓' : 'FAIL ✗'}
                                   </span>
                                 </div>
@@ -492,13 +492,13 @@ export const VerifyProductPage: React.FC = () => {
                         </div>
 
                         {/* Consumer Share CoA Callout Banner */}
-                        <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-3">
+                        <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 dark:bg-emerald-900/20 dark:border-emerald-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-3">
                           <div className="space-y-0.5">
-                            <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                              <ShieldCheck size={14} className="text-emerald-600" />
+                            <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+                              <ShieldCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
                               Consumer Verification & Export
                             </span>
-                            <p className="text-[11px] text-emerald-800">
+                            <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
                               Share this authenticated CoA with doctors, buyers, or family as a password-protected PDF or instant link.
                             </p>
                           </div>
@@ -566,13 +566,13 @@ export const VerifyProductPage: React.FC = () => {
                             {currentProduct.certificates.map(cert => (
                               <div
                                 key={cert.id}
-                                className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs"
+                                className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800 text-xs"
                               >
                                 <div className="flex items-center gap-2">
                                   <FileCheck size={16} className="text-[#0F766E] shrink-0" />
                                   <div>
-                                    <div className="font-bold text-emerald-950">{cert.type}</div>
-                                    <div className="text-[10px] text-emerald-700 font-mono">#{cert.certificateNumber}</div>
+                                    <div className="font-bold text-emerald-950 dark:text-emerald-200">{cert.type}</div>
+                                    <div className="text-[10px] text-emerald-700 font-mono dark:text-emerald-400">#{cert.certificateNumber}</div>
                                   </div>
                                 </div>
                                 <Badge variant="botanical" className="text-[10px]">{cert.status}</Badge>
@@ -590,7 +590,7 @@ export const VerifyProductPage: React.FC = () => {
         ) : (
           /* Landing / Empty State */
           <div className="max-w-2xl mx-auto py-12 text-center space-y-8">
-            <div className="w-20 h-20 rounded-3xl bg-emerald-100 text-[#0F766E] flex items-center justify-center mx-auto shadow-md">
+            <div className="w-20 h-20 rounded-3xl bg-emerald-100 text-[#0F766E] dark:bg-emerald-900/40 flex items-center justify-center mx-auto shadow-md">
               <QrCode size={40} />
             </div>
             <div className="space-y-2">
@@ -632,7 +632,7 @@ export const VerifyProductPage: React.FC = () => {
                 {products.map(p => (
                   <Card
                     key={p.id}
-                    className="p-4 rounded-2xl border-muted-foreground/20 hover:border-[#0F766E] hover:bg-emerald-50/40 transition-all cursor-pointer shadow-sm"
+                    className="p-4 rounded-2xl border-muted-foreground/20 hover:border-[#0F766E] hover:bg-emerald-50/40 dark:hover:bg-emerald-900/20 transition-all cursor-pointer shadow-sm"
                     onClick={() => navigate(`/verify/${p.id}`)}
                   >
                     <CardContent className="p-0">

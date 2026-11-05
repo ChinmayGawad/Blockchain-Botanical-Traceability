@@ -1,4 +1,5 @@
 import React, { Suspense, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -34,12 +35,13 @@ const LocalPartnerSelector = React.lazy(() =>
 );
 
 const PartnerSelectorFallback: React.FC = () => (
-  <div className="h-[420px] w-full rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center">
-    <span className="text-xs font-medium text-slate-500">Loading partner map...</span>
+  <div className="h-[420px] w-full rounded-2xl border border-slate-200 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center dark:border-slate-800">
+    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Loading partner map...</span>
   </div>
 );
 
 export const RegisterProductPage: React.FC = () => {
+  const { t } = useTranslation();
   const { registerProduct } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -48,8 +50,8 @@ export const RegisterProductPage: React.FC = () => {
   if (currentUser?.role !== 'FARMER' && currentUser?.role !== 'ADMIN') {
     return (
       <DashboardLayout
-        title="Register Botanical Harvest"
-        subtitle="5-step verification wizard to commit crop origin, GPS coordinates, and organic certificates to Hyperledger Fabric."
+        title={t('dashboard.portal.registerProductTitle')}
+        subtitle={t('dashboard.portal.registerProductSubtitle')}
       >
         <UnauthorizedCard
           currentRole={currentUser?.role || 'UNKNOWN'}
@@ -243,8 +245,8 @@ export const RegisterProductPage: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Register Botanical Harvest"
-      subtitle="5-step verification wizard to commit crop origin, GPS coordinates, and organic certificates to Hyperledger Fabric."
+      title={t('dashboard.portal.registerProductTitle')}
+      subtitle={t('dashboard.portal.registerProductSubtitle')}
     >
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Interactive Progress Tab Stepper */}
@@ -275,21 +277,22 @@ export const RegisterProductPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
-                  <Sprout size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                  <Sprout size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 1: Botanical Information</h3>
-                  <p className="text-xs text-slate-500">Provide official botanical taxonomy and harvest batch ID</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 1: Botanical Information</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Provide official botanical taxonomy and harvest batch ID</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Common Commercial Name: *</label>
+                  <label htmlFor="crop-name" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Common Commercial Name: *</label>
                   <input
+                    id="crop-name"
                     type="text"
                     required
                     value={name}
@@ -300,8 +303,9 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Scientific Botanical Latin Name: *</label>
+                  <label htmlFor="crop-botanical-name" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Scientific Botanical Latin Name: *</label>
                   <input
+                    id="crop-botanical-name"
                     type="text"
                     required
                     value={botanicalName}
@@ -312,8 +316,9 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Category: *</label>
+                  <label htmlFor="crop-category" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Category: *</label>
                   <select
+                    id="crop-category"
                     value={category}
                     onChange={e => setCategory(e.target.value as any)}
                     className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
@@ -327,8 +332,9 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Unique Batch Number: *</label>
+                  <label htmlFor="crop-batch-number" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Unique Batch Number: *</label>
                   <input
+                    id="crop-batch-number"
                     type="text"
                     required
                     value={batchId}
@@ -338,8 +344,9 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Raw Harvest Weight (kg): *</label>
+                  <label htmlFor="crop-quantity-kg" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Raw Harvest Weight (kg): *</label>
                   <input
+                    id="crop-quantity-kg"
                     type="number"
                     min="1"
                     required
@@ -350,8 +357,9 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Expected Active Compounds:</label>
+                  <label htmlFor="crop-active-compounds" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Expected Active Compounds:</label>
                   <input
+                    id="crop-active-compounds"
                     type="text"
                     value={activeCompounds}
                     onChange={e => setActiveCompounds(e.target.value)}
@@ -362,8 +370,9 @@ export const RegisterProductPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Description & Harvest Notes:</label>
+                <label htmlFor="crop-description" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Description & Harvest Notes:</label>
                 <textarea
+                  id="crop-description"
                   rows={3}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
@@ -379,7 +388,7 @@ export const RegisterProductPage: React.FC = () => {
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Continue to Farm Origin</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -394,21 +403,22 @@ export const RegisterProductPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
-                  <MapPin size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                  <MapPin size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 2: Farm Location & Soil Telemetry</h3>
-                  <p className="text-xs text-slate-500">Specify physical farm plot and exact GPS telemetry</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 2: Farm Location & Soil Telemetry</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Specify physical farm plot and exact GPS telemetry</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Physical Farm Address / Plot Details: *</label>
+                  <label htmlFor="farm-address" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Physical Farm Address / Plot Details: *</label>
                   <input
+                    id="farm-address"
                     type="text"
                     required
                     value={farmLocation}
@@ -419,8 +429,9 @@ export const RegisterProductPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">GPS Latitude (°N): *</label>
+                    <label htmlFor="farm-gps-lat" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">GPS Latitude (°N): *</label>
                     <input
+                      id="farm-gps-lat"
                       type="number"
                       step="0.0001"
                       min="-90"
@@ -433,8 +444,9 @@ export const RegisterProductPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">GPS Longitude (°E): *</label>
+                    <label htmlFor="farm-gps-lng" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">GPS Longitude (°E): *</label>
                     <input
+                      id="farm-gps-lng"
                       type="number"
                       step="0.0001"
                       min="-180"
@@ -447,8 +459,9 @@ export const RegisterProductPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Harvest Date: *</label>
+                    <label htmlFor="farm-harvest-date" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Harvest Date: *</label>
                     <input
+                      id="farm-harvest-date"
                       type="date"
                       required
                       value={harvestDate}
@@ -458,8 +471,9 @@ export const RegisterProductPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Cultivation Protocol: *</label>
+                    <label htmlFor="farm-cultivation-method" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Cultivation Protocol: *</label>
                     <select
+                      id="farm-cultivation-method"
                       value={cultivationMethod}
                       onChange={e => setCultivationMethod(e.target.value as any)}
                       className="w-full px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
@@ -482,7 +496,7 @@ export const RegisterProductPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -492,7 +506,7 @@ export const RegisterProductPage: React.FC = () => {
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Continue to Supply Partners</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -507,14 +521,14 @@ export const RegisterProductPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
-                  <Layers size={20} />
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                  <Layers size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 3: Supply Chain Partners (Local Selection)</h3>
-                  <p className="text-xs text-slate-500">Discover and designate verified nearby processors, laboratories, and logistics providers</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 3: Supply Chain Partners (Local Selection)</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Discover and designate verified nearby processors, laboratories, and logistics providers</p>
                 </div>
               </div>
 
@@ -525,7 +539,7 @@ export const RegisterProductPage: React.FC = () => {
                   onSelectionComplete={(selections) => setSelectedPartners(selections)}
                 />
               </Suspense>
-              <div className="flex justify-between pt-3 border-t border-slate-100">
+              <div className="flex justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
                 <motion.button
                   whileHover={{ scale: 1.03, y: -1 }}
                   whileTap={{ scale: 0.96 }}
@@ -533,7 +547,7 @@ export const RegisterProductPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -544,7 +558,7 @@ export const RegisterProductPage: React.FC = () => {
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Continue to Certificates</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </div>
@@ -559,21 +573,22 @@ export const RegisterProductPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
-                  <FileCheck size={20} />
+            <form onSubmit={handleNext} className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-5 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                  <FileCheck size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 4: Certificates & IPFS Storage</h3>
-                  <p className="text-xs text-slate-500">Upload accredited organic certificates and pin to IPFS</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 4: Certificates & IPFS Storage</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Upload accredited organic certificates and pin to IPFS</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Certification Authority & Type: *</label>
+                  <label htmlFor="cert-type" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Certification Authority & Type: *</label>
                   <input
+                    id="cert-type"
                     type="text"
                     required
                     value={certType}
@@ -584,8 +599,9 @@ export const RegisterProductPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Certificate License Number: *</label>
+                  <label htmlFor="cert-number" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">Certificate License Number: *</label>
                   <input
+                    id="cert-number"
                     type="text"
                     required
                     value={certNumber}
@@ -596,7 +612,7 @@ export const RegisterProductPage: React.FC = () => {
 
                 {/* Decentralized IPFS Document Upload Dropzone */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label htmlFor="document-upload-input" className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-300">
                     Organic Certificate Document (PDF / DOC / Image): *
                   </label>
                   <DocumentUploadDropzone
@@ -619,7 +635,7 @@ export const RegisterProductPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -629,7 +645,7 @@ export const RegisterProductPage: React.FC = () => {
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm cursor-pointer"
                 >
                   <span>Review & Commit On-Chain</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </motion.button>
               </div>
             </form>
@@ -644,47 +660,47 @@ export const RegisterProductPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
           >
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
-                  <Blocks size={20} />
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 dark:bg-slate-900 dark:border-slate-800">
+              <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="p-2 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                  <Blocks size={20} aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Step 5: Cryptographic Review & Commit</h3>
-                  <p className="text-xs text-slate-500">Sign payload with Farmer node identity and commit to Hyperledger Fabric</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Step 5: Cryptographic Review & Commit</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Sign payload with Farmer node identity and commit to Hyperledger Fabric</p>
                 </div>
               </div>
 
               {/* Summary Review Card */}
-              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3 text-xs">
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Botanical Product:</span>
-                  <span className="font-bold text-slate-900">{name} ({botanicalName})</span>
+              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800 space-y-3 text-xs">
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Botanical Product:</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{name} ({botanicalName})</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Batch ID:</span>
-                  <span className="font-mono font-bold text-emerald-700">{batchId}</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Batch ID:</span>
+                  <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">{batchId}</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Quantity & Cultivation:</span>
-                  <span className="font-bold text-slate-800">{quantityKg} kg • {cultivationMethod}</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Quantity & Cultivation:</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-100">{quantityKg} kg • {cultivationMethod}</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Farm GPS:</span>
-                  <span className="font-mono text-slate-700">{lat}° N, {lng}° E</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Farm GPS:</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{lat}° N, {lng}° E</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Submitting Node:</span>
-                  <span className="font-semibold text-slate-800">{currentUser.name} ({currentUser.organization})</span>
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Submitting Node:</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">{currentUser.name} ({currentUser.organization})</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-200/70 pb-2">
-                  <span className="text-slate-500">Certificate Document:</span>
-                  <span className="font-semibold text-slate-800 truncate max-w-[240px]">
+                <div className="flex justify-between border-b border-slate-200/70 pb-2 dark:border-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Certificate Document:</span>
+                  <span className="font-semibold text-slate-800 truncate max-w-[240px] dark:text-slate-100">
                     {uploadedDoc?.name || 'Organic Certificate PDF'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">IPFS Certificate Hash:</span>
+                  <span className="text-slate-500 dark:text-slate-400">IPFS Certificate Hash:</span>
                   <span className="font-mono text-indigo-700">{ipfsHash}</span>
                 </div>
               </div>
@@ -706,7 +722,7 @@ export const RegisterProductPage: React.FC = () => {
                   onClick={handleBack}
                   className="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={16} aria-hidden="true" />
                   <span>Back</span>
                 </motion.button>
                 <motion.button
@@ -724,7 +740,7 @@ export const RegisterProductPage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Blocks size={16} />
+                      <Blocks size={16} aria-hidden="true" />
                       <span>Sign & Commit Crop on Blockchain</span>
                     </>
                   )}
@@ -736,31 +752,31 @@ export const RegisterProductPage: React.FC = () => {
 
         {/* Success Screen after Registration */}
         {createdProduct && (
-          <div className="bg-white p-8 rounded-3xl border border-emerald-200 shadow-xl text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle2 size={36} />
+          <div className="bg-white p-8 rounded-3xl border border-emerald-200 dark:bg-slate-900 dark:border-emerald-800 shadow-xl text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
+              <CheckCircle2 size={36} aria-hidden="true" />
             </div>
 
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 dark:text-emerald-400">
                 Block Committed Successfully
               </span>
-              <h2 className="text-2xl font-extrabold text-slate-900 mt-2">
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-2">
                 Crop Registered on Blockchain
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Product ID: <span className="font-mono font-bold text-slate-800">{createdProduct.id}</span> • Batch #{createdProduct.batchId}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Product ID: <span className="font-mono font-bold text-slate-800 dark:text-slate-100">{createdProduct.id}</span> • Batch #{createdProduct.batchId}
               </p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl p-5 text-left font-mono text-xs space-y-2">
-              <div className="text-slate-500 text-xs uppercase font-extrabold tracking-wider">
+            <div className="bg-slate-50 border border-slate-200 text-slate-800 dark:bg-slate-800/50 dark:border-slate-800 dark:text-slate-100 rounded-2xl p-5 text-left font-mono text-xs space-y-2">
+              <div className="text-slate-500 text-xs uppercase font-extrabold tracking-wider dark:text-slate-400">
                 Blockchain Transaction Receipt:
               </div>
-              <div className="text-emerald-800 font-bold break-all text-xs">
+              <div className="text-emerald-800 font-bold break-all text-xs dark:text-emerald-300">
                 TxID: {createdProduct?.blockchainTransactions?.[0]?.txId || createdProduct?.id || '0x' + Math.random().toString(16).substring(2, 66)}
               </div>
-              <div className="text-slate-600 text-xs">
+              <div className="text-slate-600 text-xs dark:text-slate-300">
                 Endorsing Peers: peer0.farmer.florachain.org, peer0.admin.florachain.org
               </div>
             </div>
@@ -774,7 +790,7 @@ export const RegisterProductPage: React.FC = () => {
                 className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>View Full Verification View</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={14} aria-hidden="true" />
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.04, y: -1 }}

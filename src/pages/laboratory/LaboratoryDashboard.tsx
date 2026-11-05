@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export const LaboratoryDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { products } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -40,8 +42,8 @@ export const LaboratoryDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Laboratory QA Testing Station"
-      subtitle={`${currentUser.name} • ${currentUser.organization || 'Eurofins AgriBio Analytics Lab'} (ID: ${currentUser.id}) • Accredited ISO/IEC 17025 Facility`}
+      title={t('dashboard.portal.laboratoryTitle')}
+      subtitle={t('dashboard.portal.laboratorySubtitle', { name: currentUser.name, org: currentUser.organization || 'Eurofins AgriBio Analytics Lab', id: currentUser.id })}
       action={
         <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
           <Link
@@ -62,52 +64,52 @@ export const LaboratoryDashboard: React.FC = () => {
             value={pendingTests.length}
             subtitle="Awaiting laboratory assay"
             icon={Clock}
-            iconColor="text-indigo-700"
-            bgColor="bg-indigo-50"
+            iconColor="text-indigo-700 dark:text-indigo-400"
+            bgColor="bg-indigo-50 dark:bg-indigo-900/20"
           />
           <MetricCard
             title="Approved & Certified"
             value={approvedTests.length}
             subtitle="Passed monograph limits"
             icon={CheckCircle2}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
           <MetricCard
             title="Rejected Contaminations"
             value={rejectedTests.length}
             subtitle="Smart contract locked"
             icon={XCircle}
-            iconColor="text-rose-700"
-            bgColor="bg-rose-50"
+            iconColor="text-rose-700 dark:text-rose-400"
+            bgColor="bg-rose-50 dark:bg-rose-900/20"
           />
           <MetricCard
             title="Lab Test Compliance"
             value="100%"
             subtitle="ISO 17025 Audit Standard"
             icon={FlaskConical}
-            iconColor="text-indigo-700"
-            bgColor="bg-indigo-50"
+            iconColor="text-indigo-700 dark:text-indigo-400"
+            bgColor="bg-indigo-50 dark:bg-indigo-900/20"
           />
         </div>
 
         {/* Pending QA Queue */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
               <span>Pending QA Testing Queue</span>
-              <span className="text-xs font-bold bg-indigo-100 text-indigo-900 px-2.5 py-0.5 rounded-full border border-indigo-200">
+              <span className="text-xs font-bold bg-indigo-100 text-indigo-900 dark:bg-indigo-900/40 dark:text-indigo-200 px-2.5 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
                 {pendingTests.length} Samples
               </span>
             </h3>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               Botanical batches requiring mandatory HPLC purity, pesticide, and heavy metal assays
             </p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+              <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-5 py-3.5">Sample Name</th>
                   <th className="px-5 py-3.5">Batch Code</th>
@@ -117,22 +119,22 @@ export const LaboratoryDashboard: React.FC = () => {
                   <th className="px-5 py-3.5 text-right">Inspection</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {pendingTests.map(product => (
-                  <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                     <td className="px-5 py-4">
-                      <div className="font-bold text-sm text-slate-900">{product.name}</div>
-                      <div className="text-xs font-mono text-slate-500 italic mt-0.5">{product.botanicalName}</div>
+                      <div className="font-bold text-sm text-slate-900 dark:text-white">{product.name}</div>
+                      <div className="text-xs font-mono text-slate-500 dark:text-slate-400 italic mt-0.5">{product.botanicalName}</div>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="font-mono font-bold text-xs text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
+                      <span className="font-mono font-bold text-xs text-emerald-900 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700 inline-block">
                         {product.batchId}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-slate-700 font-medium">
+                    <td className="px-5 py-4 text-slate-700 dark:text-slate-300 font-medium">
                       {product.processingDetails?.processorName || product.farmerOrg}
                     </td>
-                    <td className="px-5 py-4 font-bold text-slate-900">
+                    <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                       {product.quantityKg.toLocaleString()} kg
                     </td>
                     <td className="px-5 py-4">
@@ -157,24 +159,24 @@ export const LaboratoryDashboard: React.FC = () => {
         </div>
 
         {/* Issued Lab Certificates */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
               Issued Chemical Assay Certificates
             </h3>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               Assays validated and endorsed by {currentUser.name} on the blockchain
             </p>
           </div>
 
           {myLabReports.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500">
+            <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
               No lab certificates have been published under this lab account yet. Select an incoming sample above to perform your first QA inspection.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+                <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="px-5 py-3.5">Botanical Batch</th>
                     <th className="px-5 py-3.5">HPLC Purity Marker</th>
@@ -183,17 +185,17 @@ export const LaboratoryDashboard: React.FC = () => {
                     <th className="px-5 py-3.5 text-right">Certificate</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {myLabReports.map(product => (
-                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="font-bold text-sm text-slate-900">{product.name}</div>
-                        <div className="text-xs font-mono text-slate-500 mt-0.5">{product.batchId}</div>
+                        <div className="font-bold text-sm text-slate-900 dark:text-white">{product.name}</div>
+                        <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">{product.batchId}</div>
                       </td>
-                      <td className="px-5 py-4 font-mono font-bold text-indigo-900">
+                      <td className="px-5 py-4 font-mono font-bold text-indigo-900 dark:text-indigo-300">
                         {product.labReport?.purityPercentage}% Purity Assay
                       </td>
-                      <td className="px-5 py-4 text-xs font-semibold text-slate-700">
+                      <td className="px-5 py-4 text-xs font-semibold text-slate-700 dark:text-slate-300">
                         ICP-MS: {product.labReport?.heavyMetalsStatus} • Micro: {product.labReport?.microbialTestStatus}
                       </td>
                       <td className="px-5 py-4">

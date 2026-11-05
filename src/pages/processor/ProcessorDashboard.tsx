@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBlockchain } from '../../context/BlockchainContext';
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 
 export const ProcessorDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { products } = useBlockchain();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -39,8 +41,8 @@ export const ProcessorDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="Processor Bio-Refining Portal"
-      subtitle={`${currentUser.name} • ${currentUser.organization || 'PhytoExtracts Bio-Refining Ltd'} (ID: ${currentUser.id}) • ${currentUser.location || 'GMP Extraction Unit'}`}
+      title={t('dashboard.portal.processorTitle')}
+      subtitle={t('dashboard.portal.processorSubtitle', { name: currentUser.name, org: currentUser.organization || 'PhytoExtracts Bio-Refining Ltd', id: currentUser.id, location: currentUser.location || 'GMP Extraction Unit' })}
       action={
         <motion.div whileHover={{ scale: 1.04, y: -1 }} whileTap={{ scale: 0.96 }}>
           <Link
@@ -61,52 +63,52 @@ export const ProcessorDashboard: React.FC = () => {
             value={incomingRawCrops.length}
             subtitle="Awaiting facility intake"
             icon={Package}
-            iconColor="text-teal-700"
-            bgColor="bg-teal-50"
+            iconColor="text-teal-700 dark:text-teal-400"
+            bgColor="bg-teal-50 dark:bg-teal-900/20"
           />
           <MetricCard
             title="My Processed Batches"
             value={myProcessedBatches.length}
             subtitle="Milled & Extracted"
             icon={Cog}
-            iconColor="text-purple-700"
-            bgColor="bg-purple-50"
+            iconColor="text-purple-700 dark:text-purple-400"
+            bgColor="bg-purple-50 dark:bg-purple-900/20"
           />
           <MetricCard
             title="Dispatched to Lab"
             value={sentToLab.length}
             subtitle="Under QA assay"
             icon={FlaskConical}
-            iconColor="text-indigo-700"
-            bgColor="bg-indigo-50"
+            iconColor="text-indigo-700 dark:text-indigo-400"
+            bgColor="bg-indigo-50 dark:bg-indigo-900/20"
           />
           <MetricCard
             title="Extraction Yield"
             value="89.2%"
             subtitle="Low thermal loss"
             icon={CheckCircle2}
-            iconColor="text-emerald-700"
-            bgColor="bg-emerald-50"
+            iconColor="text-emerald-700 dark:text-emerald-400"
+            bgColor="bg-emerald-50 dark:bg-emerald-900/20"
           />
         </div>
 
         {/* Incoming Raw Crops Awaiting Processing */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
               <span>Incoming Raw Crops Queue</span>
-              <span className="text-xs font-bold bg-teal-100 text-teal-900 px-2.5 py-0.5 rounded-full border border-teal-200">
+              <span className="text-xs font-bold bg-teal-100 text-teal-900 dark:bg-teal-900/40 dark:text-teal-200 px-2.5 py-0.5 rounded-full border border-teal-200 dark:border-teal-800">
                 {incomingRawCrops.length} Available
               </span>
             </h3>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               Fresh harvests registered by farmers ready for bio-refining & extraction
             </p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+              <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-5 py-3.5">Botanical Crop</th>
                   <th className="px-5 py-3.5">Batch ID</th>
@@ -116,27 +118,27 @@ export const ProcessorDashboard: React.FC = () => {
                   <th className="px-5 py-3.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {incomingRawCrops.map(product => (
-                  <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                     <td className="px-5 py-4">
-                      <div className="font-bold text-sm text-slate-900">{product.name}</div>
-                      <div className="text-xs font-mono text-slate-500 italic mt-0.5">{product.botanicalName}</div>
+                      <div className="font-bold text-sm text-slate-900 dark:text-white">{product.name}</div>
+                      <div className="text-xs font-mono text-slate-500 dark:text-slate-400 italic mt-0.5">{product.botanicalName}</div>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="font-mono font-bold text-xs text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">
+                      <span className="font-mono font-bold text-xs text-emerald-900 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700 inline-block">
                         {product.batchId}
                       </span>
                     </td>
-                    <td className="px-5 py-4 font-bold text-slate-900">
+                    <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
                       {product.quantityKg.toLocaleString()} kg
                     </td>
-                    <td className="px-5 py-4 text-slate-700">
+                    <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
                       <div className="flex items-center gap-1.5 font-medium">
-                        <MapPin size={13} className="text-rose-600 shrink-0" />
+                        <MapPin size={13} className="text-rose-600 dark:text-rose-400 shrink-0" />
                         <span className="truncate max-w-xs">{product.farmLocation}</span>
                       </div>
-                      <span className="text-xs text-slate-500 mt-0.5 block">By {product.farmerName}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 block">By {product.farmerName}</span>
                     </td>
                     <td className="px-5 py-4">
                       <StatusBadge status={product.status} />
@@ -160,24 +162,24 @@ export const ProcessorDashboard: React.FC = () => {
         </div>
 
         {/* My Processed Batches Section */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
               My Facility Processing Logs
             </h3>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               Batches refined by {currentUser.name} ({currentUser.organization})
             </p>
           </div>
 
           {myProcessedBatches.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500">
+            <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
               No batches have been processed under this facility account yet. Select an incoming crop above to log your first extraction.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200">
+                <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="px-5 py-3.5">Product Name</th>
                     <th className="px-5 py-3.5">Method</th>
@@ -187,20 +189,20 @@ export const ProcessorDashboard: React.FC = () => {
                     <th className="px-5 py-3.5 text-right">Audit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {myProcessedBatches.map(product => (
-                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="font-bold text-sm text-slate-900">{product.name}</div>
-                        <div className="text-xs font-mono text-slate-500 mt-0.5">{product.batchId}</div>
+                        <div className="font-bold text-sm text-slate-900 dark:text-white">{product.name}</div>
+                        <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">{product.batchId}</div>
                       </td>
-                      <td className="px-5 py-4 font-semibold text-slate-800">
+                      <td className="px-5 py-4 font-semibold text-slate-800 dark:text-slate-200">
                         {product.processingDetails?.method}
                       </td>
-                      <td className="px-5 py-4 font-mono font-bold text-slate-900">
+                      <td className="px-5 py-4 font-mono font-bold text-slate-900 dark:text-white">
                         {product.processingDetails?.initialQuantityKg}kg → {product.processingDetails?.processedQuantityKg}kg
                       </td>
-                      <td className="px-5 py-4 font-bold text-amber-800">
+                      <td className="px-5 py-4 font-bold text-amber-800 dark:text-amber-300">
                         {product.processingDetails?.yieldLossPercentage}%
                       </td>
                       <td className="px-5 py-4">
