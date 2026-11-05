@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Languages, Check, ChevronDown } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, AppLanguage } from '../../i18n';
-import { switchDynamicLanguage } from '../../services/dynamicTranslateService';
 
 interface LanguageSwitcherProps {
   variant?: 'navbar' | 'ticker' | 'mobile';
@@ -41,7 +40,6 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       setRotation(prev => prev + 360);
     }
     i18n.changeLanguage(code);
-    switchDynamicLanguage(code);
     setIsOpen(false);
   };
 
