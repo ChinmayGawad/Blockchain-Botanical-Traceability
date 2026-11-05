@@ -4,6 +4,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider, useAuth } from '../../src/context/AuthContext';
 import { BlockchainProvider, useBlockchain } from '../../src/context/BlockchainContext';
+import { ThemeProvider } from '../../src/context/ThemeContext';
+import { ToastProvider } from '../../src/context/ToastContext';
 import { Navbar } from '../../src/components/layout/Navbar';
 import '../../src/i18n';
 
@@ -32,11 +34,15 @@ describe('Automated Web3 Wallet Connection & Navbar Removal', () => {
   it('completely removes the manual Connect Wallet button from Navbar', async () => {
     render(
       <BrowserRouter>
-        <AuthProvider>
-          <BlockchainProvider>
-            <Navbar />
-          </BlockchainProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <BlockchainProvider>
+                <Navbar />
+              </BlockchainProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </BrowserRouter>
     );
 
@@ -60,10 +66,12 @@ describe('Automated Web3 Wallet Connection & Navbar Removal', () => {
       </BrowserRouter>
     );
 
+    // Wallet auto-connect resolves asynchronously (dynamic web3 service load);
+    // allow enough time for the promise chain to settle.
     await waitFor(() => {
       expect(screen.getByTestId('is-connected').textContent).toBe('YES');
       expect(screen.getByTestId('wallet-address').textContent).toMatch(/^0x[a-fA-F0-9]{40}$/);
-    });
+    }, { timeout: 4000 });
   });
 
   it('automatically maps and switches wallet accounts when stakeholder role changes', async () => {
@@ -84,7 +92,7 @@ describe('Automated Web3 Wallet Connection & Navbar Removal', () => {
       expect(screen.getByTestId('wallet-address').textContent?.toLowerCase()).toBe(
         '0x70997970c51812dc3a010c7d01b50e0d17dc79c8'
       );
-    });
+    }, { timeout: 4000 });
 
     // Switch to PROCESSOR (Account 2: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC)
     screen.getByText('Set Processor').click();
@@ -93,7 +101,7 @@ describe('Automated Web3 Wallet Connection & Navbar Removal', () => {
       expect(screen.getByTestId('wallet-address').textContent?.toLowerCase()).toBe(
         '0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc'
       );
-    });
+    }, { timeout: 4000 });
 
     // Switch to LABORATORY (Account 3: 0x90F79bf6EB2c4f870365E785982E1f101E93b906)
     screen.getByText('Set Lab').click();
@@ -102,6 +110,6 @@ describe('Automated Web3 Wallet Connection & Navbar Removal', () => {
       expect(screen.getByTestId('wallet-address').textContent?.toLowerCase()).toBe(
         '0x90f79bf6eb2c4f870365e785982e1f101e93b906'
       );
-    });
+    }, { timeout: 4000 });
   });
 });

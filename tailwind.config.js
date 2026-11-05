@@ -6,6 +6,14 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
+    screens: {
+      xs: '475px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    },
     container: {
       center: true,
       padding: '2rem',
@@ -48,20 +56,6 @@ export default {
         card: {
           DEFAULT: 'hsl(var(--card, 0 0% 100%))',
           foreground: 'hsl(var(--card-foreground, 166 84% 16%))',
-        },
-        // Botanical Theme Specific Tokens
-        brand: {
-          forest: '#0F766E',
-          'forest-dark': '#115E59',
-          emerald: '#10B981',
-          'emerald-light': '#CCFCDE',
-          surface: '#ffffff',
-          bg: '#F0FDF4',
-          'bg-tint': '#F0FDF4',
-          border: '#CCFCDE',
-          'border-focus': '#0F766E',
-          muted: '#5F7A6B',
-          dark: '#064E3B',
         },
         botanical: {
           50: '#f0fdf4',

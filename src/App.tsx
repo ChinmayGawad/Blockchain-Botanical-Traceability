@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { BlockchainProvider } from './context/BlockchainContext';
+import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/layout/Navbar';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppRoutes } from './routes/AppRoutes';
@@ -15,7 +17,7 @@ const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground w-full max-w-full bg-blobs relative selection:bg-accent selection:text-white transition-colors duration-500">
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-[100px] z-[-1] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-white/40 dark:bg-slate-950/60 backdrop-blur-[100px] z-[-1] pointer-events-none"></div>
 
       {!isAuthRoute && <Navbar />}
 
@@ -40,13 +42,17 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 export function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <AuthProvider>
-          <BlockchainProvider>
-            <AppLayout />
-          </BlockchainProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <ToastProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <BlockchainProvider>
+                <AppLayout />
+              </BlockchainProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </ToastProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
