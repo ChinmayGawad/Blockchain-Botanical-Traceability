@@ -128,7 +128,7 @@ Verify on-chain: ${verificationUrl}`;
         }`}>
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-xl shrink-0 ${isApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-              {isApproved ? <ShieldCheck className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+              {isApproved ? <ShieldCheck aria-hidden="true" className="h-5 w-5" /> : <AlertTriangle aria-hidden="true" className="h-5 w-5" />}
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -168,7 +168,7 @@ Verify on-chain: ${verificationUrl}`;
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
               <div className="p-1.5 bg-amber-100 text-amber-800 rounded-lg shrink-0">
-                <Lock className="h-4 w-4" />
+                <Lock aria-hidden="true" className="h-4 w-4" />
               </div>
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-amber-950 flex items-center gap-2">
@@ -186,7 +186,7 @@ Verify on-chain: ${verificationUrl}`;
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label className="font-semibold text-amber-950 flex items-center gap-2">
+              <label htmlFor="pdf-passcode" className="font-semibold text-amber-950 flex items-center gap-2">
                 <span>Custom PDF Passcode</span>
                 <span className="text-[10px] font-medium text-amber-800 bg-amber-100/90 border border-amber-200/80 px-2 py-0.5 rounded-md">
                   Recipient Access Code
@@ -200,9 +200,10 @@ Verify on-chain: ${verificationUrl}`;
             <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
               <div className="relative flex-1">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-700 pointer-events-none">
-                  <KeyRound className="h-4 w-4" />
+                  <KeyRound aria-hidden="true" className="h-4 w-4" />
                 </div>
                 <input
+                  id="pdf-passcode"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -215,6 +216,7 @@ Verify on-chain: ${verificationUrl}`;
                     onClick={() => setShowPassword(!showPassword)}
                     className="p-1.5 text-amber-700 hover:text-amber-900 rounded-lg hover:bg-amber-100 transition cursor-pointer"
                     title={showPassword ? 'Hide passcode' : 'Show passcode'}
+                    aria-label={showPassword ? 'Hide passcode' : 'Show passcode'}
                   >
                     {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                   </button>
@@ -223,6 +225,7 @@ Verify on-chain: ${verificationUrl}`;
                     onClick={handleCopyPassword}
                     className="p-1.5 text-amber-700 hover:text-amber-900 rounded-lg hover:bg-amber-100 transition cursor-pointer"
                     title="Copy passcode to clipboard"
+                    aria-label="Copy passcode to clipboard"
                   >
                     {isCopiedPassword ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
@@ -235,7 +238,7 @@ Verify on-chain: ${verificationUrl}`;
                 disabled={isDownloading}
                 className="h-10 px-4.5 shrink-0 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition active:scale-[0.98] disabled:opacity-50 cursor-pointer"
               >
-                <Download className="h-4 w-4" />
+                <Download aria-hidden="true" className="h-4 w-4" />
                 <span>{isDownloading ? 'Encrypting PDF...' : 'Download Encrypted PDF'}</span>
               </button>
             </div>
@@ -264,7 +267,7 @@ Verify on-chain: ${verificationUrl}`;
             >
               <div className="flex items-center space-x-2.5 min-w-0">
                 <div className="p-1.5 bg-emerald-50 group-hover:bg-emerald-100 text-emerald-700 rounded-lg transition shrink-0">
-                  <Share2 className="h-4 w-4" />
+                  <Share2 aria-hidden="true" className="h-4 w-4" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs sm:text-sm font-semibold text-gray-900 block group-hover:text-emerald-700 transition truncate">
@@ -277,10 +280,10 @@ Verify on-chain: ${verificationUrl}`;
               </div>
               {shareSuccess ? (
                 <span className="text-xs font-medium text-emerald-600 flex items-center gap-1 shrink-0 ml-2">
-                  <Check className="h-3.5 w-3.5" /> Shared!
+                  <Check aria-hidden="true" className="h-3.5 w-3.5" /> Shared!
                 </span>
               ) : (
-                <Sparkles className="h-4 w-4 text-emerald-500 opacity-60 group-hover:opacity-100 shrink-0 ml-2" />
+                <Sparkles aria-hidden="true" className="h-4 w-4 text-emerald-500 opacity-60 group-hover:opacity-100 shrink-0 ml-2" />
               )}
             </button>
 
@@ -292,7 +295,7 @@ Verify on-chain: ${verificationUrl}`;
             >
               <div className="flex items-center space-x-2.5 min-w-0">
                 <div className="p-1.5 bg-blue-50 group-hover:bg-blue-100 text-blue-700 rounded-lg transition shrink-0">
-                  <Copy className="h-4 w-4" />
+                  <Copy aria-hidden="true" className="h-4 w-4" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs sm:text-sm font-semibold text-gray-900 block group-hover:text-blue-700 transition truncate">
@@ -305,10 +308,10 @@ Verify on-chain: ${verificationUrl}`;
               </div>
               {isCopiedLink ? (
                 <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 shrink-0 ml-2">
-                  <Check className="h-3.5 w-3.5" /> Copied!
+                  <Check aria-hidden="true" className="h-3.5 w-3.5" /> Copied!
                 </span>
               ) : (
-                <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-500 shrink-0 ml-2" />
+                <ExternalLink aria-hidden="true" className="h-4 w-4 text-gray-400 group-hover:text-blue-500 shrink-0 ml-2" />
               )}
             </button>
 
@@ -320,7 +323,7 @@ Verify on-chain: ${verificationUrl}`;
             >
               <div className="flex items-center space-x-2.5 min-w-0">
                 <div className="p-1.5 bg-purple-50 group-hover:bg-purple-100 text-purple-700 rounded-lg transition shrink-0">
-                  <FileText className="h-4 w-4" />
+                  <FileText aria-hidden="true" className="h-4 w-4" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs sm:text-sm font-semibold text-gray-900 block group-hover:text-purple-700 transition truncate">
@@ -333,10 +336,10 @@ Verify on-chain: ${verificationUrl}`;
               </div>
               {isCopiedSummary ? (
                 <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 shrink-0 ml-2">
-                  <Check className="h-3.5 w-3.5" /> Copied!
+                  <Check aria-hidden="true" className="h-3.5 w-3.5" /> Copied!
                 </span>
               ) : (
-                <Copy className="h-4 w-4 text-gray-400 group-hover:text-purple-500 shrink-0 ml-2" />
+                <Copy aria-hidden="true" className="h-4 w-4 text-gray-400 group-hover:text-purple-500 shrink-0 ml-2" />
               )}
             </button>
           </div>

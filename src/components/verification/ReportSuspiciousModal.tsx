@@ -189,7 +189,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
         /* Rich Interactive Success State */
         <div className="py-6 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
           <div className="w-20 h-20 bg-emerald-100 text-emerald-800 rounded-3xl flex items-center justify-center mx-auto border-2 border-emerald-300 shadow-lg shadow-emerald-900/10">
-            <CheckCircle2 size={44} />
+            <CheckCircle2 size={44} aria-hidden="true" />
           </div>
 
           <div className="space-y-1.5">
@@ -214,7 +214,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 onClick={handleCopyTicket}
                 className="flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer"
               >
-                {copiedTicket ? <Check size={13} /> : <Copy size={13} />}
+                {copiedTicket ? <Check size={13} aria-hidden="true" /> : <Copy size={13} aria-hidden="true" />}
                 <span>{copiedTicket ? 'Copied' : 'Copy Ticket'}</span>
               </button>
             </div>
@@ -239,7 +239,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
           </div>
 
           <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3.5 max-w-md mx-auto text-left flex items-start gap-3 text-xs text-emerald-950">
-            <Clock size={18} className="text-emerald-700 shrink-0 mt-0.5" />
+            <Clock size={18} aria-hidden="true" className="text-emerald-700 shrink-0 mt-0.5" />
             <div>
               <span className="font-bold">Next Steps & Governance Protocol:</span>
               <div className="text-slate-600 mt-0.5">
@@ -289,26 +289,33 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
           {/* Section 1: Interactive Reason Tiles */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-slate-700 flex items-center justify-between">
-              <span>1. Select Incident Reason *</span>
+              <span id="report-reason-label">1. Select Incident Reason *</span>
               <span className="text-[11px] font-medium text-slate-500">Pick the closest issue</span>
             </label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div
+              role="radiogroup"
+              aria-labelledby="report-reason-label"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
+            >
               {INCIDENT_CATEGORIES.map(cat => {
                 const isSelected = reason === cat.id;
                 const Icon = cat.icon;
                 return (
-                  <div
+                  <button
                     key={cat.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     onClick={() => setReason(cat.id)}
-                    className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 relative ${
+                    className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 relative text-left w-full ${
                       isSelected
                         ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-600/10'
                         : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
                     }`}
                   >
                     <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                      <Icon size={18} />
+                      <Icon size={18} aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0 pr-4">
                       <div className="flex items-center justify-between">
@@ -318,10 +325,10 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                     </div>
                     {isSelected && (
                       <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center">
-                        <Check size={10} strokeWidth={3} />
+                        <Check size={10} strokeWidth={3} aria-hidden="true" />
                       </div>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -331,12 +338,13 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
             {/* Severity Selector */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">
+              <label id="report-severity-label" className="block text-xs font-bold text-slate-700">
                 Incident Severity Level:
               </label>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div role="group" aria-labelledby="report-severity-label" className="grid grid-cols-3 gap-1.5">
                 <button
                   type="button"
+                  aria-pressed={severity === 'LOW'}
                   onClick={() => setSeverity('LOW')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                     severity === 'LOW'
@@ -348,6 +356,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 </button>
                 <button
                   type="button"
+                  aria-pressed={severity === 'MEDIUM'}
                   onClick={() => setSeverity('MEDIUM')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                     severity === 'MEDIUM'
@@ -359,6 +368,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 </button>
                 <button
                   type="button"
+                  aria-pressed={severity === 'CRITICAL'}
                   onClick={() => setSeverity('CRITICAL')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                     severity === 'CRITICAL'
@@ -373,12 +383,13 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
 
             {/* Purchase Location */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">
+              <label htmlFor="report-purchase-location" className="block text-xs font-bold text-slate-700">
                 Purchase Store / Online Vendor:
               </label>
               <div className="relative">
-                <Store size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Store size={14} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
+                  id="report-purchase-location"
                   type="text"
                   value={purchaseLocation}
                   onChange={e => setPurchaseLocation(e.target.value)}
@@ -391,11 +402,12 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
 
           {/* Section 3: Description of Issue */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700 flex items-center justify-between">
+            <label htmlFor="report-details" className="block text-xs font-bold text-slate-700 flex items-center justify-between">
               <span>Detailed Description of Issue *</span>
               <span className="text-[11px] font-normal text-slate-400">Be as specific as possible</span>
             </label>
             <textarea
+              id="report-details"
               required
               rows={3}
               value={description}
@@ -414,7 +426,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
             {attachedFile ? (
               <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 truncate">
-                  <Paperclip size={15} className="text-emerald-700 shrink-0" />
+                  <Paperclip size={15} aria-hidden="true" className="text-emerald-700 shrink-0" />
                   <span className="truncate">{attachedFile}</span>
                   <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">2.4 MB</span>
                 </div>
@@ -423,21 +435,23 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                   onClick={handleRemoveAttached}
                   className="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
                   title="Remove attached evidence"
+                  aria-label="Remove attached evidence"
                 >
-                  <Trash2 size={15} />
+                  <Trash2 size={15} aria-hidden="true" />
                 </button>
               </div>
             ) : (
-              <div
+              <button
+                type="button"
                 onClick={handleAttachSimulatedPhoto}
-                className="border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/30 p-3.5 rounded-2xl text-center cursor-pointer transition-all group"
+                className="w-full border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/30 p-3.5 rounded-2xl text-center cursor-pointer transition-all group"
               >
                 <div className="flex items-center justify-center gap-2 text-xs text-slate-600 group-hover:text-emerald-800 font-semibold">
-                  <UploadCloud size={16} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                  <UploadCloud size={16} aria-hidden="true" className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
                   <span>Click to attach packaging photo, QR snapshot, or invoice proof</span>
                 </div>
                 <span className="text-[10px] text-slate-400 block mt-0.5">PNG, JPG, or PDF up to 10MB</span>
-              </div>
+              </button>
             )}
           </div>
 
@@ -448,8 +462,9 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="block text-[11px] font-bold text-slate-600">Your Full Name *</label>
+                <label htmlFor="report-name" className="block text-[11px] font-bold text-slate-600">Your Full Name *</label>
                 <input
+                  id="report-name"
                   type="text"
                   required
                   value={name}
@@ -459,8 +474,9 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-[11px] font-bold text-slate-600">Contact Email *</label>
+                <label htmlFor="report-email" className="block text-[11px] font-bold text-slate-600">Contact Email *</label>
                 <input
+                  id="report-email"
                   type="email"
                   required
                   value={email}
@@ -474,7 +490,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
 
           {/* Consortium Protocol Assurance Banner */}
           <div className="bg-amber-50/80 border border-amber-300 rounded-2xl p-3.5 flex items-start gap-3 text-amber-950 text-xs">
-            <ShieldAlert size={18} className="text-amber-700 shrink-0 mt-0.5" />
+            <ShieldAlert size={18} aria-hidden="true" className="text-amber-700 shrink-0 mt-0.5" />
             <div>
               <span className="font-bold">Cryptographic Governance Notice:</span> Verified fraud reports trigger smart contract holds on pending distributor batches and activate physical lot quarantine protocols.
             </div>
@@ -498,7 +514,7 @@ export const ReportSuspiciousModal: React.FC<ReportSuspiciousModalProps> = ({
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <Send size={14} />
+                  <Send size={14} aria-hidden="true" />
                   <span>Transmit Incident Report to Admin Node</span>
                 </>
               )}

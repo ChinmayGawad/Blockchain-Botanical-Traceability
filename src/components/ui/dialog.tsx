@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useModalA11y } from '@/hooks/useModalA11y';
 
 interface DialogProps {
   open: boolean;
@@ -11,6 +12,7 @@ interface DialogProps {
 interface DialogContextType {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  titleId?: string;
 }
 
 const DialogContext = React.createContext<DialogContextType | null>(null);
@@ -44,56 +46,50 @@ export const DialogContent: React.FC<
   const context = React.useContext(DialogContext);
   if (!context) throw new Error('DialogContent must be used within Dialog');
 
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        context.onOpenChange(false);
-      }
-    };
-    if (context.open) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [context.open]);
+  const titleId = React.useId();
+  const panelRef = useModalA11y<HTMLDivElement>(context.open, () =>
+    context.onOpenChange(false)
+  );
 
   if (!context.open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-      role="dialog"
-      aria-modal="true"
-    >
-      {/* Backdrop */}
+    <DialogContext.Provider value={{ ...context, titleId }}>
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in"
-        onClick={() => context.onOpenChange(false)}
-        aria-hidden="true"
-      />
-
-      {/* Modal Surface */}
-      <div
-        className={cn(
-          'relative z-50 w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl transition-all duration-200 animate-in zoom-in-95',
-          className
-        )}
-        {...props}
+        ref={panelRef}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
       >
-        {children}
-        <button
-          type="button"
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in"
           onClick={() => context.onOpenChange(false)}
-          aria-label="Close dialog"
-          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[36px] min-w-[36px] flex items-center justify-center"
+          aria-hidden="true"
+        />
+
+        {/* Modal Surface */}
+        <div
+          className={cn(
+            'relative z-50 w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl transition-all duration-200 animate-in zoom-in-95 focus:outline-none',
+            className
+          )}
+          {...props}
         >
-          <X className="h-4 w-4" />
-        </button>
+          {children}
+          <button
+            type="button"
+            onClick={() => context.onOpenChange(false)}
+            aria-label="Close dialog"
+            className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[36px] min-w-[36px] flex items-center justify-center"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
-    </div>
+    </DialogContext.Provider>
   );
 };
 
@@ -122,13 +118,18 @@ export const DialogFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 
 export const DialogTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   className,
+  id,
   ...props
-}) => (
-  <h2
-    className={cn('text-xl font-bold tracking-tight text-foreground', className)}
-    {...props}
-  />
-);
+}) => {
+  const context = React.useContext(DialogContext);
+  return (
+    <h2
+      id={id ?? context?.titleId}
+      className={cn('text-xl font-bold tracking-tight text-foreground', className)}
+      {...props}
+    />
+  );
+};
 
 export const DialogDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({
   className,

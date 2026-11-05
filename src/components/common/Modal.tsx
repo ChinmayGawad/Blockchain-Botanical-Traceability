@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useId } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useModalA11y } from '@/hooks/useModalA11y';
 
 interface ModalProps {
   isOpen: boolean;
@@ -20,19 +21,8 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   maxWidth = 'lg',
 }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const titleId = useId();
+  const a11yRef = useModalA11y<HTMLDivElement>(isOpen, onClose);
 
   const widthClasses: Record<string, string> = {
     sm: 'max-w-sm',
@@ -56,20 +46,26 @@ export const Modal: React.FC<ModalProps> = ({
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
             onClick={onClose}
+            aria-hidden="true"
           />
 
           {/* Modal Dialog */}
           <motion.div
+            ref={a11yRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className={`relative w-full ${widthClasses[maxWidth] || 'max-w-lg'} bg-white rounded-3xl shadow-2xl border border-slate-200 z-10 my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden`}
+            className={`relative w-full ${widthClasses[maxWidth] || 'max-w-lg'} bg-white rounded-3xl shadow-2xl border border-slate-200 z-10 my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] flex flex-col overflow-hidden focus:outline-none`}
           >
             {/* Header */}
             <div className="shrink-0 flex items-start justify-between px-6 py-3.5 border-b border-slate-100 bg-slate-50/70">
               <div>
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                <h3 id={titleId} className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                   {title}
                 </h3>
                 {subtitle && (

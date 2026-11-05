@@ -59,7 +59,7 @@ export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product, onSh
           className="bg-white border-2 border-dashed border-emerald-300 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center space-y-4"
         >
           <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            <ShieldCheck size={14} className="text-emerald-600" /> FloraChain Authenticity Tag
+            <ShieldCheck size={14} aria-hidden="true" className="text-emerald-600" /> FloraChain Authenticity Tag
           </div>
 
           <div className="p-4 bg-white rounded-xl shadow-md border border-slate-100 inline-block">
@@ -92,11 +92,12 @@ export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product, onSh
 
         {/* Verification Link Input */}
         <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-left">
-          <label className="text-xs font-semibold text-slate-600 block mb-1">
+          <label htmlFor="qr-verification-url" className="text-xs font-semibold text-slate-600 block mb-1">
             Consumer Scan / Direct Verification URL:
           </label>
           <div className="flex items-center gap-2">
             <input
+              id="qr-verification-url"
               type="text"
               readOnly
               value={verificationUrl}
@@ -106,7 +107,7 @@ export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product, onSh
               onClick={copyUrl}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
             >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
+              {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
@@ -119,7 +120,7 @@ export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product, onSh
             onClick={onShareReport}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-sm font-semibold transition-colors shadow-2xs"
           >
-            <Share2 size={16} className="text-emerald-700" />
+            <Share2 size={16} aria-hidden="true" className="text-emerald-700" />
             <span>Share Password-Protected CoA Monograph</span>
           </button>
         )}
@@ -130,14 +131,14 @@ export const QRModal: React.FC<QRModalProps> = ({ isOpen, onClose, product, onSh
             onClick={handleDownloadSVG}
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-semibold transition-colors shadow-2xs"
           >
-            <Download size={16} />
+            <Download size={16} aria-hidden="true" />
             <span>Download SVG</span>
           </button>
           <button
             onClick={handlePrint}
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
           >
-            <Printer size={16} />
+            <Printer size={16} aria-hidden="true" />
             <span>Print Label</span>
           </button>
         </div>

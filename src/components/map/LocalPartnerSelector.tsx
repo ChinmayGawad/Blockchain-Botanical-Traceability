@@ -333,8 +333,8 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
           <div className="bg-white p-4 rounded-xl border border-emerald-100 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div>
-                <label className="text-sm font-semibold text-emerald-950 flex items-center gap-2">
-                  <Search size={16} className="text-emerald-600 shrink-0" />
+                <label htmlFor="search-radius" className="text-sm font-semibold text-emerald-950 flex items-center gap-2">
+                  <Search size={16} aria-hidden="true" className="text-emerald-600 shrink-0" />
                   <span>Search Radius:</span>
                   <span className="font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
                     {radiusKm} km
@@ -346,6 +346,7 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
               </div>
               <div className="w-full sm:w-56">
                 <input
+                  id="search-radius"
                   type="range"
                   min="25"
                   max="1500"
@@ -412,14 +413,14 @@ export const LocalPartnerSelector: React.FC<LocalPartnerSelectorProps> = ({
                         <div className={`mt-0.5 rounded-full p-1 flex-shrink-0 ${
                           selected?.id === partner.id ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'
                         }`}>
-                          <CheckCircle2 size={16} />
+                          <CheckCircle2 size={16} aria-hidden="true" />
                         </div>
                         <div>
                           <div className={`text-sm font-medium ${selected?.id === partner.id ? 'text-emerald-900' : 'text-slate-700'}`}>
                             {partner.name}
                           </div>
                           <div className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                            <MapPin size={12} />
+                            <MapPin size={12} aria-hidden="true" />
                             {partner.distanceKm.toFixed(1)} km away
                           </div>
                         </div>

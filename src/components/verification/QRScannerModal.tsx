@@ -285,7 +285,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
         {cameraStatus === 'prompting' && (
           <div className="p-3.5 bg-emerald-50 border border-emerald-300 text-emerald-950 rounded-2xl flex items-start gap-3 text-xs animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="p-1.5 bg-emerald-600 text-white rounded-lg shrink-0 mt-0.5 animate-pulse">
-              <Camera size={16} />
+              <Camera size={16} aria-hidden="true" />
             </div>
             <div className="space-y-1">
               <p className="font-bold text-emerald-900">Camera Permission Requested</p>
@@ -300,7 +300,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
         {cameraStatus === 'denied' && (
           <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-950 rounded-2xl flex items-start gap-3 text-xs animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="p-1.5 bg-rose-600 text-white rounded-lg shrink-0 mt-0.5">
-              <AlertCircle size={16} />
+              <AlertCircle size={16} aria-hidden="true" />
             </div>
             <div className="space-y-2 flex-1">
               <div>
@@ -315,7 +315,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                   onClick={() => requestCameraAccess()}
                   className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-[11px] font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                 >
-                  <RefreshCw size={13} />
+                  <RefreshCw size={13} aria-hidden="true" />
                   <span>Retry Camera Permission</span>
                 </button>
                 <button
@@ -334,7 +334,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
         {(cameraStatus === 'unsupported' || cameraStatus === 'error') && (
           <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-950 rounded-2xl flex items-start gap-3 text-xs animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="p-1.5 bg-amber-600 text-white rounded-lg shrink-0 mt-0.5">
-              <VideoOff size={16} />
+              <VideoOff size={16} aria-hidden="true" />
             </div>
             <div className="space-y-2 flex-1">
               <div>
@@ -351,7 +351,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                   onClick={startSimulatedScan}
                   className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-[11px] font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                 >
-                  <Sparkles size={13} />
+                  <Sparkles size={13} aria-hidden="true" />
                   <span>Simulate Quick Scan (Demo)</span>
                 </button>
               </div>
@@ -363,7 +363,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
         {cameraStatus === 'success' && (
           <div className="p-3.5 bg-emerald-100 border border-emerald-400 text-emerald-950 rounded-2xl flex items-center gap-3 text-xs animate-in zoom-in-95 duration-200 shadow-sm">
             <div className="p-1.5 bg-emerald-600 text-white rounded-lg shrink-0">
-              <CheckCircle2 size={18} />
+              <CheckCircle2 size={18} aria-hidden="true" />
             </div>
             <div>
               <p className="font-bold text-emerald-900">QR Code Verified!</p>
@@ -422,7 +422,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
             {cameraStatus !== 'streaming' ? (
               <>
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-3 shadow-inner">
-                  <Camera size={28} className={cameraStatus === 'prompting' ? 'animate-pulse' : ''} />
+                  <Camera size={28} aria-hidden="true" className={cameraStatus === 'prompting' ? 'animate-pulse' : ''} />
                 </div>
 
                 <p className="text-sm font-bold text-white">
@@ -441,7 +441,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                     disabled={cameraStatus === 'prompting'}
                     className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md cursor-pointer active:scale-95"
                   >
-                    <Camera size={16} />
+                    <Camera size={16} aria-hidden="true" />
                     <span>
                       {cameraStatus === 'prompting' ? 'Requesting Access...' : 'Activate Camera Scanner'}
                     </span>
@@ -454,7 +454,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                     className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
                     title="Simulate scanning a sample batch without camera"
                   >
-                    <Sparkles size={14} className="text-emerald-400" />
+                    <Sparkles size={14} aria-hidden="true" className="text-emerald-400" />
                     <span>Demo Scan</span>
                   </button>
                 </div>
@@ -467,7 +467,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                   className="px-3 py-1.5 bg-slate-900/80 hover:bg-slate-800 text-white border border-slate-700 rounded-xl text-xs font-medium flex items-center gap-1.5 backdrop-blur-md cursor-pointer transition-colors shadow-sm"
                   title="Switch between front and rear cameras"
                 >
-                  <SwitchCamera size={14} className="text-emerald-400" />
+                  <SwitchCamera size={14} aria-hidden="true" className="text-emerald-400" />
                   <span>Switch Camera</span>
                 </button>
 
@@ -476,7 +476,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                   onClick={stopCameraStream}
                   className="px-3 py-1.5 bg-rose-600/85 hover:bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 backdrop-blur-md cursor-pointer transition-colors shadow-sm"
                 >
-                  <VideoOff size={14} />
+                  <VideoOff size={14} aria-hidden="true" />
                   <span>Stop Camera</span>
                 </button>
               </div>
@@ -486,11 +486,12 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
 
         {/* Manual ID Search */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-slate-700">
+          <label htmlFor="manual-batch-code" className="block text-xs font-bold text-slate-700">
             Or enter Product ID / Batch Code manually:
           </label>
           <form onSubmit={handleManualSubmit} className="flex gap-2">
             <input
+              id="manual-batch-code"
               type="text"
               placeholder="e.g. BOT-2024-8901 or ASH-2024-089"
               value={manualCode}
@@ -502,7 +503,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
               className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shrink-0 shadow-sm cursor-pointer"
             >
               <span>Verify</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={15} aria-hidden="true" />
             </button>
           </form>
         </div>
@@ -510,7 +511,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
         {/* Quick Demo Samples */}
         <div className="space-y-2 pt-2 border-t border-slate-100">
           <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles size={13} className="text-emerald-700" /> Click to Test Demo Batches:
+            <Sparkles size={13} aria-hidden="true" className="text-emerald-700" /> Click to Test Demo Batches:
           </span>
 
           <div className="space-y-2">
@@ -542,7 +543,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose 
                   <span className="text-xs font-bold text-slate-700 capitalize">
                     {product.status.replace('_', ' ').toLowerCase()}
                   </span>
-                  <ArrowRight size={14} className="text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight size={14} aria-hidden="true" className="text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all" />
                 </div>
               </button>
             ))}
